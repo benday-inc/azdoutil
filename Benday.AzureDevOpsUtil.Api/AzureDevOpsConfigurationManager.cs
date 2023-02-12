@@ -80,6 +80,29 @@ public class AzureDevOpsConfigurationManager
         }
     }
 
+    public AzureDevOpsConfiguration[] GetAll()
+    {
+        if (File.Exists(PathToConfigurationFile) == false)
+        {
+            return new AzureDevOpsConfiguration[] { };
+        }
+        else
+        {
+            var json = File.ReadAllText(PathToConfigurationFile);
+
+            var configs = JsonSerializer.Deserialize<AzureDevOpsConfiguration[]>(json);
+
+            if (configs == null || configs.Length == 0)
+            {
+                return new AzureDevOpsConfiguration[] { };
+            }
+            else
+            {
+                return configs;
+            }
+        }
+    }
+
     public void Save(AzureDevOpsConfiguration config)
     {
         if (config is null)

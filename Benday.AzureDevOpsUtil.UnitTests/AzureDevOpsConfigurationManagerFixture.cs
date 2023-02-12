@@ -140,4 +140,32 @@ public class AzureDevOpsConfigurationManagerFixture
 
         Assert.IsNull(actual, $"Should not find configuration named 'config2'");
     }
+
+    [TestMethod]
+    public void GetAll()
+    {
+        // arrange
+        _SystemUnderTest = Utilities.InitializeTestModeConfigurationManager();
+
+        SystemUnderTest.Save(new AzureDevOpsConfiguration()
+        {
+            Name = "config1",
+            CollectionUrl = "url1",
+            Token = "token1"
+        });
+
+        SystemUnderTest.Save(new AzureDevOpsConfiguration()
+        {
+            Name = "config2",
+            CollectionUrl = "url2",
+            Token = "token2"
+        });
+
+        // act
+        var actual = SystemUnderTest.GetAll();
+
+        // assert
+        Assert.IsNotNull(actual);
+        Assert.AreEqual<int>(2, actual.Length, "Config count was wrong.");
+    }
 }
