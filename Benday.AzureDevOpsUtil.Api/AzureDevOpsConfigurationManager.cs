@@ -1,7 +1,23 @@
-﻿namespace Benday.AzureDevOpsUtil.Api;
+﻿using System.Text.Json;
+
+namespace Benday.AzureDevOpsUtil.Api;
 
 public class AzureDevOpsConfigurationManager
 {
+    public static AzureDevOpsConfigurationManager Instance
+    {
+        get
+        {
+            if (_Instance == null)
+            {
+                _Instance = new AzureDevOpsConfigurationManager();
+            }
+
+            return _Instance;
+        }
+        set => _Instance = value;
+    }
+
     public AzureDevOpsConfigurationManager()
     {
 
@@ -13,6 +29,7 @@ public class AzureDevOpsConfigurationManager
     }
 
     private string? _PathToConfigurationFile;
+    private static AzureDevOpsConfigurationManager? _Instance;
 
     // Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)
     public string PathToConfigurationFile
@@ -30,5 +47,35 @@ public class AzureDevOpsConfigurationManager
         }
 
         private set => _PathToConfigurationFile = value;
+    }
+
+    public AzureDevOpsConfiguration? Get(string name = Constants.DefaultConfigurationName)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException($"'{nameof(name)}' cannot be null or whitespace.", nameof(name));
+        }
+
+        if (File.Exists(PathToConfigurationFile) == false)
+        {
+            return null;
+        }
+        else
+        {
+            var json = File.ReadAllText(PathToConfigurationFile);
+
+            var configs = JsonSerializer.Deserialize<AzureDevOpsConfiguration[]>(json);
+
+            if (configs == null || configs.Length == 0)
+            {
+                return null;
+            }
+            else
+            {
+                var match = configs.Where(x => x.Name == name).FirstOrDefault();
+
+                return match;
+            }
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Benday.AzureDevOpsUtil.Api;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Benday.AzureDevOpsUtil.UnitTests;
 
 [TestClass]
@@ -10,7 +11,7 @@ public class AzureDevOpsConfigurationManagerFixture
         _SystemUnderTest = null;
     }
 
-    private AzureDevOpsConfigurationManager _SystemUnderTest;
+    private AzureDevOpsConfigurationManager? _SystemUnderTest;
 
     private AzureDevOpsConfigurationManager SystemUnderTest
     {
