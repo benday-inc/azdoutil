@@ -31,4 +31,14 @@ public class Utilities
 
         return manager;
     }
+
+    public static void AssertFileExists(string path)
+    {
+        Assert.IsTrue(File.Exists(path), $"File does not exist '{path}'");
+    }
+
+    public static void AssertFileDoesNotExist(string path)
+    {
+        Assert.IsFalse(File.Exists(path), $"File should not exist '{path}'");
+    }
 }

@@ -129,6 +129,18 @@ public class AzureDevOpsConfigurationManager
 
     private void Save(List<AzureDevOpsConfiguration> configurations)
     {
+        var dirName = Path.GetDirectoryName(PathToConfigurationFile);
+
+        if (dirName == null)
+        {
+            throw new InvalidOperationException($"Could not establish directory.");
+        }
+
+        if (Directory.Exists(dirName)== false)
+        {
+            Directory.CreateDirectory(dirName);
+        }
+
         var json = JsonSerializer.Serialize<AzureDevOpsConfiguration[]>(configurations.ToArray());
 
         File.WriteAllText(PathToConfigurationFile, json);

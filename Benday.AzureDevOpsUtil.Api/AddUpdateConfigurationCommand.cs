@@ -31,6 +31,21 @@ public class AddUpdateConfigurationCommand : SynchronousCommand
 
     protected override void OnExecute()
     {
-        throw new NotImplementedException();
+        var configName = Constants.DefaultConfigurationName;
+
+        if (Arguments[Constants.ArgumentNameConfigurationName].HasValue == true)
+        {
+            configName =
+                Arguments[Constants.ArgumentNameConfigurationName].Value;
+        }
+
+        var config = new AzureDevOpsConfiguration()
+        {
+            CollectionUrl = Arguments[Constants.ArgumentNameCollectionUrl].Value,
+            Token = Arguments[Constants.ArgumentNameToken].Value,
+            Name = configName
+        };
+
+        AzureDevOpsConfigurationManager.Instance.Save(config);
     }
 }

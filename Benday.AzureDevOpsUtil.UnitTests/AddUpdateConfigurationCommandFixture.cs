@@ -60,6 +60,8 @@ public class AddUpdateConfigurationCommandFixture
     public void AddNamedConfiguration()
     {
         // arrange
+        Utilities.AssertFileDoesNotExist(ConfigurationManager.PathToConfigurationFile);
+
         var expectedConfigurationName = "config123";
         var expectedToken = "token-value";
         var expectedUrl = "https://dev.azure.com/benday";
@@ -78,6 +80,7 @@ public class AddUpdateConfigurationCommandFixture
         _SystemUnderTest.Execute();
 
         // assert        
+        Utilities.AssertFileExists(ConfigurationManager.PathToConfigurationFile);
         var output = OutputProvider.GetOutput();
         Console.WriteLine(output);
 
@@ -93,6 +96,8 @@ public class AddUpdateConfigurationCommandFixture
     public void AddDefaultConfiguration()
     {
         // arrange
+        Utilities.AssertFileDoesNotExist(ConfigurationManager.PathToConfigurationFile);
+
         var expectedConfigurationName = Constants.DefaultConfigurationName;
         var expectedToken = "token-value";
         var expectedUrl = "https://dev.azure.com/benday";
@@ -110,6 +115,7 @@ public class AddUpdateConfigurationCommandFixture
         _SystemUnderTest.Execute();
 
         // assert        
+        Utilities.AssertFileExists(ConfigurationManager.PathToConfigurationFile);
         var output = OutputProvider.GetOutput();
         Console.WriteLine(output);
 

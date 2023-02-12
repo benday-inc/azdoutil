@@ -63,13 +63,13 @@ public class AzureDevOpsConfigurationManagerFixture
         };
 
 
-        AssertFileDoesNotExist(SystemUnderTest.PathToConfigurationFile);
+        Utilities.AssertFileDoesNotExist(SystemUnderTest.PathToConfigurationFile);
 
         // act
         SystemUnderTest.Save(config);
 
         // assert
-        AssertFileExists(SystemUnderTest.PathToConfigurationFile);
+        Utilities.AssertFileExists(SystemUnderTest.PathToConfigurationFile);
 
         var actual = SystemUnderTest.Get(expectedConfigurationName);
 
@@ -77,17 +77,7 @@ public class AzureDevOpsConfigurationManagerFixture
         Assert.AreEqual(expectedConfigurationName, actual.Name, "Config name was wrong");
         Assert.AreEqual(expectedUrl, actual.CollectionUrl, "Collection url was wrong");
         Assert.AreEqual(expectedToken, actual.Token, "Token was wrong");
-    }
-
-    private void AssertFileExists(string path)
-    {
-        Assert.IsTrue(File.Exists(path), $"File does not exist '{path}'");
-    }
-
-    private void AssertFileDoesNotExist(string path)
-    {
-        Assert.IsFalse(File.Exists(path), $"File should not exist '{path}'");
-    }
+    }    
 
     [TestMethod]
     public void AddConfig_Named()
@@ -106,13 +96,13 @@ public class AzureDevOpsConfigurationManagerFixture
             Name = expectedConfigurationName
         };
 
-        AssertFileDoesNotExist(SystemUnderTest.PathToConfigurationFile);
+        Utilities.AssertFileDoesNotExist(SystemUnderTest.PathToConfigurationFile);
 
         // act
         SystemUnderTest.Save(config);
 
         // assert
-        AssertFileExists(SystemUnderTest.PathToConfigurationFile);
+        Utilities.AssertFileExists(SystemUnderTest.PathToConfigurationFile);
 
         var actual = SystemUnderTest.Get(expectedConfigurationName);
 
