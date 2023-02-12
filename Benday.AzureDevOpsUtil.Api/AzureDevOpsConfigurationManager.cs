@@ -127,6 +127,45 @@ public class AzureDevOpsConfigurationManager
         Save(configurations);
     }
 
+    public void Remove(string configName)
+    {
+        if (string.IsNullOrEmpty(configName))
+        {
+            throw new ArgumentException($"'{nameof(configName)}' cannot be null or empty.", nameof(configName));
+        }
+
+        List<AzureDevOpsConfiguration> configurations;
+
+        if (File.Exists(PathToConfigurationFile) == true)
+        {
+            var json = File.ReadAllText(PathToConfigurationFile);
+
+            var configs = JsonSerializer.Deserialize<AzureDevOpsConfiguration[]>(json);
+
+            if (configs == null || configs.Length == 0)
+            {
+                configurations = new List<AzureDevOpsConfiguration>();
+            }
+            else
+            {
+                configurations = configs.ToList();
+            }
+        }
+        else
+        {
+            configurations = new List<AzureDevOpsConfiguration>();
+        }
+
+        var match = configurations.Where(x => x.Name == configName).FirstOrDefault();
+
+        if (match != null)
+        {
+            configurations.Remove(match);
+        }
+        
+        Save(configurations);
+    }
+
     private void Save(List<AzureDevOpsConfiguration> configurations)
     {
         var dirName = Path.GetDirectoryName(PathToConfigurationFile);

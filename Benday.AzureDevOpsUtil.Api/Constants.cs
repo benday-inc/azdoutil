@@ -10,6 +10,7 @@ public static class Constants
     
     public const string CommandArgumentNameShowConfig = "showconfig";
     public const string CommandArgumentNameAddUpdateConfig = "addconfig";
+    public const string CommandArgumentNameRemoveConfig = "removeconfig";
 
     public const string ArgumentNameConfigurationName = "name";
     public const string ArgumentNameCollectionUrl = "url";

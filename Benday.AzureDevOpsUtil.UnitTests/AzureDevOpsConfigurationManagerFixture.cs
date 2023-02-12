@@ -111,4 +111,33 @@ public class AzureDevOpsConfigurationManagerFixture
         Assert.AreEqual(expectedUrl, actual.CollectionUrl, "Collection url was wrong");
         Assert.AreEqual(expectedToken, actual.Token, "Token was wrong");
     }
+
+    [TestMethod]
+    public void RemoveConfig()
+    {
+        // arrange
+        _SystemUnderTest = Utilities.InitializeTestModeConfigurationManager();
+
+        SystemUnderTest.Save(new AzureDevOpsConfiguration()
+        {
+            Name = "config1",
+            CollectionUrl = "url1",
+            Token = "token1"
+        });
+
+        SystemUnderTest.Save(new AzureDevOpsConfiguration()
+        {
+            Name = "config2",
+            CollectionUrl = "url2",
+            Token = "token2"
+        });
+
+        // act
+        SystemUnderTest.Remove("config2");
+
+        // assert
+        var actual = SystemUnderTest.Get("config2");
+
+        Assert.IsNull(actual, $"Should not find configuration named 'config2'");
+    }
 }
