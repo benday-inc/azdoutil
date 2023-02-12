@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using System.Xml.Linq;
 
 namespace Benday.AzureDevOpsUtil.Api;
 
@@ -77,5 +78,59 @@ public class AzureDevOpsConfigurationManager
                 return match;
             }
         }
+    }
+
+    public void Save(AzureDevOpsConfiguration config)
+    {
+        if (config is null)
+        {
+            throw new ArgumentNullException(nameof(config));
+        }
+        else if (string.IsNullOrEmpty( config.Name) ==true)
+        {
+            throw new ArgumentException(nameof(config), "Name value not set");
+        }
+
+        List<AzureDevOpsConfiguration> configurations;
+
+        if (File.Exists(PathToConfigurationFile) == true)
+        {
+            var json = File.ReadAllText(PathToConfigurationFile);
+
+            var configs = JsonSerializer.Deserialize<AzureDevOpsConfiguration[]>(json);
+
+            if (configs == null || configs.Length == 0)
+            {
+                configurations = new List<AzureDevOpsConfiguration>();
+            }
+            else
+            {
+                configurations = configs.ToList();
+            }
+        }
+        else
+        {
+            configurations = new List<AzureDevOpsConfiguration>();
+        }
+
+        var match = configurations.Where(x => x.Name == config.Name).FirstOrDefault();
+
+        if (match != null)
+        {
+            configurations.Remove(match);
+        }
+        else
+        {
+            configurations.Add(config);
+        }
+
+        Save(configurations);
+    }
+
+    private void Save(List<AzureDevOpsConfiguration> configurations)
+    {
+        var json = JsonSerializer.Serialize<AzureDevOpsConfiguration[]>(configurations.ToArray());
+
+        File.WriteAllText(PathToConfigurationFile, json);
     }
 }

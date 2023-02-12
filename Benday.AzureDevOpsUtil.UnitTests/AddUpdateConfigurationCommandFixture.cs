@@ -32,29 +32,14 @@ public class AddUpdateConfigurationCommandFixture
         get
         {
             if (_ConfigurationManager == null)
-            {
-                var folderPath =
-                    Path.Combine(
-                        TestContext.TestResultsDirectory,
-                        DateTime.Now.Ticks.ToString());
-
-                if (Directory.Exists(folderPath) == false)
-                {
-                    Directory.CreateDirectory(folderPath);
-                }
-
-                var configPath =
-                    Path.Combine(folderPath, Constants.ConfigFileName);
-
-                _ConfigurationManager = 
-                    new AzureDevOpsConfigurationManager(configPath);
+            {                
+                _ConfigurationManager =
+                    Utilities.InitializeTestModeConfigurationManager();
             }
 
             return _ConfigurationManager;
         }
     }
-
-    public TestContext TestContext { get; set; }
 
     private StringBuilderTextOutputProvider? _OutputProvider;
 
