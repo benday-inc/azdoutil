@@ -20,16 +20,16 @@ public class WorkItemScriptRow
         }
     }
 
-    public string ActionId { get; set; }
-    public string Description { get; set; }
-    public string WorkItemId { get; set; }
-    public string Operation { get; set; }
-    public string WorkItemType { get; set; }
+    public string ActionId { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public string WorkItemId { get; set; } = string.Empty;
+    public string Operation { get; set; } = string.Empty;
+    public string WorkItemType { get; set; } = string.Empty;
     public int ActionDay { get; set; }
     public int ActionHour { get; set; }
     public int ActionMinute { get; set; }
-    public string Refname { get; set; }
-    public string FieldValue { get; set; }
+    public string Refname { get; set; } = string.Empty;
+    public string FieldValue { get; set; } = string.Empty;
     public int ExcelRowId { get; set; }
 
     public override string ToString()

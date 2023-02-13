@@ -12,4 +12,3 @@ public class ClassificationNodeAttributes
     [JsonPropertyName("finishDate")]
     public DateTime FinishDate { get; set; }
 }
-

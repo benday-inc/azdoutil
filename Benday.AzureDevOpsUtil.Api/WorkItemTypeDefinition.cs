@@ -1,3 +1,4 @@
+using Benday.XmlUtilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,11 +14,20 @@ namespace Benday.AzureDevOpsUtil.Api
         public WorkItemTypeDefinition(string path)
         {
             LoadFromFile(path);
+
+            if (_document is null)
+            {
+                throw new InvalidOperationException($"_document is null at end of ctor");
+            }
         }
 
         public WorkItemTypeDefinition(XDocument doc)
         {
             Initialize(doc);
+            if (_document is null)
+            {
+                throw new InvalidOperationException($"_document is null at end of ctor");
+            }
         }
 
         private void Initialize(XDocument doc)
@@ -111,7 +121,9 @@ namespace Benday.AzureDevOpsUtil.Api
 
         public XElement GetWebLayout()
         {
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
             var match = _document.Root.Element("WORKITEMTYPE").Element("FORM").Element("WebLayout");
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
 
             return match;
         }

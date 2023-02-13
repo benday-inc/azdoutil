@@ -27,6 +27,7 @@ public static class Constants
     public const string ArgumentNameQuietMode = "quiet";
     public const int RetryDelayInMillisecs = 100;
 
+    public const string CommandArg_Comment = "comment";
     public const string CommandArg_SkipFutureDates = "skipfuturedates";
     public const string CommandArg_PathToExcel = "pathtoexcel";
     public const string CommandArg_StartDate = "startdate";

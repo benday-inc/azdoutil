@@ -2,6 +2,7 @@
 using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Text;
+using Benday.AzureDevOpsUtil.Api.Messages;
 
 namespace Benday.AzureDevOpsUtil.Api;
 
@@ -14,33 +15,7 @@ public abstract class AzureDevOpsCommandBase : AsynchronousCommand
     {
     }
 
-    protected bool ArgumentBooleanValue(string argumentName)
-    {
-        if (Arguments.ContainsKey(argumentName) == false)
-        {
-            return false;
-        }
-        else
-        {
-            var argAsBool = Arguments[argumentName] as BooleanArgument;
 
-            if (argAsBool == null)
-            {
-                throw new InvalidOperationException($"Cannot call ArgumentBooleanValue() on non-boolean arg '{argumentName}'.");
-            }
-            else
-            {
-                if (argAsBool.HasValue == false)
-                {
-                    return false;
-                }
-                else
-                {
-                    return argAsBool.ValueAsBoolean;
-                }
-            }
-        }
-    }
 
     protected void AddCommonArguments(ArgumentCollection arguments)
     {
@@ -53,8 +28,8 @@ public abstract class AzureDevOpsCommandBase : AsynchronousCommand
             .AsNotRequired().WithDescription("Configuration name to use");
     }
 
-    public bool IsQuietMode 
-    { 
+    public bool IsQuietMode
+    {
         get
         {
             if (Arguments.ContainsKey(Constants.ArgumentNameQuietMode) == true &&
@@ -118,7 +93,7 @@ public abstract class AzureDevOpsCommandBase : AsynchronousCommand
         client.BaseAddress = baseUri;
 
         client.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("Basic", 
+            new AuthenticationHeaderValue("Basic",
             Configuration.GetTokenBase64Encoded());
 
         return client;
@@ -216,5 +191,185 @@ public abstract class AzureDevOpsCommandBase : AsynchronousCommand
         var typedResponse = JsonUtilities.GetJsonValueAsType<TResponse>(responseContent);
 
         return typedResponse!;
+    }
+
+    protected async Task<bool> SendPatchForBody(
+            string requestUrl,
+            WorkItemFieldOperationValueCollection body,
+            bool throwExceptionOnError = true
+            )
+    {
+        try
+        {
+            return await SendPatchForBodySingleAttempt(requestUrl, body, throwExceptionOnError);
+        }
+        catch (Exception ex)
+        {
+            WriteLine($"{nameof(SendPatchForBody)} failed for '{requestUrl}' with error '{ex}'...retrying...");
+
+            await Task.Delay(Constants.RetryDelayInMillisecs);
+
+            var result = await SendPatchForBodySingleAttempt(requestUrl, body, throwExceptionOnError);
+
+            WriteLine($"{nameof(SendPatchForBody)} retry to '{requestUrl}' succeeded.");
+
+            return result;
+        }
+    }
+
+    private async Task<bool> SendPatchForBodySingleAttempt(
+        string requestUrl,
+        WorkItemFieldOperationValueCollection body,
+        bool throwExceptionOnError = true
+        )
+    {
+        if (string.IsNullOrEmpty(requestUrl))
+        {
+            throw new ArgumentException($"{nameof(requestUrl)} is null or empty.", nameof(requestUrl));
+        }
+
+        if ((body == null) || (body.Count == 0))
+        {
+            throw new ArgumentException($"{nameof(body)} is null or empty.", nameof(body));
+        }
+
+        using var client = GetHttpClientInstanceForAzureDevOps();
+
+        string requestAsJson;
+
+
+        requestAsJson = JsonSerializer.Serialize(body.Values);
+
+        var request = new HttpRequestMessage(new HttpMethod("PATCH"), requestUrl)
+        {
+            Content = new StringContent(requestAsJson, Encoding.UTF8, "application/json-patch+json")
+        };
+
+        var result = await client.SendAsync(request);
+
+        if (result.IsSuccessStatusCode == false)
+        {
+            var content = await result.Content.ReadAsStringAsync();
+
+            var likelyDeadlockError = false;
+
+            if (content != null && content.Contains("TF400037") == true)
+            {
+                likelyDeadlockError = true;
+            }
+
+            if (likelyDeadlockError == true)
+            {
+                throw new ServerCallGotDeadlockMessageException(
+                    $"Probable deadlock exception. Problem with server call to {requestUrl}. {result.StatusCode} {result.ReasonPhrase} - {content}");
+            }
+            else if (throwExceptionOnError == true)
+            {
+                throw new InvalidOperationException(
+                    $"Problem with server call to {requestUrl}. {result.StatusCode} {result.ReasonPhrase} - {content}");
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return true;
+        }
+    }
+
+    protected async Task<T> SendPatchForBodyAndGetTypedResponse<T>(
+        string requestUrl,
+        WorkItemFieldOperationValueCollection body, bool writeStringContentToInfo = false,
+        string? optionalDebuggingMessageInfo = null
+        )
+    {
+        try
+        {
+            return await SendPatchForBodyAndGetTypedResponseSingleAttempt<T>(requestUrl, body, writeStringContentToInfo, optionalDebuggingMessageInfo);
+        }
+        catch (Exception ex)
+        {
+            WriteLine($"{nameof(SendPatchForBodyAndGetTypedResponse)} failed for '{requestUrl}' with error '{ex}'...retrying...");
+
+            await Task.Delay(Constants.RetryDelayInMillisecs);
+
+            var result = await SendPatchForBodyAndGetTypedResponseSingleAttempt<T>(requestUrl, body, writeStringContentToInfo, optionalDebuggingMessageInfo);
+
+            WriteLine($"{nameof(SendPatchForBodyAndGetTypedResponse)} retry to '{requestUrl}' succeeded.");
+
+            return result;
+        }
+    }
+
+    protected async Task<T> SendPatchForBodyAndGetTypedResponseSingleAttempt<T>(
+        string requestUrl,
+        WorkItemFieldOperationValueCollection body, bool writeStringContentToInfo = false,
+        string? optionalDebuggingMessageInfo = null
+        )
+    {
+        if (string.IsNullOrEmpty(requestUrl))
+        {
+            throw new ArgumentException($"{nameof(requestUrl)} is null or empty.", nameof(requestUrl));
+        }
+
+        if ((body == null) || (body.Count == 0))
+        {
+            throw new ArgumentException($"{nameof(body)} is null or empty.", nameof(body));
+        }
+
+        using var client = GetHttpClientInstanceForAzureDevOps();
+
+        string requestAsJson;
+
+        requestAsJson = JsonSerializer.Serialize(body.Values);
+
+        var request = new HttpRequestMessage(new HttpMethod("PATCH"), requestUrl)
+        {
+            Content = new StringContent(requestAsJson, Encoding.UTF8, "application/json-patch+json")
+        };
+
+        var result = await client.SendAsync(request);
+
+        if (result.IsSuccessStatusCode == false)
+        {
+            var content = await result.Content.ReadAsStringAsync();
+
+            if (optionalDebuggingMessageInfo == null)
+            {
+                throw new InvalidOperationException(
+                        $"Problem with server call to {requestUrl}. {result.StatusCode} {result.ReasonPhrase} - {content}");
+            }
+            else
+            {
+                throw new InvalidOperationException(
+                                $"Problem with server call to {requestUrl}. Debug info = '{optionalDebuggingMessageInfo}'.  {result.StatusCode} {result.ReasonPhrase} - {content}");
+
+            }
+        }
+
+        var responseContent = await result.Content.ReadAsStringAsync();
+
+        if (writeStringContentToInfo == true)
+        {
+            WriteLine(responseContent);
+        }
+
+        var typedResponse = JsonUtilities.GetJsonValueAsType<T>(responseContent);
+
+        return typedResponse;
+    }
+
+    protected static void AssertFileExists(string path, string argumentName)
+    {
+        if (File.Exists(path) == false)
+        {
+            var message = string.Format(
+                "File for argument '{0}' was not found.", argumentName);
+
+            throw new FileNotFoundException(
+                message, path);
+        }
     }
 }

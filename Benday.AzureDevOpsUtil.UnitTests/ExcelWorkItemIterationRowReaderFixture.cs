@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Benday.AzureDevOpsUtil.Api.Excel;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 
 namespace Benday.AzureDevOpsUtil.UnitTests;
@@ -22,7 +23,7 @@ public class ExcelWorkItemIterationRowReaderFixture
             {
                 _SystemUnderTest =
                     new ExcelWorkItemIterationRowReader(
-                        new CodeGenerator.Excel.ExcelReader(
+                        new ExcelReader(
                             "C:\\Users\\benday\\OneDrive - Benjamin Day Consulting, Inc\\work-item-script.xlsx"));
             }
 

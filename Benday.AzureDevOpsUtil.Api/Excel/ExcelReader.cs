@@ -5,25 +5,25 @@ namespace Benday.AzureDevOpsUtil.Api.Excel;
 
 public class ExcelReader
 {
-    private readonly string _pathToExcelFile;
-    private List<string> _sheetNames;
+    private readonly string _PathToExcelFile;
+    private List<string> _SheetNames;
 
     public List<string> SheetNames
     {
         get
         {
-            if (_sheetNames == null)
+            if (_SheetNames == null)
             {
                 PopulateSheetNames();
             }
 
-            return _sheetNames;
+            return _SheetNames;
         }
     }
 
     public ExcelReader(string pathToExcelFile)
     {
-        _pathToExcelFile = pathToExcelFile;
+        _PathToExcelFile = pathToExcelFile;
     }
 
     private void PopulateSheetNames()
@@ -33,7 +33,7 @@ public class ExcelReader
         using (var excel = new OfficeOpenXml.ExcelPackage())
         {
             // NOTE: open the file and ignore whether any other process has it open
-            using (var stream = File.Open(_pathToExcelFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            using (var stream = File.Open(_PathToExcelFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
                 excel.Load(stream);
             }
@@ -44,7 +44,7 @@ public class ExcelReader
             }
         }
 
-        _sheetNames = returnValue;
+        _SheetNames = returnValue;
     }
 
     public List<ExcelRowWrapper> GetRows(int sheetIndex)
@@ -58,12 +58,12 @@ public class ExcelReader
     {
         var returnValue = new List<ExcelRowWrapper>();
 
-        ExcelPackage.LicenseContext = LicenseContext.Commercial;
+        ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.Commercial;
 
         using (var excel = new OfficeOpenXml.ExcelPackage())
         {
             // NOTE: open the file and ignore whether any other process has it open
-            using (var stream = File.Open(_pathToExcelFile,
+            using (var stream = File.Open(_PathToExcelFile,
                 FileMode.Open,
                 FileAccess.Read,
                 FileShare.ReadWrite))
@@ -115,7 +115,7 @@ public class ExcelReader
     {
         using var excel = new OfficeOpenXml.ExcelPackage();
         // NOTE: open the file and ignore whether any other process has it open
-        using (var stream = File.Open(_pathToExcelFile,
+        using (var stream = File.Open(_PathToExcelFile,
                                       FileMode.Open,
                                       FileAccess.Read,
                                       FileShare.ReadWrite))
@@ -136,7 +136,7 @@ public class ExcelReader
     {
         if (SheetNames.Contains(sheetName) == false)
         {
-            throw new InvalidOperationException($"Invalid sheet name '{sheetName}' in file '{_pathToExcelFile}'.");
+            throw new InvalidOperationException($"Invalid sheet name '{sheetName}' in file '{_PathToExcelFile}'.");
         }
 
         var sheetIndex = SheetNames.IndexOf(sheetName);
@@ -144,7 +144,7 @@ public class ExcelReader
         var mappings = new Dictionary<string, int>();
 
         // NOTE: open the file and ignore whether any other process has it open
-        using (var stream = File.Open(_pathToExcelFile,
+        using (var stream = File.Open(_PathToExcelFile,
                                       FileMode.Open,
                                       FileAccess.Read,
                                       FileShare.ReadWrite))
@@ -185,7 +185,7 @@ public class ExcelReader
         }
     }
 
-    private string SafeToString(ExcelRange excelRange)
+    private static string SafeToString(ExcelRange excelRange)
     {
         if (excelRange == null || excelRange.Text == null)
         {
