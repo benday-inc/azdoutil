@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Benday.AzureDevOpsUtil.ConsoleUi": {
+      "commandName": "Project",
+      "commandLineArgs": "listprojects"
+    }
+  }
+}

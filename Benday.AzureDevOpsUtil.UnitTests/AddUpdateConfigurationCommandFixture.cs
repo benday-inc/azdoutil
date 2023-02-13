@@ -64,7 +64,7 @@ public class AddUpdateConfigurationCommandFixture
 
         var expectedConfigurationName = "config123";
         var expectedToken = "token-value";
-        var expectedUrl = "https://dev.azure.com/benday";
+        var expectedUrl = "https://dev.azure.com/benday/";
 
         var commandLineArgs = Utilities.GetStringArray(
             Constants.CommandArgumentNameAddUpdateConfig,
@@ -100,7 +100,7 @@ public class AddUpdateConfigurationCommandFixture
 
         var expectedConfigurationName = Constants.DefaultConfigurationName;
         var expectedToken = "token-value";
-        var expectedUrl = "https://dev.azure.com/benday";
+        var expectedUrl = "https://dev.azure.com/benday/";
 
         var commandLineArgs = Utilities.GetStringArray(
             Constants.CommandArgumentNameAddUpdateConfig,

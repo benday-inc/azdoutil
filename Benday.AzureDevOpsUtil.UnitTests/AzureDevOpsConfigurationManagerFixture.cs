@@ -53,7 +53,7 @@ public class AzureDevOpsConfigurationManagerFixture
 
         var expectedConfigurationName = Constants.DefaultConfigurationName;
         var expectedToken = "token-value";
-        var expectedUrl = "https://dev.azure.com/benday";
+        var expectedUrl = "https://dev.azure.com/benday/";
 
         var config = new AzureDevOpsConfiguration()
         {
@@ -87,7 +87,7 @@ public class AzureDevOpsConfigurationManagerFixture
 
         var expectedConfigurationName = "config123";
         var expectedToken = "token-value";
-        var expectedUrl = "https://dev.azure.com/benday";
+        var expectedUrl = "https://dev.azure.com/benday/";
 
         var config = new AzureDevOpsConfiguration()
         {

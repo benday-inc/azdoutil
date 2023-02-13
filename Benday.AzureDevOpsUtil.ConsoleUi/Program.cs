@@ -13,7 +13,7 @@ class Program
         }
         else
         {
-            var command = util.GetCommand(args, typeof(ShowConfigurationCommand).Assembly);
+            var command = util.GetCommand(args, typeof(ListConfigurationCommand).Assembly);
 
             if (command == null)
             {
@@ -21,7 +21,7 @@ class Program
             }
             else
             {
-                var attr = util.GetCommandAttributeForCommandName(typeof(ShowConfigurationCommand).Assembly,
+                var attr = util.GetCommandAttributeForCommandName(typeof(ListConfigurationCommand).Assembly,
                     command.ExecutionInfo.CommandName);
 
                 if (attr == null)
@@ -66,7 +66,7 @@ class Program
 
     private static void DisplayUsage(CommandAttributeUtility util)
     {
-        var assembly = typeof(ShowConfigurationCommand).Assembly;
+        var assembly = typeof(ListConfigurationCommand).Assembly;
 
         var commands = util.GetAvailableCommandNames(assembly);
 
