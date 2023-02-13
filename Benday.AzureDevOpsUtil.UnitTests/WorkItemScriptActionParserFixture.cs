@@ -1,9 +1,9 @@
-﻿using Benday.WorkItemUtility.Api;
+﻿using Benday.AzureDevOpsUtil.Api;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 
-namespace Benday.WorkItemUtility.UnitTests;
+namespace Benday.AzureDevOpsUtil.UnitTests;
 
 [TestClass]
 public class WorkItemScriptActionParserFixture

@@ -1,8 +1,7 @@
-﻿using Benday.WorkItemUtility.Api;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 
-namespace Benday.WorkItemUtility.UnitTests;
+namespace Benday.AzureDevOpsUtil.UnitTests;
 
 [TestClass]
 public class ExcelWorkItemIterationRowReaderFixture

@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Benday.WorkItemUtility.Api;
+namespace Benday.AzureDevOpsUtil.Api;
 public class WorkItemScriptGenerator
 {
     public readonly List<string> FibonnaciValues = 

@@ -1,6 +1,6 @@
 using System;
 
-namespace Benday.WorkItemUtility.Api
+namespace Benday.AzureDevOpsUtil.Api
 {
     public class WorkItemStateTransition
     {

@@ -2,7 +2,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
 using System;
 
-namespace Benday.WorkItemUtility.UnitTests
+namespace Benday.AzureDevOpsUtil.UnitTests
 {
     public static class UnitTestUtility
     {

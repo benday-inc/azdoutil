@@ -1,8 +1,7 @@
 using System;
-using Benday.WorkItemUtility.Api;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Benday.WorkItemUtility.UnitTests
+namespace Benday.AzureDevOpsUtil.UnitTests
 {
     [TestClass]
     public class MiscTestFixture

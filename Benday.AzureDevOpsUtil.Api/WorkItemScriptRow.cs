@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text;
 
-namespace Benday.WorkItemUtility.Api;
+namespace Benday.AzureDevOpsUtil.Api;
 public class WorkItemScriptRow
 {
     public bool IsComment

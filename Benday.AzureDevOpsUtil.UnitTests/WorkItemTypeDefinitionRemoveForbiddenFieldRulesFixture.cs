@@ -1,12 +1,12 @@
+using Benday.AzureDevOpsUtil.Api;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Benday.WorkItemUtility.Api;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Benday.WorkItemUtility.UnitTests
+namespace Benday.AzureDevOpsUtil.UnitTests
 {
     [TestClass]
     public class WorkItemTypeDefinitionRemoveForbiddenFieldRulesFixture

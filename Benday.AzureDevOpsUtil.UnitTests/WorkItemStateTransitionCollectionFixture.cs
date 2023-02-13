@@ -1,7 +1,7 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Benday.WorkItemUtility.Api;
+﻿using Benday.AzureDevOpsUtil.Api;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Benday.WorkItemUtility.UnitTests
+namespace Benday.AzureDevOpsUtil.UnitTests
 {
 
     [TestClass]

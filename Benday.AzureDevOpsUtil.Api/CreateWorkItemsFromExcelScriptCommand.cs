@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Benday.AzureDevOpsUtil.Api;
@@ -78,6 +79,25 @@ public class CreateWorkItemsFromExcelScriptCommand : AzureDevOpsCommandBase
         return command;
     }
 
+    private CreateTeamProjectCommand CreateCreateTeamProjectCommandInstance()
+    {
+        var execInfo = ExecutionInfo.GetCloneOfArguments(
+            Constants.CommandName_CreateProject,
+            true);
+
+        execInfo.Arguments.Remove(Constants.CommandArg_TeamProjectName);
+        execInfo.Arguments.Add(Constants.ArgumentNameTeamProjectName,
+            Arguments[Constants.CommandArg_TeamProjectName].Value);
+
+        execInfo.Arguments.Add(Constants.CommandArg_ProcessTemplateName,
+                Arguments[Constants.CommandArg_ProcessTemplateName].Value);
+
+        var command =
+            new CreateTeamProjectCommand(execInfo, _OutputProvider);
+
+        return command;
+    }
+
     private async Task PopulateIterations()
     {
         var reader = new ExcelWorkItemIterationRowReader(
@@ -88,12 +108,15 @@ public class CreateWorkItemsFromExcelScriptCommand : AzureDevOpsCommandBase
 
         foreach (var item in rows)
         {
-            var args = Arguments.GetCloneOfArguments(true);
-            args.SetArgumentValue(Constants.CommandArg_IterationName, item.IterationName);
-            args.SetArgumentValue(Constants.CommandArg_StartDate, item.GetIterationStart(_startDate).ToShortDateString());
-            args.SetArgumentValue(Constants.CommandArg_EndDate, item.GetIterationEnd(_startDate).ToShortDateString());
+            var execInfo = ExecutionInfo.GetCloneOfArguments(
+                Constants.CommandName_SetIteration,
+                true);
 
-            var command = new SetIterationCommand(args);
+            execInfo.Arguments.Add(Constants.CommandArg_IterationName, item.IterationName);
+            execInfo.Arguments.Add(Constants.CommandArg_StartDate, item.GetIterationStart(_startDate).ToShortDateString());
+            execInfo.Arguments.Add(Constants.CommandArg_EndDate, item.GetIterationEnd(_startDate).ToShortDateString());
+
+            var command = new SetIterationCommand(execInfo, _OutputProvider);
 
             await command.Run();
         }
@@ -114,12 +137,7 @@ public class CreateWorkItemsFromExcelScriptCommand : AzureDevOpsCommandBase
         else if (_createProjectIfNotExists == true &&
             getExistingProjectCommand.LastResult == null)
         {
-            var createProjectArgs = args.GetCloneOfArguments(true);
-
-            createProjectArgs.SetArgumentValue(Constants.CommandArg_ProcessTemplateName,
-                Arguments[Constants.CommandArg_ProcessTemplateName]);
-
-            var createProjectCommand = new CreateTeamProjectCommand(createProjectArgs);
+            var createProjectCommand = CreateCreateTeamProjectCommandInstance();
 
             await createProjectCommand.ExecuteAsync();
 

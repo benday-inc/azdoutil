@@ -18,6 +18,7 @@ public static class Constants
     public const string CommandName_CreateWorkItemsFromExcelScript = "createfromexcel";
     public const string CommandName_CreateProject = "createproject";
     public const string CommandName_ListProcessTemplates = "listprocesstemplates";
+    public const string CommandName_SetIteration = "setiteration";
 
     public const string ArgumentNameTeamProjectName = "name";
     public const string ArgumentNameConfigurationName = "config";
@@ -32,5 +33,7 @@ public static class Constants
     public const string CommandArg_TeamProjectName = "teamproject";
     public const string CommandArg_CreateProjectIfNotExists = "createproject";
     public const string CommandArg_ProcessTemplateName = "processname";
+    public const string CommandArg_EndDate = "enddate";
+    public const string CommandArg_IterationName = "name";
 
 }

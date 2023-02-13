@@ -5,7 +5,7 @@ using System.Linq;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
-namespace Benday.WorkItemUtility.Api
+namespace Benday.AzureDevOpsUtil.Api
 {
     public class WorkItemTypeDefinition
     {

@@ -1,12 +1,12 @@
-﻿using System;
+﻿using Benday.AzureDevOpsUtil.Api;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Benday.WorkItemUtility.Api;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Benday.WorkItemUtility.UnitTests;
+namespace Benday.AzureDevOpsUtil.UnitTests;
 [TestClass]
 public class WorkItemScriptGeneratorFixture
 {

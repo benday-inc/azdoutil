@@ -1,7 +1,7 @@
+using Benday.AzureDevOpsUtil.Api;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Benday.WorkItemUtility.Api;
 
-namespace Benday.WorkItemUtility.UnitTests
+namespace Benday.AzureDevOpsUtil.UnitTests
 {
     [TestClass]
     public class WorkItemStateTransitionFixture

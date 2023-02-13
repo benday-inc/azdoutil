@@ -1,11 +1,11 @@
+using Benday.AzureDevOpsUtil.Api;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using Benday.WorkItemUtility.Api;
 using System.Collections.Generic;
 using System.Xml.Linq;
 using System.Linq;
 
-namespace Benday.WorkItemUtility.UnitTests
+namespace Benday.AzureDevOpsUtil.UnitTests
 {
     [TestClass]
     public class WorkItemTypeDefinitionFixture
@@ -178,7 +178,7 @@ namespace Benday.WorkItemUtility.UnitTests
             */
         }
 
-        private void AssertAreEquivalent(List<WorkItemStateTransition> expected, 
+        private void AssertAreEquivalent(List<WorkItemStateTransition> expected,
             WorkItemStateTransitionCollection actual)
         {
             Assert.AreEqual<int>(expected.Count, actual.Count, "Count");
