@@ -23,8 +23,8 @@ namespace Benday.AzureDevOpsUtil.UnitTests
 
             Console.WriteLine($"original working dir: {Environment.CurrentDirectory}");
 
-            workingDir = workingDir.Replace("/bin/Debug/net6.0", "");
-            workingDir = workingDir.Replace("\\bin\\Debug\\net6.0", "");
+            workingDir = workingDir.Replace("/bin/Debug/net7.0", "");
+            workingDir = workingDir.Replace("\\bin\\Debug\\net7.0", "");
 
             var fullyQualifiedPath = Path.GetFullPath(Path.Combine(workingDir, pathToFile));
 
@@ -32,7 +32,8 @@ namespace Benday.AzureDevOpsUtil.UnitTests
             Console.WriteLine($"pathToFile: {pathToFile}");
             Console.WriteLine($"fullyQualifiedPath: {fullyQualifiedPath}");
 
-            Assert.AreEqual<bool>(true, File.Exists(fullyQualifiedPath), "Path should exist");
+            Assert.AreEqual<bool>(true, File.Exists(fullyQualifiedPath), 
+                $"Path should exist. '{fullyQualifiedPath}'");
 
             return fullyQualifiedPath;
         }

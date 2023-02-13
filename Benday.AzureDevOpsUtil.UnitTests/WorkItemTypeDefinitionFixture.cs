@@ -8,6 +8,7 @@ using System.Linq;
 namespace Benday.AzureDevOpsUtil.UnitTests
 {
     [TestClass]
+    [Ignore("Need to migrate test files into solution")]
     public class WorkItemTypeDefinitionFixture
     {
         private WorkItemTypeDefinition? _systemUnderTest;

@@ -9,6 +9,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Benday.AzureDevOpsUtil.UnitTests
 {
     [TestClass]
+    [Ignore("Need to migrate test files into solution")]
     public class WorkItemTypeDefinitionRemoveForbiddenFieldRulesFixture
     {
         private WorkItemTypeDefinition? _systemUnderTest;
