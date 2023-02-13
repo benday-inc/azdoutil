@@ -15,7 +15,7 @@ class Program
         {
             try
             {
-                var command = util.GetCommand(args, typeof(ListConfigurationCommand).Assembly);
+                var command = util.GetCommand(args, typeof(StringUtility).Assembly);
 
                 if (command == null)
                 {
@@ -23,7 +23,7 @@ class Program
                 }
                 else
                 {
-                    var attr = util.GetCommandAttributeForCommandName(typeof(ListConfigurationCommand).Assembly,
+                    var attr = util.GetCommandAttributeForCommandName(typeof(StringUtility).Assembly,
                         command.ExecutionInfo.CommandName);
 
                     if (attr == null)
@@ -74,7 +74,7 @@ class Program
 
     private static void DisplayUsage(CommandAttributeUtility util)
     {
-        var assembly = typeof(ListConfigurationCommand).Assembly;
+        var assembly = typeof(StringUtility).Assembly;
 
         var commands = util.GetAvailableCommandNames(assembly);
 

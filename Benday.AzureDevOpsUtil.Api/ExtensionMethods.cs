@@ -21,7 +21,7 @@ public static class ExtensionMethods
                 
         if (quietMode == true)
         {
-            argsClone.Add(Constants.ArgumentNameQuietMode, "true");
+            argsClone.TryAdd(Constants.ArgumentNameQuietMode, "true");
         }
 
         var returnValue = new CommandExecutionInfo();

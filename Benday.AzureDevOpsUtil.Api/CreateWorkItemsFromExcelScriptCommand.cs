@@ -340,7 +340,7 @@ public class CreateWorkItemsFromExcelScriptCommand : AzureDevOpsCommandBase
         execInfo.Arguments.Add(Constants.ArgumentNameTeamProjectName,
             Arguments[Constants.CommandArg_TeamProjectName].Value);
 
-        execInfo.Arguments.Add(Constants.CommandArg_ProcessTemplateName,
+        execInfo.Arguments.TryAdd(Constants.CommandArg_ProcessTemplateName,
                 Arguments[Constants.CommandArg_ProcessTemplateName].Value);
 
         var command =
