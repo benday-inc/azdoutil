@@ -31,6 +31,36 @@ public static class ExtensionMethods
         return returnValue;
     }
 
+    public static void AddArgumentValue(
+        this CommandExecutionInfo execInfo, string argName, string argValue)
+    {
+        if (execInfo is null || execInfo.Arguments is null)
+        {
+            throw new ArgumentNullException(nameof(execInfo));
+        }
+
+        if (execInfo.Arguments.ContainsKey(argName) == true)
+        {
+            execInfo.Arguments.Remove(argName);
+        }
+
+        execInfo.Arguments.Add(argName, argValue);
+    }
+
+    public static void RemoveArgumentValue(
+        this CommandExecutionInfo execInfo, string argName)
+    {
+        if (execInfo is null || execInfo.Arguments is null)
+        {
+            throw new ArgumentNullException(nameof(execInfo));
+        }
+
+        if (execInfo.Arguments.ContainsKey(argName) == true)
+        {
+            execInfo.Arguments.Remove(argName);
+        }
+    }
+
     public static DateTime GetDateTimeValue(
         this ArgumentCollection args, string argumentName)
     {

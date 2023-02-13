@@ -2,7 +2,9 @@
   "profiles": {
     "Benday.AzureDevOpsUtil.ConsoleUi": {
       "commandName": "Project",
-      "commandLineArgs": "createfromexcel /pathtoexcel:\"C:\\code\\benday-inc\\AzureDevOpsWorkItemUtility\\excel-work-item-scripts\\work-item-script-v3.xlsx\" /startdate:\"1/30/2023\" /teamproject:\"MetricsAndDashboardResearch1\" /createproject:true /processname:\"Scrum\" /skipfuturedates"
+      "commandLineArgs": "createfromexcel /pathtoexcel:\"/Users/benday/code/benday-inc/AzureDevOpsWorkIXtemUtility/excel-work-item-scripts/work-item-script-v3.xlsx\" /startdate:\"1/30/2023\" /teamproject:\"MetricsAndDashboardResearch1\" /createproject:true /processname:\"Scrum\" /skipfuturedates"
     }
   }
 }
+
+

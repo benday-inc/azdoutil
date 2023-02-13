@@ -27,10 +27,10 @@ public class SetIterationCommand : AzureDevOpsCommandBase
         var arguments = new ArgumentCollection();
 
         AddCommonArguments(arguments);
-        Arguments.AddString(Constants.CommandArg_TeamProjectName).WithDescription("Team project name");
-        Arguments.AddDateTime(Constants.CommandArg_StartDate).WithDescription("Iteration start date");
-        Arguments.AddDateTime(Constants.CommandArg_EndDate).WithDescription("Iteration end date");
-        Arguments.AddString(Constants.CommandArg_IterationName).WithDescription("Iteration name");
+        arguments.AddString(Constants.CommandArg_TeamProjectName).WithDescription("Team project name");
+        arguments.AddDateTime(Constants.CommandArg_StartDate).WithDescription("Iteration start date");
+        arguments.AddDateTime(Constants.CommandArg_EndDate).WithDescription("Iteration end date");
+        arguments.AddString(Constants.CommandArg_IterationName).WithDescription("Iteration name");
 
         return arguments;
     }

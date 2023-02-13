@@ -320,8 +320,8 @@ public class CreateWorkItemsFromExcelScriptCommand : AzureDevOpsCommandBase
             Constants.CommandName_GetProject,
             true);
 
-        execInfo.Arguments.Remove(Constants.CommandArg_TeamProjectName);
-        execInfo.Arguments.Add(Constants.ArgumentNameTeamProjectName,
+        execInfo.RemoveArgumentValue(Constants.CommandArg_TeamProjectName);
+        execInfo.AddArgumentValue(Constants.ArgumentNameTeamProjectName,
             Arguments[Constants.CommandArg_TeamProjectName].Value);
 
         var command =
@@ -353,7 +353,7 @@ public class CreateWorkItemsFromExcelScriptCommand : AzureDevOpsCommandBase
     {
         var reader = new ExcelWorkItemIterationRowReader(
                         new ExcelReader(
-                            _pathToExcel));
+                            _pathToExcel!));
 
         var rows = reader.GetRows();
 
@@ -363,10 +363,10 @@ public class CreateWorkItemsFromExcelScriptCommand : AzureDevOpsCommandBase
                 Constants.CommandName_SetIteration,
                 true);
 
-            execInfo.Arguments.Add(Constants.CommandArg_IterationName, item.IterationName);
-            execInfo.Arguments.Add(Constants.CommandArg_StartDate, item.GetIterationStart(_startDate).ToShortDateString());
-            execInfo.Arguments.Add(Constants.CommandArg_EndDate, item.GetIterationEnd(_startDate).ToShortDateString());
-
+            execInfo.AddArgumentValue(Constants.CommandArg_IterationName, item.IterationName);
+            execInfo.AddArgumentValue(Constants.CommandArg_StartDate, item.GetIterationStart(_startDate).ToShortDateString());
+            execInfo.AddArgumentValue(Constants.CommandArg_EndDate, item.GetIterationEnd(_startDate).ToShortDateString());
+            
             var command = new SetIterationCommand(execInfo, _OutputProvider);
 
             await command.ExecuteAsync();
