@@ -14,9 +14,12 @@ public static class Constants
     public const string CommandArgumentNameListConfig = "listconfig";
 
     public const string CommandName_ListProjects = "listprojects";
+    public const string CommandName_GetProject = "getproject";
 
-    public const string ArgumentNameConfigurationName = "name";
+    public const string ArgumentNameTeamProjectName = "name";
+    public const string ArgumentNameConfigurationName = "config";
     public const string ArgumentNameCollectionUrl = "url";
     public const string ArgumentNameToken = "pat";
     public const string ArgumentNameQuietMode = "quiet";
+    public const int RetryDelayInMillisecs = 100;
 }

@@ -28,8 +28,6 @@ public class ListTeamProjectsCommand : AzureDevOpsCommandBase
     {
         using var client = GetHttpClientInstanceForAzureDevOps();
 
-        WriteLine($"Base Address: {client.BaseAddress}");
-
         var requestUrl = $"_apis/projects?$top=10000&api-version=7.0";
 
         var temp = await client.GetAsync(requestUrl);
