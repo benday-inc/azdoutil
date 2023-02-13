@@ -1,5 +1,7 @@
 ﻿using Benday.CommandsFramework;
 using System.Net.Http.Headers;
+using System.Text.Json;
+using System.Text;
 
 namespace Benday.AzureDevOpsUtil.Api;
 
@@ -10,6 +12,34 @@ public abstract class AzureDevOpsCommandBase : AsynchronousCommand
     public AzureDevOpsCommandBase(
             CommandExecutionInfo info, ITextOutputProvider outputProvider) : base(info, outputProvider)
     {
+    }
+
+    protected bool ArgumentBooleanValue(string argumentName)
+    {
+        if (Arguments.ContainsKey(argumentName) == false)
+        {
+            return false;
+        }
+        else
+        {
+            var argAsBool = Arguments[argumentName] as BooleanArgument;
+
+            if (argAsBool == null)
+            {
+                throw new InvalidOperationException($"Cannot call ArgumentBooleanValue() on non-boolean arg '{argumentName}'.");
+            }
+            else
+            {
+                if (argAsBool.HasValue == false)
+                {
+                    return false;
+                }
+                else
+                {
+                    return argAsBool.ValueAsBoolean;
+                }
+            }
+        }
     }
 
     protected void AddCommonArguments(ArgumentCollection arguments)
@@ -133,5 +163,58 @@ public abstract class AzureDevOpsCommandBase : AsynchronousCommand
 
             return typedResponse!;
         }
+    }
+
+    protected async Task<TResponse> SendPostForBodyAndGetTypedResponseSingleAttempt<TResponse, TRequest>(
+            string requestUrl,
+            TRequest body, bool writeStringContentToInfo = false,
+            string? optionalDebuggingMessageInfo = null
+            )
+    {
+        if (string.IsNullOrEmpty(requestUrl))
+        {
+            throw new ArgumentException($"{nameof(requestUrl)} is null or empty.", nameof(requestUrl));
+        }
+
+        using var client = GetHttpClientInstanceForAzureDevOps();
+
+        string requestAsJson;
+
+        requestAsJson = JsonSerializer.Serialize(body);
+
+        var request = new HttpRequestMessage(new HttpMethod("POST"), requestUrl)
+        {
+            Content = new StringContent(requestAsJson, Encoding.UTF8, "application/json")
+        };
+
+        var result = await client.SendAsync(request);
+
+        if (result.IsSuccessStatusCode == false)
+        {
+            var content = await result.Content.ReadAsStringAsync();
+
+            if (optionalDebuggingMessageInfo == null)
+            {
+                throw new InvalidOperationException(
+                        $"Problem with server call to {requestUrl}. {result.StatusCode} {result.ReasonPhrase} - {content}");
+            }
+            else
+            {
+                throw new InvalidOperationException(
+                                $"Problem with server call to {requestUrl}. Debug info = '{optionalDebuggingMessageInfo}'.  {result.StatusCode} {result.ReasonPhrase} - {content}");
+
+            }
+        }
+
+        var responseContent = await result.Content.ReadAsStringAsync();
+
+        if (writeStringContentToInfo == true)
+        {
+            WriteLine(responseContent);
+        }
+
+        var typedResponse = JsonUtilities.GetJsonValueAsType<TResponse>(responseContent);
+
+        return typedResponse!;
     }
 }
