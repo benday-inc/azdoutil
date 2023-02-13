@@ -13,54 +13,62 @@ class Program
         }
         else
         {
-            var command = util.GetCommand(args, typeof(ListConfigurationCommand).Assembly);
-
-            if (command == null)
+            try
             {
-                DisplayUsage(util);
-            }
-            else
-            {
-                var attr = util.GetCommandAttributeForCommandName(typeof(ListConfigurationCommand).Assembly,
-                    command.ExecutionInfo.CommandName);
+                var command = util.GetCommand(args, typeof(ListConfigurationCommand).Assembly);
 
-                if (attr == null)
+                if (command == null)
                 {
-                    throw new InvalidOperationException(
-                        $"Could not get command attribute for command name '{command.ExecutionInfo.CommandName}'.");
+                    DisplayUsage(util);
                 }
                 else
                 {
-                    if (attr.IsAsync == false)
-                    {
-                        var runThis = command as ISynchronousCommand;
+                    var attr = util.GetCommandAttributeForCommandName(typeof(ListConfigurationCommand).Assembly,
+                        command.ExecutionInfo.CommandName);
 
-                        if (runThis == null)
-                        {
-                            throw new InvalidOperationException($"Could not convert type to {typeof(ISynchronousCommand)}.");
-                        }
-                        else
-                        {
-                            runThis.Execute();
-                        }
+                    if (attr == null)
+                    {
+                        throw new InvalidOperationException(
+                            $"Could not get command attribute for command name '{command.ExecutionInfo.CommandName}'.");
                     }
                     else
                     {
-                        var runThis = command as IAsyncCommand;
-
-                        if (runThis == null)
+                        if (attr.IsAsync == false)
                         {
-                            throw new InvalidOperationException($"Could not convert type to {typeof(IAsyncCommand)}.");
+                            var runThis = command as ISynchronousCommand;
+
+                            if (runThis == null)
+                            {
+                                throw new InvalidOperationException($"Could not convert type to {typeof(ISynchronousCommand)}.");
+                            }
+                            else
+                            {
+                                runThis.Execute();
+                            }
                         }
                         else
                         {
-                            var temp = runThis.ExecuteAsync().GetAwaiter();
+                            var runThis = command as IAsyncCommand;
 
-                            temp.GetResult();
+                            if (runThis == null)
+                            {
+                                throw new InvalidOperationException($"Could not convert type to {typeof(IAsyncCommand)}.");
+                            }
+                            else
+                            {
+                                var temp = runThis.ExecuteAsync().GetAwaiter();
+
+                                temp.GetResult();
+                            }
                         }
                     }
                 }
+            } 
+            catch (KnownException ex)
+            {
+                Console.WriteLine(ex.Message);
             }
+
         }
     }
 

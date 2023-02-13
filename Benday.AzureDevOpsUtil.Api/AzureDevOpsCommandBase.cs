@@ -57,7 +57,7 @@ public abstract class AzureDevOpsCommandBase : AsynchronousCommand
 
                 if (temp == null)
                 {
-                    throw new InvalidOperationException($"Could not find a configuration named '{configName}'.");
+                    throw new KnownException($"Could not find a configuration named '{configName}'. Add a configuration and try again.");
                 }
 
                 _AzureDevOpsConfiguration = temp;
