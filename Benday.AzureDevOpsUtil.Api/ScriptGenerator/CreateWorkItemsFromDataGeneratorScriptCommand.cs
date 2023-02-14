@@ -4,13 +4,12 @@ using Benday.CommandsFramework;
 
 namespace Benday.AzureDevOpsUtil.Api.ScriptGenerator;
 
-
-[Command(Name = Constants.CommandName_CreateWorkItemsFromExcelScript,
-        Description = "Create work items using Excel script",
+[Command(Name = Constants.CommandName_CreateWorkItemsFromDataGenerator,
+        Description = "Create work items using random data generator",
         IsAsync = true)]
-public class CreateWorkItemsFromExcelScriptCommand : AzureDevOpsCommandBase
+public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandBase
 {
-    public CreateWorkItemsFromExcelScriptCommand(
+    public CreateWorkItemsFromDataGeneratorScriptCommand(
         CommandExecutionInfo info, ITextOutputProvider outputProvider) : base(info, outputProvider)
     {
     }
@@ -27,10 +26,8 @@ public class CreateWorkItemsFromExcelScriptCommand : AzureDevOpsCommandBase
             .WithDescription("Skip script steps that occur in the future");
 
 
-        arguments.AddString(Constants.CommandArg_PathToExcel)
-            .WithDescription("Path to the Excel script");
-        arguments.AddDateTime(Constants.CommandArg_StartDate)
-            .WithDescription("Date for the start of the Excel script");
+        arguments.AddInt32(Constants.CommandArg_SprintCount)
+            .WithDescription("Number of sprints to generate");
         arguments.AddString(Constants.CommandArg_TeamProjectName)
             .WithDescription("Name of the team project");
         arguments.AddString(Constants.CommandArg_ProcessTemplateName)
@@ -46,12 +43,66 @@ public class CreateWorkItemsFromExcelScriptCommand : AzureDevOpsCommandBase
     private bool _skipFutureDates = false;
     private DateTime _startDate;
     private bool _createProjectIfNotExists = false;
-    private string? _pathToExcel;
     private List<WorkItemScriptAction>? _actions;
     private string _teamProjectName = string.Empty;
 
+    private DateTime FindStartDate(List<WorkItemScriptSprint> sprints)
+    {
+        var sprintCount = sprints.Count;
+
+        var now = DateTime.Now;
+
+        var proposedStart = now;
+
+        while (proposedStart.DayOfWeek != DayOfWeek.Monday)
+        {
+            proposedStart = proposedStart.AddDays(-1);
+        }
+
+        var startOfSprint = proposedStart.Date.AddDays(-14 * sprintCount);
+
+        return startOfSprint;
+    }
+    private void WriteScriptToDisk(WorkItemScriptGenerator generator)
+    {
+        var toPath = Path.Combine(@"c:\temp\workitemscripttemp", $"workitem-script-{DateTime.Now.Ticks}.xlsx");
+
+        new ExcelWorkItemScriptWriter().WriteToExcel(
+            toPath,
+            generator.Actions);
+    }
+
     protected override async Task OnExecute()
     {
+        var sprints = new List<WorkItemScriptSprint>();
+
+        for (int i = 0; i < Arguments.GetInt32Value(Constants.CommandArg_SprintCount); i++)
+        {
+            sprints.Add(new WorkItemScriptSprint()
+            {
+                AverageNumberOfTasksPerPbi = 5,
+                NewPbiCount = 15,
+                RefinedPbiCountMeeting1 = 5,
+                RefinedPbiCountMeeting2 = 5,
+                SprintNumber = i + 1,
+                SprintPbiCount = 7,
+                SprintPbisToDoneCount = 5,
+                DailyHoursPerTeamMember = 6,
+                TeamMemberCount = 7
+            });
+        }
+
+        //var sprintStartDate = ((sprintNumber - 1) * 14);
+        //var sprintEndDate = (sprintNumber * 14) - 1;
+
+        var generator = new WorkItemScriptGenerator();
+
+        generator.GenerateScript(sprints);
+
+        WriteScriptToDisk(generator);
+
+        _startDate = FindStartDate(sprints);
+
         _skipFutureDates = Arguments.GetBooleanValue(Constants.CommandArg_SkipFutureDates);
 
         if (_skipFutureDates == true)
@@ -60,44 +111,34 @@ public class CreateWorkItemsFromExcelScriptCommand : AzureDevOpsCommandBase
         }
 
         _teamProjectName = Arguments.GetStringValue(Constants.CommandArg_TeamProjectName);
-        _pathToExcel = Arguments.GetStringValue(Constants.CommandArg_PathToExcel);
-
-        AssertFileExists(_pathToExcel, Constants.CommandArg_PathToExcel);
-
-        _startDate = Arguments.GetDateTimeValue(Constants.CommandArg_StartDate);
 
         _createProjectIfNotExists = Arguments.GetBooleanValue(Constants.CommandArg_CreateProjectIfNotExists);
 
-        PopulateActions();
+        PopulateActions(generator);
 
         _skipFutureDates = Arguments.GetBooleanValue(Constants.CommandArg_SkipFutureDates);
         _createProjectIfNotExists = Arguments.GetBooleanValue(Constants.CommandArg_CreateProjectIfNotExists);
 
         await EnsureProjectExists();
-        await PopulateIterations();
+        await PopulateIterations(sprints, _startDate);
         await RunScript();
     }
 
-    private void PopulateActions()
+    private void PopulateActions(WorkItemScriptGenerator generator)
     {
-        var reader = new ExcelWorkItemScriptRowReader(
-                        new ExcelReader(
-                            _pathToExcel!));
+        _actions = generator.Actions;
 
-        var rows = reader.GetRows();
-
-        CleanUpRowDataShortcuts(rows);
-
-        _actions = WorkItemScriptActionParser.GetActions(rows);
+        CleanUpRowDataShortcuts(_actions);
     }
 
-    private static void CleanUpRowDataShortcuts(List<WorkItemScriptRow> rows)
+    private static void CleanUpRowDataShortcuts(List<WorkItemScriptAction> rows)
     {
         foreach (var row in rows)
         {
-            if (string.Equals("PBI", row.WorkItemType, StringComparison.InvariantCultureIgnoreCase) == true)
+            if (string.Equals("PBI", row.Definition.WorkItemType,
+                StringComparison.InvariantCultureIgnoreCase) == true)
             {
-                row.WorkItemType = "Product Backlog Item";
+                row.Definition.WorkItemType = "Product Backlog Item";
             }
         }
     }
@@ -344,23 +385,29 @@ public class CreateWorkItemsFromExcelScriptCommand : AzureDevOpsCommandBase
         return command;
     }
 
-    private async Task PopulateIterations()
+    private async Task PopulateIterations(
+        List<WorkItemScriptSprint> sprints, DateTime startDate)
     {
-        var reader = new ExcelWorkItemIterationRowReader(
-                        new ExcelReader(
-                            _pathToExcel!));
-
-        var rows = reader.GetRows();
-
-        foreach (var item in rows)
+        foreach (var item in sprints)
         {
             var execInfo = ExecutionInfo.GetCloneOfArguments(
                 Constants.CommandName_SetIteration,
                 true);
 
-            execInfo.AddArgumentValue(Constants.CommandArg_IterationName, item.IterationName);
-            execInfo.AddArgumentValue(Constants.CommandArg_StartDate, item.GetIterationStart(_startDate).ToShortDateString());
-            execInfo.AddArgumentValue(Constants.CommandArg_EndDate, item.GetIterationEnd(_startDate).ToShortDateString());
+            var sprintStartDate = startDate.AddDays(
+                ((item.SprintNumber - 1) * 14)
+                );
+                 
+            var sprintEndDate = startDate.AddDays((item.SprintNumber * 14) - 1);
+
+            item.StartDate = sprintStartDate;
+            item.EndDate = sprintEndDate;
+
+            WriteLine($"Setting sprint {item.SprintNumber} dates from {item.StartDate.ToShortDateString()} to {item.EndDate.ToShortDateString()}");
+
+            execInfo.AddArgumentValue(Constants.CommandArg_IterationName, $"Sprint {item.SprintNumber}");
+            execInfo.AddArgumentValue(Constants.CommandArg_StartDate, item.StartDate.ToShortDateString());
+            execInfo.AddArgumentValue(Constants.CommandArg_EndDate, item.EndDate.ToShortDateString());
 
             var command = new SetIterationCommand(execInfo, _OutputProvider);
 

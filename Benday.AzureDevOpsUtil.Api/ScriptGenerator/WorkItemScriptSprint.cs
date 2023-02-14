@@ -16,4 +16,6 @@ public class WorkItemScriptSprint
     public int AverageNumberOfTasksPerPbi { get; set; }
     public int TeamMemberCount { get; set; }
     public int DailyHoursPerTeamMember { get; set; }
+    public DateTime StartDate { get; set; }
+    public DateTime EndDate { get; set; }
 }

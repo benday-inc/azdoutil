@@ -13,6 +13,8 @@ public class ExcelWorkItemScriptWriter
 {
     public void WriteToExcel(string filename, List<WorkItemScriptAction> actions)
     {
+        ExcelPackage.LicenseContext = LicenseContext.Commercial;
+
         using (var excel = new OfficeOpenXml.ExcelPackage())
         {
             var worksheetScript = excel.Workbook.Worksheets.Add(ExcelConstants.SheetNameScript);
