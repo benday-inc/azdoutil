@@ -7,5 +7,31 @@ public class WorkItemScriptWorkItem
     public string WorkItemType { get; set; } = string.Empty;
     public string State { get; set; } = string.Empty;
     public string Iteration { get; set; } = string.Empty;
+    public int RemainingWork { get; set; } = 0;
     public WorkItemScriptWorkItem? Parent { get; set; }
+
+    public List<WorkItemScriptWorkItem> ChildItems { get; set; } = new List<WorkItemScriptWorkItem>();
+
+    public int TotalRemainingWork
+    {
+        get
+        {
+            if (ChildItems.Count == 0)
+            {
+                return 0;
+            }
+            else
+            {
+                int total = 0;
+
+                foreach (var child in ChildItems)
+                {
+                    total += child.RemainingWork;
+                }
+
+                return total;
+            }
+        }
+    }
+    public bool IsDone { get; set; }
 }

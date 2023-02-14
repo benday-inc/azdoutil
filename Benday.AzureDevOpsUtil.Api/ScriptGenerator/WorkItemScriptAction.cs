@@ -25,7 +25,7 @@ public class WorkItemScriptAction
         return startDate;
     }
 
-    public void AddSetValue(string refname, string value)
+    public void SetValue(string refname, string value)
     {
         var temp = new WorkItemScriptRow()
         {

@@ -93,7 +93,9 @@ public class WorkItemScriptGeneratorFixture
             RefinedPbiCountMeeting2 = 5,
             SprintNumber = 1,
             SprintPbiCount = 7,
-            SprintPbisToDoneCount = 5
+            SprintPbisToDoneCount = 5,
+            DailyHoursPerTeamMember = 6,
+            TeamMemberCount = 7
         };
 
         var sprint2 = new WorkItemScriptSprint()
@@ -104,7 +106,9 @@ public class WorkItemScriptGeneratorFixture
             RefinedPbiCountMeeting2 = 5,
             SprintNumber = 2,
             SprintPbiCount = 7,
-            SprintPbisToDoneCount = 5
+            SprintPbisToDoneCount = 5,
+            DailyHoursPerTeamMember = 6,
+            TeamMemberCount = 7
         };
 
         var sprints = new List<WorkItemScriptSprint>

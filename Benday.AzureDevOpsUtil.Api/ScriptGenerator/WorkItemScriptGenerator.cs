@@ -10,10 +10,9 @@ public class WorkItemScriptGenerator
         "1", "2", "3", "5", "8", "13", "21"
         };
 
-    public readonly List<string> HourValues =
+    public readonly List<int> HourValues =
         new() {
-        "1", "2", "3", "4", "6", "8", "12", "16", "24", "40"
-        };
+            1, 2, 3, 4, 5, 6, 8, 12, 16, 24, 32,38 };
 
     private readonly List<string> _actionWords;
     private readonly List<string> _endingWords;
@@ -155,6 +154,7 @@ public class WorkItemScriptGenerator
     public List<WorkItemScriptWorkItem> ProductBacklogItemsThatNeedRefinementRound2 { get; set; } = new();
     public List<WorkItemScriptWorkItem> ProductBacklogItemsReadyForSprint { get; set; } = new();
     public List<WorkItemScriptWorkItem> ProductBacklogItemsInSprint { get; set; } = new();
+    public List<WorkItemScriptWorkItem> ProductBacklogItemsDone { get; set; } = new();
     public List<WorkItemScriptAction> Actions { get; set; } = new();
 
     private void Move(WorkItemScriptWorkItem moveThis,
@@ -194,9 +194,11 @@ public class WorkItemScriptGenerator
         ScriptRefinementMeeting1(sprint);
         ScriptRefinementMeeting2(sprint);
         ScriptSprintPlanning(sprint);
+        ScriptDailyScrums(sprint);
 
         SprintTasks.Clear();
         ProductBacklogItemsInSprint.Clear();
+        ProductBacklogItemsDone.Clear();
     }
 
     private int GetNextActionNumber()
@@ -250,7 +252,7 @@ public class WorkItemScriptGenerator
 
         if (randomizeNumber == true)
         {
-            numberOfItemsToRefine = 
+            numberOfItemsToRefine =
                 rnd.GetNumberInRange(0,
                     sprint.RefinedPbiCountMeeting2);
         }
@@ -275,11 +277,149 @@ public class WorkItemScriptGenerator
                 action.Definition.Refname = "Status";
                 action.Definition.FieldValue = "Ready for Sprint";
 
-                action.AddSetValue("Effort", FibonnaciValues.Random());
+                action.SetValue("Effort", FibonnaciValues.Random());
 
                 Actions.Add(action);
             }
         }
+    }
+
+    private void BurndownTask(WorkItemScriptSprint sprint, WorkItemScriptWorkItem task,
+        int sprintDayNumber, int remainingWork)
+    {
+        var action = new WorkItemScriptAction();
+
+        action.ActionId = GetNextActionNumber().ToString();
+        action.Definition.Operation = "Update";
+
+        if (remainingWork == 0)
+        {
+            action.Definition.Description = "Task Done";
+            action.Definition.Refname = "Status";
+            action.Definition.FieldValue = "Done";
+
+            action.SetValue("RemainingWork", remainingWork.ToString());
+        }
+        else
+        {
+            action.Definition.Description = "Burn down task";
+            action.Definition.Refname = "RemainingWork";
+            action.Definition.FieldValue = remainingWork.ToString();
+        }
+
+        action.Definition.WorkItemId = task.Id;
+        action.Definition.WorkItemType = task.WorkItemType;
+        action.Definition.ActionDay =
+            ((sprint.SprintNumber - 1) * SPRINT_DURATION) + sprintDayNumber;
+
+        Actions.Add(action);
+    }
+
+    private void MarkPbiAsDone(WorkItemScriptSprint sprint, WorkItemScriptWorkItem pbi, int sprintDayNumber)
+    {
+        pbi.IsDone = true;
+
+        var action = new WorkItemScriptAction();
+
+        action.ActionId = GetNextActionNumber().ToString();
+        action.Definition.Operation = "Update";
+        action.Definition.Description = "PBI Done";
+        action.Definition.WorkItemId = pbi.Id;
+        action.Definition.WorkItemType = pbi.WorkItemType;
+        action.Definition.ActionDay =
+            ((sprint.SprintNumber - 1) * SPRINT_DURATION) + sprintDayNumber;
+        action.Definition.Refname = "Status";
+        action.Definition.FieldValue = "Done";
+
+        Actions.Add(action);
+    }
+
+    private void ScriptDailyScrum(WorkItemScriptSprint sprint, int sprintDayNumber)
+    {
+        var dailyBurndownMax = sprint.DailyHoursPerTeamMember * sprint.TeamMemberCount;
+
+        var todaysBurndownAmount = new RandomNumGen().GetNumberInRange(0, dailyBurndownMax);
+
+        if (ProductBacklogItemsInSprint.Count == 0)
+        {
+            return;
+        }
+
+        int pbiTotalRemainingWork = -1;
+
+        foreach (var pbi in ProductBacklogItemsInSprint)
+        {
+            if (todaysBurndownAmount <= 0)
+            {
+                // out of hours for today
+                break;
+            }
+            else if (pbi.IsDone == true)
+            {
+                // pbi is done
+                break;
+            }
+
+            pbiTotalRemainingWork = pbi.TotalRemainingWork;
+
+            while (todaysBurndownAmount > 0 &&
+                ProductBacklogItemsInSprint.Count > 0 &&
+                pbiTotalRemainingWork > 0)
+            {
+                foreach (var task in pbi.ChildItems)
+                {
+                    if (task.RemainingWork <= 0)
+                    {
+                        // no changes
+                    }
+                    else if (task.RemainingWork >= todaysBurndownAmount)
+                    {
+                        task.RemainingWork -= todaysBurndownAmount;
+                        todaysBurndownAmount = 0;
+                        BurndownTask(sprint, task, sprintDayNumber, task.RemainingWork);
+                    }
+                    else
+                    {
+                        // less work than available to burn down
+                        todaysBurndownAmount -= task.RemainingWork;
+                        task.RemainingWork = 0;
+                        BurndownTask(sprint, task, sprintDayNumber, task.RemainingWork);
+                    }
+
+                    pbiTotalRemainingWork = pbi.TotalRemainingWork;
+
+                    if (pbiTotalRemainingWork == 0)
+                    {
+                        MarkPbiAsDone(sprint, pbi, sprintDayNumber);
+                        break;
+                    }
+                }
+
+                Console.WriteLine($"Sprint {sprint.SprintNumber}: pbi {pbi.Id} -- remaining burndown: {todaysBurndownAmount}");
+
+            }
+        }
+    }
+
+    private void ScriptDailyScrums(WorkItemScriptSprint sprint)
+    {
+        // week 1
+        // no daily scrum on first day because sprint planning
+        ScriptDailyScrum(sprint, 2);
+        ScriptDailyScrum(sprint, 3);
+        ScriptDailyScrum(sprint, 4);
+        ScriptDailyScrum(sprint, 5);
+
+        // weekend 1
+
+        // week 2
+        ScriptDailyScrum(sprint, 8);
+        ScriptDailyScrum(sprint, 9);
+        ScriptDailyScrum(sprint, 10);
+        ScriptDailyScrum(sprint, 11);
+        ScriptDailyScrum(sprint, 12);
+
+        // weekend 2
     }
 
     private void ScriptSprintPlanning(WorkItemScriptSprint sprint, bool randomizeNumber = false)
@@ -316,7 +456,8 @@ public class WorkItemScriptGenerator
                 action.Definition.Refname = "Status";
                 action.Definition.FieldValue = "Committed";
 
-                action.AddSetValue("IterationPath", $"Sprint {sprint.SprintNumber}");
+                action.SetValue("IterationPath", $"Sprint {sprint.SprintNumber}");
+                action.SetValue("Effort", FibonnaciValues.Random().ToString());
 
                 Actions.Add(action);
             }
@@ -336,6 +477,9 @@ public class WorkItemScriptGenerator
                     Parent = parentPbi
                 };
 
+                parentPbi.ChildItems.Add(task);
+                task.RemainingWork = HourValues.RandomItem();
+
                 this.SprintTasks.Add(task.Id, task);
 
                 var action = new WorkItemScriptAction();
@@ -350,11 +494,14 @@ public class WorkItemScriptGenerator
                 action.Definition.Refname = "Title";
                 action.Definition.FieldValue = task.Title;
 
-                action.AddSetValue("IterationPath", $"Sprint {sprint.SprintNumber}");
-                action.AddSetValue("PARENT", parentPbi.Id);
+                action.SetValue("IterationPath", $"Sprint {sprint.SprintNumber}");
+                action.SetValue("PARENT", parentPbi.Id);
+
+                action.SetValue("RemainingWork", task.RemainingWork.ToString());
+
 
                 Actions.Add(action);
-            }            
+            }
         }
     }
 
@@ -370,14 +517,14 @@ public class WorkItemScriptGenerator
         returnValue.Definition.Description = "Create PBI";
         returnValue.Definition.WorkItemId = item.Id;
         returnValue.Definition.WorkItemType = item.WorkItemType;
-        returnValue.Definition.ActionDay = 
-            ((sprint.SprintNumber - 1)  * SPRINT_DURATION);
+        returnValue.Definition.ActionDay =
+            ((sprint.SprintNumber - 1) * SPRINT_DURATION);
         returnValue.Definition.Refname = "Title";
         returnValue.Definition.FieldValue = item.Title;
 
         return returnValue;
     }
-   
+
     public void GenerateScript(List<WorkItemScriptSprint> sprints)
     {
         foreach (var item in sprints)

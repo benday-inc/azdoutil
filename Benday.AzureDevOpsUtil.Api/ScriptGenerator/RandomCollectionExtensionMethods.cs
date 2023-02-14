@@ -52,6 +52,34 @@ public static class RandomCollectionExtensionMethods
         }       
     }
 
+    public static int RandomItem(this List<int> items)
+    {
+        if (items.Count == 0)
+        {
+            return 0;
+        }
+
+        var rnd = new RandomNumGen();
+
+        var topOfRange = items.Count - 1;
+
+        if (topOfRange < 0)
+        {
+            topOfRange = 0;
+        }
+
+        var randomIndex = rnd.GetNumberInRange(0, topOfRange);
+
+        if (randomIndex < items.Count)
+        {
+            return items[randomIndex];
+        }
+        else
+        {
+            return 0;
+        }
+    }
+
     public static string RandomPhrase(this List<string> strings, int wordCount)
     {
         if (strings == null)
