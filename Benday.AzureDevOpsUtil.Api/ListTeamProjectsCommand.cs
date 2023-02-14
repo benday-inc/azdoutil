@@ -47,5 +47,5 @@ public class ListTeamProjectsCommand : AzureDevOpsCommandBase
                 WriteLine($"{item.Name}");
             }
         }
-    }    
+    }
 }

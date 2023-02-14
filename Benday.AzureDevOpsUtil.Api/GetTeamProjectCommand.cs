@@ -6,9 +6,9 @@ namespace Benday.AzureDevOpsUtil.Api;
 [Command(Name = Constants.CommandName_GetProject,
         Description = "Get team project info",
         IsAsync = true)]
-public class GetTeamProjectsCommand : AzureDevOpsCommandBase
+public class GetTeamProjectCommand : AzureDevOpsCommandBase
 {
-    public GetTeamProjectsCommand(
+    public GetTeamProjectCommand(
         CommandExecutionInfo info, ITextOutputProvider outputProvider) : base(info, outputProvider)
     {
     }
@@ -18,7 +18,7 @@ public class GetTeamProjectsCommand : AzureDevOpsCommandBase
         var arguments = new ArgumentCollection();
 
         AddCommonArguments(arguments);
-        arguments.AddString(Constants.ArgumentNameTeamProjectName)  
+        arguments.AddString(Constants.ArgumentNameTeamProjectName)
             .AsRequired()
             .WithDescription("Team project name");
 

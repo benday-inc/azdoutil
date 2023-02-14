@@ -1,5 +1,4 @@
 ﻿using System.Text.Json;
-using System.Xml.Linq;
 
 namespace Benday.AzureDevOpsUtil.Api;
 
@@ -109,7 +108,7 @@ public class AzureDevOpsConfigurationManager
         {
             throw new ArgumentNullException(nameof(config));
         }
-        else if (string.IsNullOrEmpty( config.Name) ==true)
+        else if (string.IsNullOrEmpty(config.Name) == true)
         {
             throw new ArgumentException(nameof(config), "Name value not set");
         }
@@ -185,7 +184,7 @@ public class AzureDevOpsConfigurationManager
         {
             configurations.Remove(match);
         }
-        
+
         Save(configurations);
     }
 
@@ -198,7 +197,7 @@ public class AzureDevOpsConfigurationManager
             throw new InvalidOperationException($"Could not establish directory.");
         }
 
-        if (Directory.Exists(dirName)== false)
+        if (Directory.Exists(dirName) == false)
         {
             Directory.CreateDirectory(dirName);
         }

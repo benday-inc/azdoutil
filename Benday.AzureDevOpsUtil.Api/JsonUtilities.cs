@@ -4,7 +4,7 @@ namespace Benday.AzureDevOpsUtil.Api;
 
 public static class JsonUtilities
 {
-    public static T? GetJsonValueAsType<T>(string json)
+    public static T GetJsonValueAsType<T>(string json)
     {
         if (json == null)
         {
@@ -13,6 +13,13 @@ public static class JsonUtilities
 
         var returnValue = JsonSerializer.Deserialize<T>(json);
 
-        return returnValue;
+        if (returnValue == null)
+        {
+            throw new InvalidOperationException($"Could not deserialize json to {nameof(T)}");
+        }
+        else
+        {
+            return returnValue;
+        }
     }
 }

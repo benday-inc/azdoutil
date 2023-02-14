@@ -32,7 +32,7 @@ public class AddUpdateConfigurationCommandFixture
         get
         {
             if (_ConfigurationManager == null)
-            {                
+            {
                 _ConfigurationManager =
                     Utilities.InitializeTestModeConfigurationManager();
             }
