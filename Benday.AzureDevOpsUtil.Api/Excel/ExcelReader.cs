@@ -7,23 +7,25 @@ public class ExcelReader
     private readonly string _PathToExcelFile;
     private List<string> _SheetNames;
 
+    public ExcelReader(string pathToExcelFile)
+    {
+        _PathToExcelFile = pathToExcelFile;
+
+        PopulateSheetNames();
+
+        if (_SheetNames == null)
+        {
+            throw new InvalidOperationException($"Problem while populating sheet names.");
+        }
+    }
+
     public List<string> SheetNames
     {
         get
         {
-            if (_SheetNames == null)
-            {
-                PopulateSheetNames();
-            }
-
             return _SheetNames;
         }
-    }
-
-    public ExcelReader(string pathToExcelFile)
-    {
-        _PathToExcelFile = pathToExcelFile;
-    }
+    }    
 
     private void PopulateSheetNames()
     {

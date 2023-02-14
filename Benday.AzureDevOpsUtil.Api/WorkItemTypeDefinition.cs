@@ -38,9 +38,9 @@ namespace Benday.AzureDevOpsUtil.Api
 
         private XDocument _document;
 
-        public XElement Element => _document.Root;
+        public XElement Element => _document.Root ?? throw new InvalidOperationException("Document root is null.");
 
-        private string _workItemType;
+        private string? _workItemType;
 
         public string WorkItemType
         {
@@ -99,7 +99,7 @@ namespace Benday.AzureDevOpsUtil.Api
             }
         }
 
-        public XElement GetFieldByRefname(string refname)
+        public XElement? GetFieldByRefname(string refname)
         {
             if (string.IsNullOrEmpty(refname))
                 throw new ArgumentException("refname is null or empty.", nameof(refname));
@@ -113,11 +113,9 @@ namespace Benday.AzureDevOpsUtil.Api
             return match;
         }
 
-        public XElement GetWebLayout()
+        public XElement? GetWebLayout()
         {
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-            var match = _document.Root.Element("WORKITEMTYPE").Element("FORM").Element("WebLayout");
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
+            var match = _document.Root?.Element("WORKITEMTYPE")?.Element("FORM")?.Element("WebLayout") ?? null;
 
             return match;
         }
@@ -134,7 +132,7 @@ namespace Benday.AzureDevOpsUtil.Api
             var match = webLayout.Descendants("Control").Where(x =>
                 x.HasAttributes == true &&
                 x.Attribute("FieldName") != null &&
-                x.Attribute("FieldName").Value == refname
+                x.Attribute("FieldName")!.Value == refname
             ).FirstOrDefault();
 
             return (match != null);
@@ -157,7 +155,7 @@ namespace Benday.AzureDevOpsUtil.Api
             var match = webLayout.Elements("Page").Where(x =>
                 x.HasAttributes == true &&
                 x.Attribute("Label") != null &&
-                x.Attribute("Label").Value == pageName
+                x.Attribute("Label")!.Value == pageName
             ).FirstOrDefault();
 
             return (match != null);
@@ -173,12 +171,12 @@ namespace Benday.AzureDevOpsUtil.Api
     <FIELDS> 
              */
 
-            var matches = _document.Root.Element("WORKITEMTYPE").Element("FIELDS").Elements(ELEMENT_NAME_FIELD).ToList();
+            var matches = _document.Root?.Element("WORKITEMTYPE")?.Element("FIELDS")?.Elements(ELEMENT_NAME_FIELD).ToList();
 
-            return matches.ToList();
+            return matches?.ToList() ?? new List<XElement>();
         }
 
-        public XElement GetFieldsElement()
+        public XElement? GetFieldsElement()
         {
             /*
              *<?xml version="1.0" encoding="utf-8"?>
@@ -188,39 +186,40 @@ namespace Benday.AzureDevOpsUtil.Api
     <FIELDS> 
              */
 
-            var match = _document.Root.Element("WORKITEMTYPE").Element("FIELDS");
+            var match = _document.Root?.Element("WORKITEMTYPE")?.Element("FIELDS");
 
             return match;
         }
 
-        public string GetInitialState()
+        public string? GetInitialState()
         {
-            var transitions = _document.Root.Element("WORKITEMTYPE").Element("WORKFLOW").Element("TRANSITIONS");
+            var transitions = _document.Root?.Element("WORKITEMTYPE")?.Element("WORKFLOW")?.Element("TRANSITIONS");
+
+            if (transitions == null)
+            {
+                return null;
+            }
 
             var match = (from temp in transitions.Elements("TRANSITION")
                          where
                          XmlUtility.GetAttributeValue(temp, "from") == string.Empty
                          select temp).FirstOrDefault();
 
-            if (match == null)
-            {
-                return null;
-            }
-            else
-            {
-                return XmlUtility.GetAttributeValue(match, "to");
-            }
+            return match == null ? null : XmlUtility.GetAttributeValue(match, "to");
         }
 
         public List<string> GetStates()
         {
-            var matches = _document.Root.Element("WORKITEMTYPE").Element("WORKFLOW").Elements("STATES").Elements("STATE");
+            var matches = _document.Root?.Element("WORKITEMTYPE")?.Element("WORKFLOW")?.Elements("STATES")?.Elements("STATE");
 
             var returnValue = new List<string>();
 
-            foreach (var item in matches)
+            if (matches != null)
             {
-                returnValue.Add(XmlUtility.GetAttributeValue(item, "value"));
+                foreach (var item in matches)
+                {
+                    returnValue.Add(XmlUtility.GetAttributeValue(item, "value"));
+                }
             }
 
             return returnValue;
@@ -228,7 +227,12 @@ namespace Benday.AzureDevOpsUtil.Api
 
         public List<XElement> GetStatesWithReadOnlyFlags()
         {
-            var allStates = _document.Root.Element("WORKITEMTYPE").Element("WORKFLOW").Elements("STATES").Elements("STATE");
+            var allStates = _document.Root?.Element("WORKITEMTYPE")?.Element("WORKFLOW")?.Elements("STATES")?.Elements("STATE");
+
+            if (allStates == null)
+            {
+                return new();
+            }
 
             var matches = (from temp in allStates
                            where temp.Descendants("READONLY").FirstOrDefault() != null
@@ -249,7 +253,12 @@ namespace Benday.AzureDevOpsUtil.Api
 
         public WorkItemStateTransitionCollection GetTransitions()
         {
-            var transitions = _document.Root.Element("WORKITEMTYPE").Element("WORKFLOW").Element("TRANSITIONS").Elements("TRANSITION");
+            var transitions = _document.Root?.Element("WORKITEMTYPE")?.Element("WORKFLOW")?.Element("TRANSITIONS")?.Elements("TRANSITION");
+
+            if (transitions == null)
+            {
+                throw new InvalidOperationException($"Could not locate transitions element.");
+            }
 
             string from;
             string to;
@@ -293,10 +302,7 @@ namespace Benday.AzureDevOpsUtil.Api
             {
                 var whenNotChangedElement = fieldElement.Element("WHENNOTCHANGED");
 
-                if (whenNotChangedElement != null)
-                {
-                    whenNotChangedElement.Remove();
-                }
+                whenNotChangedElement?.Remove();
             }
         }
 
@@ -330,14 +336,11 @@ namespace Benday.AzureDevOpsUtil.Api
 
                 var requiredElement = fieldElement.Element("REQUIRED");
 
-                if (requiredElement != null)
-                {
-                    requiredElement.Remove();
-                }
+                requiredElement?.Remove();
             }
         }
 
-        private void RemoveReadOnlyFromState(XElement stateWithReadOnly)
+        private static void RemoveReadOnlyFromState(XElement stateWithReadOnly)
         {
             var fieldsElement = stateWithReadOnly.Element("FIELDS");
 
@@ -388,6 +391,11 @@ namespace Benday.AzureDevOpsUtil.Api
             var states = GetStates();
             var initialState = GetInitialState();
 
+            if (initialState == null)
+            {
+                throw new InvalidOperationException($"Could not determine initial state for work item.");
+            }
+
             var allToAllTransitions = new WorkItemStateTransitionCollection
             {
                 { string.Empty, initialState }
@@ -427,7 +435,12 @@ namespace Benday.AzureDevOpsUtil.Api
 
             if (Contains(transition) == false)
             {
-                var transitions = _document.Root.Element("WORKITEMTYPE").Element("WORKFLOW").Element("TRANSITIONS");
+                var transitions = _document.Root?.Element("WORKITEMTYPE")?.Element("WORKFLOW")?.Element("TRANSITIONS");
+
+                if (transitions == null)
+                {
+                    throw new InvalidOperationException($"Could not locate transitions element");
+                }
 
                 var newTransition = XElement.Parse(transition.ToXml());
 
@@ -442,7 +455,12 @@ namespace Benday.AzureDevOpsUtil.Api
 
             if (ContainsState(state) == false)
             {
-                var states = _document.Root.Element("WORKITEMTYPE").Element("WORKFLOW").Element("STATES");
+                var states = _document.Root?.Element("WORKITEMTYPE")?.Element("WORKFLOW")?.Element("STATES");
+
+                if (states == null)
+                {
+                    throw new InvalidOperationException($"Could not locate states element.");
+                }
 
                 var newState = XElement.Parse(string.Format("<STATE value=\"{0}\" />", state));
 
@@ -455,21 +473,19 @@ namespace Benday.AzureDevOpsUtil.Api
             if (transition == null)
                 throw new ArgumentNullException(nameof(transition), "transition is null.");
 
-            var transitions = _document.Root.Element("WORKITEMTYPE").Element("WORKFLOW").Element("TRANSITIONS");
+            var transitions = _document.Root?.Element("WORKITEMTYPE")?.Element("WORKFLOW")?.Element("TRANSITIONS");
+
+            if (transitions == null)
+            {
+                throw new InvalidOperationException($"Could not locate transitions element.");
+            }
 
             var match = (from temp in transitions.Elements("TRANSITION")
                          where XmlUtility.GetAttributeValue(temp, "from") == transition.From &&
                          XmlUtility.GetAttributeValue(temp, "to") == transition.To
                          select temp).FirstOrDefault();
 
-            if (match == null)
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
+            return match != null;
         }
 
         public void RemoveState(string state)
@@ -481,13 +497,18 @@ namespace Benday.AzureDevOpsUtil.Api
             {
                 var removeThis = GetStateElement(state);
 
-                removeThis.Remove();
+                removeThis?.Remove();
             }
         }
 
-        private XElement GetStateElement(string state)
+        private XElement? GetStateElement(string state)
         {
-            var states = _document.Root.Element("WORKITEMTYPE").Element("WORKFLOW").Element("STATES");
+            var states = _document.Root?.Element("WORKITEMTYPE")?.Element("WORKFLOW")?.Element("STATES");
+
+            if (states == null)
+            {
+                return null;
+            }
 
             var match = (from temp in states.Elements("STATE")
                          where XmlUtility.GetAttributeValue(temp, "value") == state
@@ -501,14 +522,7 @@ namespace Benday.AzureDevOpsUtil.Api
                 throw new ArgumentException("state is null or empty.", nameof(state));
 
             var match = GetStateElement(state);
-            if (match == null)
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
+            return match != null;
         }
 
         public void RemoveTransition(string state)
@@ -516,7 +530,12 @@ namespace Benday.AzureDevOpsUtil.Api
             if (string.IsNullOrEmpty(state))
                 throw new ArgumentException("state is null or empty.", nameof(state));
 
-            var transitions = _document.Root.Element("WORKITEMTYPE").Element("WORKFLOW").Element("TRANSITIONS");
+            var transitions = _document.Root?.Element("WORKITEMTYPE")?.Element("WORKFLOW")?.Element("TRANSITIONS");
+
+            if (transitions == null)
+            {
+                throw new InvalidOperationException($"Could not locate transitions");
+            }
 
             var matches = (from temp in transitions.Elements("TRANSITION")
                            where

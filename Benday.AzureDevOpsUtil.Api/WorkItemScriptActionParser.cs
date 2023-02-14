@@ -1,11 +1,11 @@
 ﻿namespace Benday.AzureDevOpsUtil.Api;
 public class WorkItemScriptActionParser
 {
-    public List<WorkItemScriptAction> GetActions(List<WorkItemScriptRow> rows)
+    public static List<WorkItemScriptAction> GetActions(List<WorkItemScriptRow> rows)
     {
         var returnValue = new List<WorkItemScriptAction>();
 
-        WorkItemScriptAction current = null;
+        WorkItemScriptAction? current = null;
 
         foreach (var row in rows)
         {
@@ -22,9 +22,7 @@ public class WorkItemScriptActionParser
                         throw new InvalidOperationException($"Expected non-empty action id for excel row {row.ExcelRowId}");
                     }
 
-                    current = new WorkItemScriptAction();
-
-                    current.ActionId = row.ActionId;
+                    current = new WorkItemScriptAction() { ActionId = row.ActionId };
 
                     current.Rows.Add(row);
 
@@ -38,9 +36,7 @@ public class WorkItemScriptActionParser
                     }
                     else
                     {
-                        current = new WorkItemScriptAction();
-
-                        current.ActionId = row.ActionId;
+                        current = new WorkItemScriptAction() { ActionId = row.ActionId };
 
                         current.Rows.Add(row);
 

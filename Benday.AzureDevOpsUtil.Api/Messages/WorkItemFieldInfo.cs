@@ -15,15 +15,15 @@ public class WorkItemFieldInfo
     public bool AlwaysRequired { get; set; }
 
     [JsonPropertyName("dependentFields")]
-    public WorkItemDependentFieldInfo[] DependentFields { get; set; }
+    public WorkItemDependentFieldInfo[] DependentFields { get; set; } = new WorkItemDependentFieldInfo[0];
 
     [JsonPropertyName("referenceName")]
-    public string ReferenceName { get; set; }
+    public string ReferenceName { get; set; } = string.Empty;
 
     [JsonPropertyName("name")]
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
     [JsonPropertyName("url")]
-    public string Url { get; set; }
+    public string Url { get; set; } = string.Empty;
 
-    public string DataType { get; set; }
+    public string DataType { get; set; } = string.Empty;
 }

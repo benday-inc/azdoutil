@@ -27,7 +27,7 @@ public class ModifyWorkItemResponse
 
                 foreach (var key in Fields.Keys)
                 {
-                    _fieldsAsStrings.Add(key, Fields[key].ToString());
+                    _fieldsAsStrings.Add(key, Fields[key]?.ToString() ?? string.Empty);
                 }
             }
 

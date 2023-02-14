@@ -4,7 +4,6 @@ namespace Benday.AzureDevOpsUtil.Api.Excel;
 
 public class ExcelRowWrapper
 {
-    private readonly int _rowIndex;
     private readonly Dictionary<string, string> _values = new();
 
     public ExcelRowWrapper(Dictionary<string, int> mappings, ExcelWorksheet sheet, int rowIndex)
@@ -19,9 +18,9 @@ public class ExcelRowWrapper
             throw new ArgumentNullException(nameof(sheet), "Argument cannot be null.");
         }
 
-        _rowIndex = rowIndex;
+        RowIndex = rowIndex;
 
-        PopulateValues(sheet, mappings, _rowIndex);
+        PopulateValues(sheet, mappings, RowIndex);
     }
 
     private void PopulateValues(
@@ -48,7 +47,7 @@ public class ExcelRowWrapper
 
     public bool IsRowEmpty { get; private set; }
 
-    public int RowIndex => _rowIndex;
+    public int RowIndex { get; }
 
     public string this[string columnName]
     {
@@ -56,7 +55,7 @@ public class ExcelRowWrapper
         {
             if (_values.ContainsKey(columnName) == false)
             {
-                return null;
+                return string.Empty;
             }
             else
             {

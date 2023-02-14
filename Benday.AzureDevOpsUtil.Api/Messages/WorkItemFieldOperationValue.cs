@@ -7,12 +7,11 @@ public class WorkItemFieldOperationValue
     [JsonPropertyName("op")]
     public string Operation { get; set; } = "add";
 
-    [JsonPropertyName("path")]
-    public string Path { get; set; }
+    [JsonPropertyName("path")] public string Path { get; set; } = string.Empty;
 
     [JsonPropertyName("value")]
-    public object Value { get; set; }
+    public object Value { get; set; } = string.Empty;
 
     [JsonIgnore]
-    public string Refname { get; set; }
+    public string Refname { get; set; }= string.Empty;
 }

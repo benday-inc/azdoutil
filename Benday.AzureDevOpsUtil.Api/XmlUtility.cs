@@ -5,11 +5,11 @@ public static class XmlUtility
     {
         if (fromElement == null || fromElement.HasAttributes == false || fromElement.Attribute(attributeName) == null)
         {
-            return null;
+            return string.Empty;
         }
         else
         {
-            return fromElement.Attribute(attributeName).Value;
+            return fromElement.Attribute(attributeName)?.Value ?? string.Empty;
         }
     }
 

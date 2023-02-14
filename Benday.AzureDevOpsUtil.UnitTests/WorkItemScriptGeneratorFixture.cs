@@ -7,21 +7,21 @@ public class WorkItemScriptGeneratorFixture
     [TestInitialize]
     public void OnTestInitialize()
     {
-        _SystemUnderTest = null;
+        _systemUnderTest = null;
     }
 
-    private WorkItemScriptGenerator _SystemUnderTest;
+    private WorkItemScriptGenerator? _systemUnderTest;
 
     private WorkItemScriptGenerator SystemUnderTest
     {
         get
         {
-            if (_SystemUnderTest == null)
+            if (_systemUnderTest == null)
             {
-                _SystemUnderTest = new WorkItemScriptGenerator();
+                _systemUnderTest = new WorkItemScriptGenerator();
             }
 
-            return _SystemUnderTest;
+            return _systemUnderTest;
         }
     }
 

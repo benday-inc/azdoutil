@@ -8,21 +8,18 @@ public class WorkItemScriptActionParserFixture
     [TestInitialize]
     public void OnTestInitialize()
     {
-        _SystemUnderTest = null;
+        _systemUnderTest = null;
     }
 
-    private WorkItemScriptActionParser _SystemUnderTest;
+    private WorkItemScriptActionParser? _systemUnderTest;
 
     private WorkItemScriptActionParser SystemUnderTest
     {
         get
         {
-            if (_SystemUnderTest == null)
-            {
-                _SystemUnderTest = new WorkItemScriptActionParser();
-            }
+            _systemUnderTest ??= new WorkItemScriptActionParser();
 
-            return _SystemUnderTest;
+            return _systemUnderTest;
         }
     }
 
@@ -40,7 +37,7 @@ public class WorkItemScriptActionParserFixture
         };
 
         // act
-        var actions = SystemUnderTest.GetActions(rows);
+        var actions = WorkItemScriptActionParser.GetActions(rows);
 
         // assert
         Assert.AreEqual<int>(3, actions.Count, "Action count was wrong.");
@@ -63,7 +60,7 @@ public class WorkItemScriptActionParserFixture
         };
 
         // act
-        var actions = SystemUnderTest.GetActions(rows);
+        var actions = WorkItemScriptActionParser.GetActions(rows);
 
         // assert
         Assert.AreEqual<int>(3, actions.Count, "Action count was wrong.");
@@ -81,7 +78,7 @@ public class WorkItemScriptActionParserFixture
         };
 
         // act
-        var actions = SystemUnderTest.GetActions(rows);
+        var actions = WorkItemScriptActionParser.GetActions(rows);
 
         // assert
         Assert.AreEqual<int>(1, actions.Count, "Action count was wrong.");
@@ -100,7 +97,7 @@ public class WorkItemScriptActionParserFixture
         };
 
         // act
-        var actions = SystemUnderTest.GetActions(rows);
+        var actions = WorkItemScriptActionParser.GetActions(rows);
 
         // assert
         Assert.AreEqual<int>(1, actions.Count, "Action count was wrong.");
@@ -121,7 +118,7 @@ public class WorkItemScriptActionParserFixture
         };
 
         // act
-        var actions = SystemUnderTest.GetActions(rows);
+        var actions = WorkItemScriptActionParser.GetActions(rows);
 
         // assert
         Assert.AreEqual<int>(2, actions.Count, "Action count was wrong.");
@@ -129,11 +126,14 @@ public class WorkItemScriptActionParserFixture
         Assert.AreEqual<int>(1, actions[1].Rows.Count, "Row count was wrong for action 1");
     }
 
-    private WorkItemScriptRow CreateRow(string actionId, string desc)
+    private static WorkItemScriptRow CreateRow(string actionId, string desc)
     {
-        var row = new WorkItemScriptRow();
-        row.ActionId = actionId.ToString();
-        row.Description = desc;
+        var row = new WorkItemScriptRow()
+        {
+            ActionId = actionId.ToString(),
+            Description = desc
+        };        
+        
         return row;
     }
 

@@ -51,6 +51,13 @@ public class CreateWorkItemsFromExcelScriptCommand : AzureDevOpsCommandBase
 
     protected override async Task OnExecute()
     {
+        _skipFutureDates = Arguments.GetBooleanValue(Constants.CommandArg_SkipFutureDates);
+
+        if (_skipFutureDates == true)
+        {
+            WriteLine("Skip future dates is true. Skipping instructions that are in the future.");
+        }
+
         _teamProjectName = Arguments.GetStringValue(Constants.CommandArg_TeamProjectName);
         _pathToExcel = Arguments.GetStringValue(Constants.CommandArg_PathToExcel);
 
@@ -80,10 +87,10 @@ public class CreateWorkItemsFromExcelScriptCommand : AzureDevOpsCommandBase
 
         CleanUpRowDataShortcuts(rows);
 
-        _actions = new WorkItemScriptActionParser().GetActions(rows);
+        _actions = WorkItemScriptActionParser.GetActions(rows);
     }
 
-    private void CleanUpRowDataShortcuts(List<WorkItemScriptRow> rows)
+    private static void CleanUpRowDataShortcuts(List<WorkItemScriptRow> rows)
     {
         foreach (var row in rows)
         {
@@ -128,16 +135,9 @@ public class CreateWorkItemsFromExcelScriptCommand : AzureDevOpsCommandBase
         }
     }
 
-    private bool IsEqualCaseInsensitive(string value1, string value2)
+    private static bool IsEqualCaseInsensitive(string value1, string value2)
     {
-        if (string.Equals(value1, value2, StringComparison.CurrentCultureIgnoreCase) == true)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return string.Equals(value1, value2, StringComparison.CurrentCultureIgnoreCase);
     }
 
     private async Task CreatePbi(WorkItemScriptAction action)
@@ -174,7 +174,7 @@ public class CreateWorkItemsFromExcelScriptCommand : AzureDevOpsCommandBase
         AddActionWorkItemIdMap(action, savedWorkItemInfo);
     }
 
-    private string GetFullRefname(WorkItemScriptRow row)
+    private static string GetFullRefname(WorkItemScriptRow row)
     {
         if (row.Refname == "Title")
         {

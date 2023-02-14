@@ -3,22 +3,12 @@
 namespace Benday.AzureDevOpsUtil.Api.Messages;
 public class WorkItemRelation : IWorkItemRelation
 {
-    private WorkItemRelationAttributes _attributes;
 
     [JsonPropertyName("rel")]
-    public string RelationType { get; set; }
+    public string RelationType { get; set; } = string.Empty;
 
-    [JsonPropertyName("url")]
-    public string RelationUrl { get; set; }
+    [JsonPropertyName("url")] public string RelationUrl { get; set; } = string.Empty;
 
     [JsonPropertyName("attributes")]
-    public WorkItemRelationAttributes Attributes
-    {
-        get
-        {
-            if (_attributes == null) _attributes = new WorkItemRelationAttributes();
-            return _attributes;
-        }
-        set => _attributes = value;
-    }
+    public WorkItemRelationAttributes Attributes { get; set; } = new();
 }

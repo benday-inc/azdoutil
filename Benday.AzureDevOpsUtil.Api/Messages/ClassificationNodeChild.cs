@@ -5,6 +5,6 @@ namespace Benday.AzureDevOpsUtil.Api.Messages;
 public class ClassificationNodeChild : ClassificationNode
 {
     [JsonPropertyName("attributes")]
-    public ClassificationNodeAttributes Attributes { get; set; }
+    public ClassificationNodeAttributes Attributes { get; set; } = new();
 }
 
