@@ -5,14 +5,15 @@ namespace Benday.AzureDevOpsUtil.Api.ScriptGenerator;
 public class WorkItemScriptGenerator
 {
     private const int SPRINT_DURATION = 14;
-    public readonly List<string> FibonnaciValues =
+    public readonly List<string> FibonacciValues =
         new() {
         "1", "2", "3", "5", "8", "13", "21"
         };
 
     public readonly List<int> HourValues =
         new() {
-            1, 2, 3, 4, 5, 6, 8, 12, 16, 24, 32,38 };
+            1, 2, 3, 4, 5, 6, 8, 12
+        };
 
     private readonly List<string> _actionWords;
     private readonly List<string> _endingWords;
@@ -280,7 +281,7 @@ public class WorkItemScriptGenerator
                 action.Definition.Refname = "Status";
                 action.Definition.FieldValue = "Ready for Sprint";
 
-                item.Effort = FibonnaciValues.Random();
+                item.Effort = FibonacciValues.Random();
                 action.SetValue("Effort", item.Effort);
 
                 Actions.Add(action);
@@ -340,7 +341,7 @@ public class WorkItemScriptGenerator
                 action.Definition.Refname = "Status";
                 action.Definition.FieldValue = "Ready for Sprint";
 
-                pbi.Effort = FibonnaciValues.Random();
+                pbi.Effort = FibonacciValues.Random();
 
                 action.SetValue("Effort", pbi.Effort);
                 action.SetValue("IterationPath", string.Empty);
@@ -493,7 +494,7 @@ public class WorkItemScriptGenerator
                 action.Definition.FieldValue = "Committed";
 
                 action.SetValue("IterationPath", $"Sprint {sprint.SprintNumber}");
-                action.SetValue("Effort", FibonnaciValues.Random().ToString());
+                action.SetValue("Effort", FibonacciValues.Random().ToString());
 
                 Actions.Add(action);
             }
@@ -560,6 +561,9 @@ public class WorkItemScriptGenerator
             ((sprint.SprintNumber - 1) * SPRINT_DURATION) + createDateOffset;
         returnValue.Definition.Refname = "Title";
         returnValue.Definition.FieldValue = item.Title;
+
+        returnValue.SetValue("System.Description",
+            $"Created by action id '{actionId}'; Work item script id '{item.Id}';");
 
         return returnValue;
     }

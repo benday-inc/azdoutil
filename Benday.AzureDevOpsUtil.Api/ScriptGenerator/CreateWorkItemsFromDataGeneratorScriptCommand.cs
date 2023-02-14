@@ -80,12 +80,12 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
         {
             sprints.Add(new WorkItemScriptSprint()
             {
-                AverageNumberOfTasksPerPbi = 5,
+                AverageNumberOfTasksPerPbi = 3,
                 NewPbiCount = 15,
                 RefinedPbiCountMeeting1 = 5,
                 RefinedPbiCountMeeting2 = 5,
                 SprintNumber = i + 1,
-                SprintPbiCount = 7,
+                SprintPbiCount = 4,
                 SprintPbisToDoneCount = 5,
                 DailyHoursPerTeamMember = 6,
                 TeamMemberCount = 7
