@@ -196,6 +196,8 @@ public class WorkItemScriptGenerator
         ScriptSprintPlanning(sprint);
         ScriptDailyScrums(sprint);
 
+        MoveUndonePbisToBacklogAndReestimate(sprint);
+
         SprintTasks.Clear();
         ProductBacklogItemsInSprint.Clear();
         ProductBacklogItemsDone.Clear();
@@ -277,7 +279,8 @@ public class WorkItemScriptGenerator
                 action.Definition.Refname = "Status";
                 action.Definition.FieldValue = "Ready for Sprint";
 
-                action.SetValue("Effort", FibonnaciValues.Random());
+                item.Effort = FibonnaciValues.Random();
+                action.SetValue("Effort", item.Effort);
 
                 Actions.Add(action);
             }
@@ -315,6 +318,36 @@ public class WorkItemScriptGenerator
         Actions.Add(action);
     }
 
+    private void MoveUndonePbisToBacklogAndReestimate(WorkItemScriptSprint sprint)
+    {
+        foreach (var pbi in this.ProductBacklogItemsInSprint)
+        {
+            if (pbi.IsDone == false)
+            {
+                var action = new WorkItemScriptAction();
+
+                action.ActionId = GetNextActionNumber().ToString();
+                action.Definition.Operation = "Update";
+                action.Definition.Description = "PBI not done in sprint";
+                action.Definition.WorkItemId = pbi.Id;
+                action.Definition.WorkItemType = pbi.WorkItemType;
+
+                // last day of sprint
+                action.Definition.ActionDay =
+                    ((sprint.SprintNumber - 1) * SPRINT_DURATION) + 13;
+
+                action.Definition.Refname = "Status";
+                action.Definition.FieldValue = "Ready for Sprint";
+
+                pbi.Effort = FibonnaciValues.Random();
+
+                action.SetValue("Effort", pbi.Effort);
+                action.SetValue("IterationPath", string.Empty);
+
+                Actions.Add(action);
+            }
+        }        
+    }
     private void MarkPbiAsDone(WorkItemScriptSprint sprint, WorkItemScriptWorkItem pbi, int sprintDayNumber)
     {
         pbi.IsDone = true;

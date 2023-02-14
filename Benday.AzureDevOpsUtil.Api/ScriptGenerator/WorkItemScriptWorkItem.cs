@@ -34,4 +34,5 @@ public class WorkItemScriptWorkItem
         }
     }
     public bool IsDone { get; set; }
+    public string Effort { get; set; } = "0";
 }
