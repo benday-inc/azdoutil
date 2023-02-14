@@ -1,10 +1,4 @@
 ﻿using Benday.CommandsFramework;
-using OfficeOpenXml.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Benday.AzureDevOpsUtil.Api;
 public static class ExtensionMethods
@@ -18,14 +12,14 @@ public static class ExtensionMethods
         }
 
         var argsClone = execInfo.Arguments.ToDictionary(entry => entry.Key, entry => entry.Value);
-                
+
         if (quietMode == true)
         {
             argsClone.TryAdd(Constants.ArgumentNameQuietMode, "true");
         }
 
         var returnValue = new CommandExecutionInfo();
-        returnValue.Arguments= argsClone;
+        returnValue.Arguments = argsClone;
         returnValue.CommandName = commandName;
 
         return returnValue;

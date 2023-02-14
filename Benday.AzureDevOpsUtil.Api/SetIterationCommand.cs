@@ -1,10 +1,5 @@
 ﻿using Benday.AzureDevOpsUtil.Api.Messages;
 using Benday.CommandsFramework;
-using System;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Xml.Linq;
 namespace Benday.AzureDevOpsUtil.Api;
 
 [Command(Name = Constants.CommandName_SetIteration,

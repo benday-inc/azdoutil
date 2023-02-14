@@ -1,8 +1,3 @@
-using Benday.AzureDevOpsUtil.Api;
-using System;
-using System.Linq;
-using System.Xml.Linq;
-
 public static class StringUtility
 {
     public static string RemoveControlChars(string input)

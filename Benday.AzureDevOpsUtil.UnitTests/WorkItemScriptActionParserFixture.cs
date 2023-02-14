@@ -1,7 +1,4 @@
 ﻿using Benday.AzureDevOpsUtil.Api;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
 
 namespace Benday.AzureDevOpsUtil.UnitTests;
 
@@ -80,7 +77,7 @@ public class WorkItemScriptActionParserFixture
         var rows = new List<WorkItemScriptRow>()
         {
             CreateRow("1", "Action row 1"),
-            CreateRow("1", "Action row 2"),            
+            CreateRow("1", "Action row 2"),
         };
 
         // act

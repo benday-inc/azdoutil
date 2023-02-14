@@ -1,5 +1,4 @@
-﻿using Benday.AzureDevOpsUtil.Api;
-using Benday.CommandsFramework;
+﻿using Benday.CommandsFramework;
 
 class Program
 {
@@ -63,7 +62,7 @@ class Program
                         }
                     }
                 }
-            } 
+            }
             catch (KnownException ex)
             {
                 Console.WriteLine(ex.Message);

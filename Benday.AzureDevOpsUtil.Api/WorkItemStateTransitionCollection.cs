@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace Benday.AzureDevOpsUtil.Api
 {
     public class WorkItemStateTransitionCollection : List<WorkItemStateTransition>

@@ -1,11 +1,5 @@
 ﻿using Benday.AzureDevOpsUtil.Api.Messages;
 using Benday.CommandsFramework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace Benday.AzureDevOpsUtil.Api;
 
@@ -21,7 +15,7 @@ public class CreateTeamProjectCommand : AzureDevOpsCommandBase
     }
 
     public ListProjectsResponse? LastResult { get; private set; }
-    
+
     protected override ArgumentCollection GetAvailableArguments()
     {
         var arguments = new ArgumentCollection();

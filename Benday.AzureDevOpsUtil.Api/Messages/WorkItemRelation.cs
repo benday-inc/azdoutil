@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace Benday.AzureDevOpsUtil.Api.Messages;
 public class WorkItemRelation : IWorkItemRelation

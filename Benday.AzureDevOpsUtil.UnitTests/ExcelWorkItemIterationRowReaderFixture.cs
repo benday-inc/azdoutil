@@ -1,6 +1,4 @@
 ﻿using Benday.AzureDevOpsUtil.Api.Excel;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 
 namespace Benday.AzureDevOpsUtil.UnitTests;
 

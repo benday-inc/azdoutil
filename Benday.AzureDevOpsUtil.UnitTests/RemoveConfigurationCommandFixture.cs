@@ -99,5 +99,5 @@ public class RemoveConfigurationCommandFixture
 
         Assert.IsNull(actual1, $"Should not find configuration named 'config1'");
         Assert.IsNotNull(actual2, $"Could not find configuration named 'config2'");
-    }    
+    }
 }

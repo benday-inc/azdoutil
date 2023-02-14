@@ -1,9 +1,5 @@
 using Benday.AzureDevOpsUtil.Api;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
 using System.Xml.Linq;
-using System.Linq;
 
 namespace Benday.AzureDevOpsUtil.UnitTests
 {
@@ -162,7 +158,7 @@ namespace Benday.AzureDevOpsUtil.UnitTests
                 new WorkItemStateTransition("Dev Complete", "Refined"),
                 new WorkItemStateTransition("Dev Complete", "In QA"),
                 new WorkItemStateTransition("Dev Complete", "In Progress"),
-            };            
+            };
 
             // act
             SystemUnderTest.CreateAllToAllStateTransitions();
@@ -172,11 +168,11 @@ namespace Benday.AzureDevOpsUtil.UnitTests
 
             AssertAreEquivalent(expectedAllToAll, actual);
 
-/*
-            var xml = SystemUnderTest.Element.ToString();
+            /*
+                        var xml = SystemUnderTest.Element.ToString();
 
-            File.WriteAllText("/Users/benday/Pbi-Extra-States-all-to-all-transitions.xml", xml);
-            */
+                        File.WriteAllText("/Users/benday/Pbi-Extra-States-all-to-all-transitions.xml", xml);
+                        */
         }
 
         private void AssertAreEquivalent(List<WorkItemStateTransition> expected,

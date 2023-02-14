@@ -18,7 +18,7 @@ public class GetTeamProjectCommand : AzureDevOpsCommandBase
         var arguments = new ArgumentCollection();
 
         AddCommonArguments(arguments);
-        arguments.AddString(Constants.ArgumentNameTeamProjectName)  
+        arguments.AddString(Constants.ArgumentNameTeamProjectName)
             .AsRequired()
             .WithDescription("Team project name");
 

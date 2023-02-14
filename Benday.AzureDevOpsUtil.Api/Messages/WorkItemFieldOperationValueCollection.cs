@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace Benday.AzureDevOpsUtil.Api.Messages;
+﻿namespace Benday.AzureDevOpsUtil.Api.Messages;
 
 public class WorkItemFieldOperationValueCollection
 {

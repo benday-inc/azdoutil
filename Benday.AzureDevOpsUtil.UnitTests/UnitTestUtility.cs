@@ -1,7 +1,3 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.IO;
-using System;
-
 namespace Benday.AzureDevOpsUtil.UnitTests
 {
     public static class UnitTestUtility
@@ -32,7 +28,7 @@ namespace Benday.AzureDevOpsUtil.UnitTests
             Console.WriteLine($"pathToFile: {pathToFile}");
             Console.WriteLine($"fullyQualifiedPath: {fullyQualifiedPath}");
 
-            Assert.AreEqual<bool>(true, File.Exists(fullyQualifiedPath), 
+            Assert.AreEqual<bool>(true, File.Exists(fullyQualifiedPath),
                 $"Path should exist. '{fullyQualifiedPath}'");
 
             return fullyQualifiedPath;

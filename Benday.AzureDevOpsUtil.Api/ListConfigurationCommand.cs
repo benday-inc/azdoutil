@@ -38,7 +38,7 @@ public class ListConfigurationCommand : SynchronousCommand
             var configs = AzureDevOpsConfigurationManager.Instance.GetAll();
 
             Print(configs);
-        }        
+        }
     }
 
     private void Print(AzureDevOpsConfiguration[] configs)

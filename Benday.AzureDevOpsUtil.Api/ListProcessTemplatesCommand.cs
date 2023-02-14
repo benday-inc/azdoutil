@@ -1,10 +1,5 @@
 ﻿using Benday.AzureDevOpsUtil.Api.Messages;
 using Benday.CommandsFramework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Benday.AzureDevOpsUtil.Api;
 [Command(Name = Constants.CommandName_ListProcessTemplates,
@@ -21,7 +16,7 @@ public class ListProcessTemplatesCommand : AzureDevOpsCommandBase
     {
         var arguments = new ArgumentCollection();
 
-        AddCommonArguments(arguments);       
+        AddCommonArguments(arguments);
 
         return arguments;
     }
@@ -60,7 +55,7 @@ public class ListProcessTemplatesCommand : AzureDevOpsCommandBase
                 }
             }
         }
-    }   
+    }
 
     public ListProcessTemplatesResponse? LastResult { get; set; }
 }

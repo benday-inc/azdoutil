@@ -1,12 +1,6 @@
 ﻿using Benday.AzureDevOpsUtil.Api.Excel;
 using Benday.AzureDevOpsUtil.Api.Messages;
 using Benday.CommandsFramework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace Benday.AzureDevOpsUtil.Api;
 
@@ -366,7 +360,7 @@ public class CreateWorkItemsFromExcelScriptCommand : AzureDevOpsCommandBase
             execInfo.AddArgumentValue(Constants.CommandArg_IterationName, item.IterationName);
             execInfo.AddArgumentValue(Constants.CommandArg_StartDate, item.GetIterationStart(_startDate).ToShortDateString());
             execInfo.AddArgumentValue(Constants.CommandArg_EndDate, item.GetIterationEnd(_startDate).ToShortDateString());
-            
+
             var command = new SetIterationCommand(execInfo, _OutputProvider);
 
             await command.ExecuteAsync();

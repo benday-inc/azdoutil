@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 
 namespace Benday.AzureDevOpsUtil.Api;
 public class WorkItemScriptGenerator
 {
-    public readonly List<string> FibonnaciValues = 
+    public readonly List<string> FibonnaciValues =
         new() {
-        "1", "2", "3", "5", "8", "13", "21" 
+        "1", "2", "3", "5", "8", "13", "21"
         };
     private readonly List<string> _actionWords;
     private readonly List<string> _endingWords;
@@ -19,8 +14,8 @@ public class WorkItemScriptGenerator
     public WorkItemScriptGenerator()
     {
         _actionWords = GetActionWords();
-        _randomWords = GetRandomWords(); 
-        _endingWords = GetEndingWords();        
+        _randomWords = GetRandomWords();
+        _endingWords = GetEndingWords();
     }
 
     public string GetRandomTitle()
@@ -91,7 +86,7 @@ public class WorkItemScriptGenerator
             "for fuel",
             "after flipfloparoonie time",
             "for all the marbles",
-            "without extra sugar",  
+            "without extra sugar",
             "for real this time"
         };
     }

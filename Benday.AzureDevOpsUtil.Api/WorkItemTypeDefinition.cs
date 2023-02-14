@@ -1,10 +1,4 @@
-using Benday.XmlUtilities;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Xml.Linq;
-using System.Xml.XPath;
 
 namespace Benday.AzureDevOpsUtil.Api
 {
@@ -137,9 +131,9 @@ namespace Benday.AzureDevOpsUtil.Api
                 return false;
             }
 
-            var match = webLayout.Descendants("Control").Where(x => 
-                x.HasAttributes == true && 
-                x.Attribute("FieldName") != null && 
+            var match = webLayout.Descendants("Control").Where(x =>
+                x.HasAttributes == true &&
+                x.Attribute("FieldName") != null &&
                 x.Attribute("FieldName").Value == refname
             ).FirstOrDefault();
 
@@ -160,9 +154,9 @@ namespace Benday.AzureDevOpsUtil.Api
                 return false;
             }
 
-            var match = webLayout.Elements("Page").Where(x => 
-                x.HasAttributes == true && 
-                x.Attribute("Label") != null && 
+            var match = webLayout.Elements("Page").Where(x =>
+                x.HasAttributes == true &&
+                x.Attribute("Label") != null &&
                 x.Attribute("Label").Value == pageName
             ).FirstOrDefault();
 

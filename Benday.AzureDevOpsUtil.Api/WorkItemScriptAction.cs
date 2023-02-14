@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace Benday.AzureDevOpsUtil.Api;
+﻿namespace Benday.AzureDevOpsUtil.Api;
 
 public class WorkItemScriptAction
 {

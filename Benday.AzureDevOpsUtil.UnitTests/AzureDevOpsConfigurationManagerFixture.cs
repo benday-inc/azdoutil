@@ -1,5 +1,4 @@
 ﻿using Benday.AzureDevOpsUtil.Api;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Benday.AzureDevOpsUtil.UnitTests;
 
 [TestClass]
@@ -77,7 +76,7 @@ public class AzureDevOpsConfigurationManagerFixture
         Assert.AreEqual(expectedConfigurationName, actual.Name, "Config name was wrong");
         Assert.AreEqual(expectedUrl, actual.CollectionUrl, "Collection url was wrong");
         Assert.AreEqual(expectedToken, actual.Token, "Token was wrong");
-    }    
+    }
 
     [TestMethod]
     public void AddConfig_Named()
