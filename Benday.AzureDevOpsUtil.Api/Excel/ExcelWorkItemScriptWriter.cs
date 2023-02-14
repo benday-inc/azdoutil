@@ -18,11 +18,40 @@ public class ExcelWorkItemScriptWriter
             var worksheetScript = excel.Workbook.Worksheets.Add(ExcelConstants.SheetNameScript);
             var worksheetIterations = excel.Workbook.Worksheets.Add(ExcelConstants.SheetNameIterations);
 
+            AddIterations(excel, worksheetIterations);
             AddActions(excel, worksheetScript, actions);
 
             excel.SaveAs(filename);
         }
     }
+    private void AddIterations(ExcelPackage excel, ExcelWorksheet worksheet)
+    {
+        worksheet.SetValue(1, 1, ExcelConstants.ColumnNameIterationName);
+        worksheet.SetValue(1, 2, ExcelConstants.ColumnNameStartDay);
+        worksheet.SetValue(1, 3, ExcelConstants.ColumnNameEndDay);
+        
+        AddIteration(worksheet, 1);
+        AddIteration(worksheet, 2);
+        AddIteration(worksheet, 3);
+        AddIteration(worksheet, 4);
+        AddIteration(worksheet, 5);
+        AddIteration(worksheet, 6);
+    }
+
+    private static void AddIteration(
+        ExcelWorksheet worksheet,
+        int sprintNumber)
+    {
+        var rowIndex = sprintNumber + 1;
+
+        var sprintStartDate = ((sprintNumber - 1) * 14);
+        var sprintEndDate = (sprintNumber * 14) - 1;
+
+        worksheet.SetValue(rowIndex, 1, $"Sprint {sprintNumber}");
+        worksheet.SetValue(rowIndex, 2, sprintStartDate);
+        worksheet.SetValue(rowIndex, 3, sprintEndDate);
+    }
+
     private void AddActions(ExcelPackage excel, 
         ExcelWorksheet worksheet, 
         List<WorkItemScriptAction> actions)
