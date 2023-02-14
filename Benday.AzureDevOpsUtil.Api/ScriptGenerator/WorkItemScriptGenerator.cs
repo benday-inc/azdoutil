@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 
 namespace Benday.AzureDevOpsUtil.Api.ScriptGenerator;
 public class WorkItemScriptGenerator
@@ -11,6 +12,8 @@ public class WorkItemScriptGenerator
     private readonly List<string> _actionWords;
     private readonly List<string> _endingWords;
     private readonly List<string> _randomWords;
+    private int _createdWorkItemNumber = 100;
+    private int _createdActionNumber = 100;
 
     public WorkItemScriptGenerator()
     {
@@ -145,7 +148,8 @@ public class WorkItemScriptGenerator
         };
     }
 
-    public List<WorkItemScriptWorkItem> ProductBacklogItems { get; set; } = new();
+    public Dictionary<string, WorkItemScriptWorkItem> ProductBacklogItems { get; set; } = new();
+    public List<WorkItemScriptWorkItem> ProductBacklogItemsThatNeedRefinement { get; set; } = new();
     public List<WorkItemScriptAction> Actions { get; set; } = new();
 
     public void GenerateScript(WorkItemScriptSprint sprint)
@@ -155,26 +159,60 @@ public class WorkItemScriptGenerator
             throw new ArgumentNullException(nameof(sprint), $"{nameof(sprint)} is null.");
         }
 
-        var createdWorkItemNumber = 100;
-
         for (int i = 0; i < sprint.NewPbiCount; i++)
         {
-            createdWorkItemNumber += 100;
+            _createdWorkItemNumber += 100;
 
             var item = new WorkItemScriptWorkItem
             {
-                Id = $"pbi-{createdWorkItemNumber}",
+                Id = $"pbi-{_createdWorkItemNumber}",
                 Title = GetRandomTitle(),
                 WorkItemType = "PBI",
                 State = "New",
-                Iteration= string.Empty
+                Iteration = string.Empty
             };
 
-            ProductBacklogItems.Add(item);
+            ProductBacklogItems.Add(item.Id, item);
+            ProductBacklogItemsThatNeedRefinement.Add(item);
 
-            Actions.Add(GetCreateAction(item, sprint, ((i + 1) * 100)));
+            Actions.Add(GetCreateAction(item, sprint, GetNextActionNumber()));
         }
+
+        ScriptRefinementMeeting1(sprint);
     }
+
+    private int GetNextActionNumber()
+    {
+        return ((++_createdActionNumber) * 100);
+    }
+
+    private void ScriptRefinementMeeting1(WorkItemScriptSprint sprint)
+    {
+        for (int i = 0;i < sprint.RefinedPbiCountMeeting1 ;i++)
+        {
+            var item = this.ProductBacklogItemsThatNeedRefinement.RandomItem();
+
+            if (item != null)
+            {
+                var action = new WorkItemScriptAction();
+
+                action.ActionId = GetNextActionNumber().ToString();
+                action.Definition.Operation = "Update";
+                action.Definition.Description = "Set PBI status to Needs Refinement";
+                action.Definition.WorkItemId = item.Id;
+                action.Definition.WorkItemType = item.WorkItemType;
+                action.Definition.ActionDay =
+                    ((sprint.SprintNumber - 1) * SPRINT_DURATION) + 3;
+                action.Definition.Refname = "Status";
+                action.Definition.FieldValue = "Needs Refinement";
+
+                Actions.Add(action);
+            }
+        }
+
+
+    }
+
     private WorkItemScriptAction GetCreateAction(
         WorkItemScriptWorkItem item,
         WorkItemScriptSprint sprint,
@@ -193,5 +231,13 @@ public class WorkItemScriptGenerator
         returnValue.Definition.FieldValue = item.Title;
 
         return returnValue;
+    }
+   
+    public void GenerateScript(List<WorkItemScriptSprint> sprints)
+    {
+        foreach (var item in sprints)
+        {
+            GenerateScript(item);
+        }
     }
 }

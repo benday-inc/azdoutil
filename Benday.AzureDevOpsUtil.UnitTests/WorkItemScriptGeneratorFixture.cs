@@ -60,7 +60,7 @@ public class WorkItemScriptGeneratorFixture
         {
             AverageNumberOfTasksPerPbi = 5,
             NewPbiCount = 15,
-            RefinedPbiCount = 10,
+            RefinedPbiCountMeeting1 = 10,
             SprintNumber = 1,
             SprintPbiCount = 7,
             SprintPbisToDoneCount = 5
@@ -70,8 +70,8 @@ public class WorkItemScriptGeneratorFixture
         SystemUnderTest.GenerateScript(sprint);
 
         // assert
-        Assert.AreEqual<int>(sprint.NewPbiCount, 
-            SystemUnderTest.ProductBacklogItems.Count, 
+        Assert.AreEqual<int>(sprint.NewPbiCount,
+            SystemUnderTest.ProductBacklogItems.Count,
             $"PBI Count was wrong");
 
         Assert.AreEqual<int>(sprint.NewPbiCount,
@@ -85,17 +85,35 @@ public class WorkItemScriptGeneratorFixture
     {
         // arrange
 
-        var sprint = new WorkItemScriptSprint()
+        var sprint1 = new WorkItemScriptSprint()
         {
             AverageNumberOfTasksPerPbi = 5,
             NewPbiCount = 15,
-            RefinedPbiCount = 10,
+            RefinedPbiCountMeeting1 = 5,
+            RefinedPbiCountMeeting2 = 5,
             SprintNumber = 1,
             SprintPbiCount = 7,
             SprintPbisToDoneCount = 5
         };
 
-        SystemUnderTest.GenerateScript(sprint);
+        var sprint2 = new WorkItemScriptSprint()
+        {
+            AverageNumberOfTasksPerPbi = 5,
+            NewPbiCount = 15,
+            RefinedPbiCountMeeting1 = 5,
+            RefinedPbiCountMeeting2 = 5,
+            SprintNumber = 2,
+            SprintPbiCount = 7,
+            SprintPbisToDoneCount = 5
+        };
+
+        var sprints = new List<WorkItemScriptSprint>
+        {
+            sprint1,
+            sprint2
+        };
+
+        SystemUnderTest.GenerateScript(sprints);
 
         var toPath = Path.Combine(@"c:\temp\workitemscripttemp", $"script-{DateTime.Now.Ticks}.xlsx");
 

@@ -24,6 +24,22 @@ public static class RandomCollectionExtensionMethods
         }
     }
 
+    public static T? RandomItem<T>(this List<T> items) where T : class
+    {
+        var rnd = new RandomNumGen();
+
+        var randomIndex = rnd.GetNumberInRange(0, items.Count - 1);
+
+        if (randomIndex < items.Count)
+        {
+            return items[randomIndex];
+        }
+        else
+        {
+            return null;
+        }       
+    }
+
     public static string RandomPhrase(this List<string> strings, int wordCount)
     {
         if (strings == null)
