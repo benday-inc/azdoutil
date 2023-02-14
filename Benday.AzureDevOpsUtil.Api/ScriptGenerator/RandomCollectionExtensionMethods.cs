@@ -1,8 +1,8 @@
 ﻿using System.Text;
 
-namespace Benday.AzureDevOpsUtil.Api;
+namespace Benday.AzureDevOpsUtil.Api.ScriptGenerator;
 
-public static class CollectionExtensionMethods
+public static class RandomCollectionExtensionMethods
 {
     public static string Random(this List<string> strings)
     {
@@ -54,7 +54,7 @@ public static class CollectionExtensionMethods
             else
             {
                 alreadyUsedIndexes.Add(randomIndex);
-                builder.Append(" ");
+                builder.Append(' ');
                 builder.Append(strings[randomIndex]);
             }
         }

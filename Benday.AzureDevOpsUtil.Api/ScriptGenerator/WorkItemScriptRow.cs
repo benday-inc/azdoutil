@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Benday.AzureDevOpsUtil.Api;
+namespace Benday.AzureDevOpsUtil.Api.ScriptGenerator;
 public class WorkItemScriptRow
 {
     public bool IsComment

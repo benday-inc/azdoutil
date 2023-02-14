@@ -1,4 +1,6 @@
-﻿namespace Benday.AzureDevOpsUtil.Api.Excel;
+﻿using Benday.AzureDevOpsUtil.Api.ScriptGenerator;
+
+namespace Benday.AzureDevOpsUtil.Api.Excel;
 public class ExcelWorkItemScriptRowReader
 {
     public ExcelWorkItemScriptRowReader(ExcelReader reader)

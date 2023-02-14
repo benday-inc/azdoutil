@@ -1,8 +1,9 @@
 ﻿using System.Text;
 
-namespace Benday.AzureDevOpsUtil.Api;
+namespace Benday.AzureDevOpsUtil.Api.ScriptGenerator;
 public class WorkItemScriptGenerator
 {
+    private const int SPRINT_DURATION = 14;
     public readonly List<string> FibonnaciValues =
         new() {
         "1", "2", "3", "5", "8", "13", "21"
@@ -144,5 +145,46 @@ public class WorkItemScriptGenerator
         };
     }
 
+    public List<WorkItemScriptWorkItem> ProductBacklogItems { get; set; } = new();
+    public List<WorkItemScriptAction> Actions { get; set; } = new();
 
+    public void GenerateScript(WorkItemScriptSprint sprint)
+    {
+        if (sprint == null)
+        {
+            throw new ArgumentNullException(nameof(sprint), $"{nameof(sprint)} is null.");
+        }
+
+        var createdWorkItemNumber = 100;
+
+        for (int i = 0; i < sprint.NewPbiCount; i++)
+        {
+            createdWorkItemNumber += 100;
+
+            var item = new WorkItemScriptWorkItem
+            {
+                Id = $"{createdWorkItemNumber}",
+                Title = GetRandomTitle(),
+                WorkItemType = "PBI",
+                State = "New",
+                Iteration= string.Empty
+            };
+
+            ProductBacklogItems.Add(item);
+
+            Actions.Add(GetCreateAction(item, sprint));
+        }
+    }
+    private WorkItemScriptAction GetCreateAction(
+        WorkItemScriptWorkItem item,
+        WorkItemScriptSprint sprint)
+    {
+        var returnValue = new WorkItemScriptAction();
+
+        returnValue.Definition.ActionDay = sprint.SprintNumber * SPRINT_DURATION;
+        returnValue.Definition.Refname = "Title";
+        returnValue.Definition.FieldValue = item.Title;
+
+        return returnValue;
+    }
 }

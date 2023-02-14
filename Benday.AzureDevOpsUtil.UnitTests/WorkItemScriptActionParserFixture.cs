@@ -1,4 +1,4 @@
-﻿using Benday.AzureDevOpsUtil.Api;
+﻿using Benday.AzureDevOpsUtil.Api.ScriptGenerator;
 
 namespace Benday.AzureDevOpsUtil.UnitTests;
 

@@ -2,7 +2,7 @@
 using Benday.AzureDevOpsUtil.Api.Messages;
 using Benday.CommandsFramework;
 
-namespace Benday.AzureDevOpsUtil.Api;
+namespace Benday.AzureDevOpsUtil.Api.ScriptGenerator;
 
 [Command(Name = Constants.CommandName_CreateWorkItemsFromExcelScript,
         Description = "Create work items using Excel script",

@@ -1,4 +1,4 @@
-﻿namespace Benday.AzureDevOpsUtil.Api;
+﻿namespace Benday.AzureDevOpsUtil.Api.ScriptGenerator;
 public class WorkItemScriptActionParser
 {
     public static List<WorkItemScriptAction> GetActions(List<WorkItemScriptRow> rows)
