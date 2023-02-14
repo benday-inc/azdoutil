@@ -26,9 +26,21 @@ public static class RandomCollectionExtensionMethods
 
     public static T? RandomItem<T>(this List<T> items) where T : class
     {
+        if (items.Count == 0)
+        {
+            return null;
+        }
+
         var rnd = new RandomNumGen();
 
-        var randomIndex = rnd.GetNumberInRange(0, items.Count - 1);
+        var topOfRange = items.Count - 1;
+
+        if (topOfRange < 0)
+        {
+            topOfRange = 0;
+        }
+
+        var randomIndex = rnd.GetNumberInRange(0, topOfRange);
 
         if (randomIndex < items.Count)
         {

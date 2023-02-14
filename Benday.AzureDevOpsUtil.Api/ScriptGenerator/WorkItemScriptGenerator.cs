@@ -9,6 +9,12 @@ public class WorkItemScriptGenerator
         new() {
         "1", "2", "3", "5", "8", "13", "21"
         };
+
+    public readonly List<string> HourValues =
+        new() {
+        "1", "2", "3", "4", "6", "8", "12", "16", "24", "40"
+        };
+
     private readonly List<string> _actionWords;
     private readonly List<string> _endingWords;
     private readonly List<string> _randomWords;
@@ -144,9 +150,11 @@ public class WorkItemScriptGenerator
     }
 
     public Dictionary<string, WorkItemScriptWorkItem> ProductBacklogItems { get; set; } = new();
+    public Dictionary<string, WorkItemScriptWorkItem> SprintTasks { get; set; } = new();
     public List<WorkItemScriptWorkItem> ProductBacklogItemsThatNeedRefinementRound1 { get; set; } = new();
     public List<WorkItemScriptWorkItem> ProductBacklogItemsThatNeedRefinementRound2 { get; set; } = new();
     public List<WorkItemScriptWorkItem> ProductBacklogItemsReadyForSprint { get; set; } = new();
+    public List<WorkItemScriptWorkItem> ProductBacklogItemsInSprint { get; set; } = new();
     public List<WorkItemScriptAction> Actions { get; set; } = new();
 
     private void Move(WorkItemScriptWorkItem moveThis,
@@ -185,6 +193,10 @@ public class WorkItemScriptGenerator
 
         ScriptRefinementMeeting1(sprint);
         ScriptRefinementMeeting2(sprint);
+        ScriptSprintPlanning(sprint);
+
+        SprintTasks.Clear();
+        ProductBacklogItemsInSprint.Clear();
     }
 
     private int GetNextActionNumber()
@@ -267,6 +279,82 @@ public class WorkItemScriptGenerator
 
                 Actions.Add(action);
             }
+        }
+    }
+
+    private void ScriptSprintPlanning(WorkItemScriptSprint sprint, bool randomizeNumber = false)
+    {
+        var rnd = new RandomNumGen();
+
+        int numberOfItemsToSelect = sprint.SprintPbiCount;
+
+        if (randomizeNumber == true)
+        {
+            numberOfItemsToSelect =
+                rnd.GetNumberInRange(0,
+                    sprint.SprintPbiCount);
+        }
+
+        for (int i = 0; i < numberOfItemsToSelect; i++)
+        {
+            var item = this.ProductBacklogItemsReadyForSprint.RandomItem();
+
+            if (item != null)
+            {
+                Move(item, this.ProductBacklogItemsReadyForSprint,
+                    this.ProductBacklogItemsInSprint);
+
+                var action = new WorkItemScriptAction();
+
+                action.ActionId = GetNextActionNumber().ToString();
+                action.Definition.Operation = "Update";
+                action.Definition.Description = "PBI selected for sprint\r\n";
+                action.Definition.WorkItemId = item.Id;
+                action.Definition.WorkItemType = item.WorkItemType;
+                action.Definition.ActionDay =
+                    ((sprint.SprintNumber - 1) * SPRINT_DURATION);
+                action.Definition.Refname = "Status";
+                action.Definition.FieldValue = "Committed";
+
+                action.AddSetValue("IterationPath", $"Sprint {sprint.SprintNumber}");
+
+                Actions.Add(action);
+            }
+        }
+
+        foreach (var parentPbi in this.ProductBacklogItemsInSprint)
+        {
+            for (int i = 0; i < sprint.AverageNumberOfTasksPerPbi; i++)
+            {
+                var task = new WorkItemScriptWorkItem()
+                {
+                    Id = $"task-{GetNextActionNumber()}",
+                    Iteration = $"Sprint {sprint.SprintNumber}",
+                    State = "New",
+                    Title = $"{parentPbi.Id}: Task {GetRandomTitle()}",
+                    WorkItemType = "Task",
+                    Parent = parentPbi
+                };
+
+                this.SprintTasks.Add(task.Id, task);
+
+                var action = new WorkItemScriptAction();
+
+                action.ActionId = GetNextActionNumber().ToString();
+                action.Definition.Operation = "Create";
+                action.Definition.Description = "Add task for PBI";
+                action.Definition.WorkItemId = task.Id;
+                action.Definition.WorkItemType = task.WorkItemType;
+                action.Definition.ActionDay =
+                    ((sprint.SprintNumber - 1) * SPRINT_DURATION);
+                action.Definition.Refname = "Title";
+                action.Definition.FieldValue = task.Title;
+
+                action.AddSetValue("IterationPath", $"Sprint {sprint.SprintNumber}");
+                action.AddSetValue("PARENT", parentPbi.Id);
+
+                Actions.Add(action);
+            }            
         }
     }
 
