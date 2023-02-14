@@ -43,6 +43,24 @@ public class ExcelWorkItemScriptWriter
         mappings.Add(ExcelConstants.ColumnNameFieldValue, ++columnIndex);
 
         AddColumnHeaders(worksheet, mappings);
+
+        var rowIndex = 1;
+
+        foreach ( var action in actions )
+        {
+            var row = new ExcelRowWriteWrapper(mappings, worksheet, ++rowIndex);
+
+            row[ExcelConstants.ColumnNameActionId] = action.ActionId;
+            row[ExcelConstants.ColumnNameDescription] = action.Definition.Description;
+            row[ExcelConstants.ColumnNameWorkItemId] = action.Definition.WorkItemId;
+            row[ExcelConstants.ColumnNameOperation] = action.Definition.Operation;
+            row[ExcelConstants.ColumnNameWorkItemType] = action.Definition.WorkItemType;
+            row[ExcelConstants.ColumnNameActionDay] = action.Definition.ActionDay.ToString();
+            row[ExcelConstants.ColumnNameActionHour] = action.Definition.ActionHour.ToString();
+            row[ExcelConstants.ColumnNameActionMinute] = action.Definition.ActionMinute.ToString();
+            row[ExcelConstants.ColumnNameRefname] = action.Definition.Refname;
+            row[ExcelConstants.ColumnNameFieldValue] = action.Definition.FieldValue;
+        }
     }
 
     private void AddColumnHeaders(ExcelWorksheet worksheet, Dictionary<string, int> mappings)

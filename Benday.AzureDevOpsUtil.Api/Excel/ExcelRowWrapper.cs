@@ -2,9 +2,11 @@
 
 namespace Benday.AzureDevOpsUtil.Api.Excel;
 
+
+
 public class ExcelRowWrapper
 {
-    private readonly Dictionary<string, string> _values = new();
+    protected readonly Dictionary<string, string> _values = new();
 
     public ExcelRowWrapper(Dictionary<string, int> mappings, ExcelWorksheet sheet, int rowIndex)
     {
