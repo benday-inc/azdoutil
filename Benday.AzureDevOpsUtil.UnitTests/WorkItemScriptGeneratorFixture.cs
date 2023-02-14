@@ -1,4 +1,5 @@
-﻿using Benday.AzureDevOpsUtil.Api.ScriptGenerator;
+﻿using Benday.AzureDevOpsUtil.Api.Excel;
+using Benday.AzureDevOpsUtil.Api.ScriptGenerator;
 
 namespace Benday.AzureDevOpsUtil.UnitTests;
 [TestClass]
@@ -76,6 +77,37 @@ public class WorkItemScriptGeneratorFixture
         Assert.AreEqual<int>(sprint.NewPbiCount,
             SystemUnderTest.Actions.Count,
             $"Action count was wrong");
+
+    }
+
+    [TestMethod]
+    public void SaveScriptToExcel()
+    {
+        // arrange
+
+        var sprint = new WorkItemScriptSprint()
+        {
+            AverageNumberOfTasksPerPbi = 5,
+            NewPbiCount = 15,
+            RefinedPbiCount = 10,
+            SprintNumber = 1,
+            SprintPbiCount = 7,
+            SprintPbisToDoneCount = 5
+        };
+
+        SystemUnderTest.GenerateScript(sprint);
+
+        var toPath = Path.Combine(@"c:\temp", $"script-{DateTime.Now.Ticks}.xlsx");
+
+        Assert.IsFalse(File.Exists(toPath), $"File should not exist at {toPath}");
+
+        // act
+        new ExcelWorkItemScriptWriter().WriteToExcel(
+            toPath,
+            SystemUnderTest.Actions);
+
+        // assert
+        Assert.IsTrue(File.Exists(toPath), $"File should exist at {toPath}");
 
     }
 }
