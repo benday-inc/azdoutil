@@ -89,6 +89,26 @@ public class ExcelWorkItemScriptWriter
             row[ExcelConstants.ColumnNameActionMinute] = action.Definition.ActionMinute.ToString();
             row[ExcelConstants.ColumnNameRefname] = action.Definition.Refname;
             row[ExcelConstants.ColumnNameFieldValue] = action.Definition.FieldValue;
+
+            if (action.Rows.Count > 1)
+            {
+                bool isFirst = true;
+
+                foreach (var childRow in action.Rows)
+                {
+                    if (isFirst == true)
+                    {
+                        isFirst = false;
+                    }
+                    else
+                    {
+                        var childRowWriter = new ExcelRowWriteWrapper(mappings, worksheet, ++rowIndex);
+
+                        childRowWriter[ExcelConstants.ColumnNameRefname] = childRow.Refname;
+                        childRowWriter[ExcelConstants.ColumnNameFieldValue] = childRow.FieldValue;
+                    }
+                }
+            }
         }
     }
 

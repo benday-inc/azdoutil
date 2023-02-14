@@ -40,11 +40,6 @@ public class WorkItemScriptGenerator
         return $"{char.ToUpper(word[0])}{word[1..]}";
     }
 
-    //public List<WorkItemScriptAction> GetWorkItemScript()
-    //{
-
-    //}
-
     private List<string> GetActionWords()
     {
         return new List<string>()
@@ -149,8 +144,18 @@ public class WorkItemScriptGenerator
     }
 
     public Dictionary<string, WorkItemScriptWorkItem> ProductBacklogItems { get; set; } = new();
-    public List<WorkItemScriptWorkItem> ProductBacklogItemsThatNeedRefinement { get; set; } = new();
+    public List<WorkItemScriptWorkItem> ProductBacklogItemsThatNeedRefinementRound1 { get; set; } = new();
+    public List<WorkItemScriptWorkItem> ProductBacklogItemsThatNeedRefinementRound2 { get; set; } = new();
+    public List<WorkItemScriptWorkItem> ProductBacklogItemsReadyForSprint { get; set; } = new();
     public List<WorkItemScriptAction> Actions { get; set; } = new();
+
+    private void Move(WorkItemScriptWorkItem moveThis,
+        List<WorkItemScriptWorkItem> fromList,
+        List<WorkItemScriptWorkItem> toList)
+    {
+        fromList.Remove(moveThis);
+        toList.Add(moveThis);
+    }
 
     public void GenerateScript(WorkItemScriptSprint sprint)
     {
@@ -173,12 +178,13 @@ public class WorkItemScriptGenerator
             };
 
             ProductBacklogItems.Add(item.Id, item);
-            ProductBacklogItemsThatNeedRefinement.Add(item);
+            ProductBacklogItemsThatNeedRefinementRound1.Add(item);
 
             Actions.Add(GetCreateAction(item, sprint, GetNextActionNumber()));
         }
 
         ScriptRefinementMeeting1(sprint);
+        ScriptRefinementMeeting2(sprint);
     }
 
     private int GetNextActionNumber()
@@ -186,14 +192,27 @@ public class WorkItemScriptGenerator
         return ((++_createdActionNumber) * 100);
     }
 
-    private void ScriptRefinementMeeting1(WorkItemScriptSprint sprint)
+    private void ScriptRefinementMeeting1(WorkItemScriptSprint sprint, bool randomizeNumber = false)
     {
-        for (int i = 0;i < sprint.RefinedPbiCountMeeting1 ;i++)
+        var rnd = new RandomNumGen();
+
+        int numberOfItemsToRefine = sprint.RefinedPbiCountMeeting1;
+
+        if (randomizeNumber == true)
         {
-            var item = this.ProductBacklogItemsThatNeedRefinement.RandomItem();
+            numberOfItemsToRefine =
+                rnd.GetNumberInRange(0,
+                    sprint.RefinedPbiCountMeeting1);
+        }
+
+        for (int i = 0; i < numberOfItemsToRefine; i++)
+        {
+            var item = this.ProductBacklogItemsThatNeedRefinementRound1.RandomItem();
 
             if (item != null)
             {
+                Move(item, this.ProductBacklogItemsThatNeedRefinementRound1,
+                    this.ProductBacklogItemsThatNeedRefinementRound2);
                 var action = new WorkItemScriptAction();
 
                 action.ActionId = GetNextActionNumber().ToString();
@@ -209,8 +228,46 @@ public class WorkItemScriptGenerator
                 Actions.Add(action);
             }
         }
+    }
 
+    private void ScriptRefinementMeeting2(WorkItemScriptSprint sprint, bool randomizeNumber = false)
+    {
+        var rnd = new RandomNumGen();
 
+        int numberOfItemsToRefine = sprint.RefinedPbiCountMeeting2;
+
+        if (randomizeNumber == true)
+        {
+            numberOfItemsToRefine = 
+                rnd.GetNumberInRange(0,
+                    sprint.RefinedPbiCountMeeting2);
+        }
+
+        for (int i = 0; i < numberOfItemsToRefine; i++)
+        {
+            var item = this.ProductBacklogItemsThatNeedRefinementRound2.RandomItem();
+
+            if (item != null)
+            {
+                Move(item, this.ProductBacklogItemsThatNeedRefinementRound2,
+                    this.ProductBacklogItemsReadyForSprint);
+                var action = new WorkItemScriptAction();
+
+                action.ActionId = GetNextActionNumber().ToString();
+                action.Definition.Operation = "Update";
+                action.Definition.Description = "PBI Got Refined and is ready for sprint";
+                action.Definition.WorkItemId = item.Id;
+                action.Definition.WorkItemType = item.WorkItemType;
+                action.Definition.ActionDay =
+                    ((sprint.SprintNumber - 1) * SPRINT_DURATION) + 10;
+                action.Definition.Refname = "Status";
+                action.Definition.FieldValue = "Ready for Sprint";
+
+                action.AddSetValue("Effort", FibonnaciValues.Random());
+
+                Actions.Add(action);
+            }
+        }
     }
 
     private WorkItemScriptAction GetCreateAction(

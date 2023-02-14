@@ -25,5 +25,16 @@ public class WorkItemScriptAction
         return startDate;
     }
 
+    public void AddSetValue(string refname, string value)
+    {
+        var temp = new WorkItemScriptRow()
+        {
+            Refname = refname,
+            FieldValue = value
+        };
+
+        Rows.Add(temp);
+    }
+
     public bool Skip { get; set; } = false;
 }
