@@ -97,7 +97,7 @@ public class WorkItemScriptGeneratorFixture
 
         SystemUnderTest.GenerateScript(sprint);
 
-        var toPath = Path.Combine(@"c:\temp", $"script-{DateTime.Now.Ticks}.xlsx");
+        var toPath = Path.Combine(@"c:\temp\workitemscripttemp", $"script-{DateTime.Now.Ticks}.xlsx");
 
         Assert.IsFalse(File.Exists(toPath), $"File should not exist at {toPath}");
 

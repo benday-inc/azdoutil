@@ -163,7 +163,7 @@ public class WorkItemScriptGenerator
 
             var item = new WorkItemScriptWorkItem
             {
-                Id = $"{createdWorkItemNumber}",
+                Id = $"pbi-{createdWorkItemNumber}",
                 Title = GetRandomTitle(),
                 WorkItemType = "PBI",
                 State = "New",
@@ -172,16 +172,23 @@ public class WorkItemScriptGenerator
 
             ProductBacklogItems.Add(item);
 
-            Actions.Add(GetCreateAction(item, sprint));
+            Actions.Add(GetCreateAction(item, sprint, ((i + 1) * 100)));
         }
     }
     private WorkItemScriptAction GetCreateAction(
         WorkItemScriptWorkItem item,
-        WorkItemScriptSprint sprint)
+        WorkItemScriptSprint sprint,
+        int actionId)
     {
         var returnValue = new WorkItemScriptAction();
 
-        returnValue.Definition.ActionDay = sprint.SprintNumber * SPRINT_DURATION;
+        returnValue.ActionId = actionId.ToString();
+        returnValue.Definition.Operation = "Create";
+        returnValue.Definition.Description = "Create PBI";
+        returnValue.Definition.WorkItemId = item.Id;
+        returnValue.Definition.WorkItemType = item.WorkItemType;
+        returnValue.Definition.ActionDay = 
+            ((sprint.SprintNumber - 1)  * SPRINT_DURATION);
         returnValue.Definition.Refname = "Title";
         returnValue.Definition.FieldValue = item.Title;
 
