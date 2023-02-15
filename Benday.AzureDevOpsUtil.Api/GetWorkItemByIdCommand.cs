@@ -43,7 +43,7 @@ public class GetWorkItemByIdCommand : AzureDevOpsCommandBase
 
     private async Task RunWorkItemQuery()
     {
-        var requestUrl = $"_apis/wit/workitems/{WorkItemId}?api-version=6.0";
+        var requestUrl = $"_apis/wit/workitems/{WorkItemId}?api-version=6.0&$expand=All";
 
         WorkItem = await CallEndpointViaGetAndGetResult<GetWorkItemByIdResponse>(requestUrl, true);
     }

@@ -236,6 +236,8 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
 
         PopulateBody(action, actionDate, body);
 
+        body.AddValue("System.CreatedDate", actionDate.ToString());
+
         var savedWorkItemInfo =
             await SendPatchForBodyAndGetTypedResponse<ModifyWorkItemResponse>(
                 requestUrl, body);
