@@ -84,6 +84,48 @@ public static class ExtensionMethods
         }
     }
 
+    public static int GetInt32Value(
+    this ArgumentCollection args, string argumentName)
+    {
+        if (args.ContainsKey(argumentName) == false)
+        {
+            return 0;
+        }
+        else
+        {
+            var argAsInt32 = args[argumentName] as Int32Argument;
+
+            if (argAsInt32 == null)
+            {
+                throw new InvalidOperationException($"Cannot get as int arg '{argumentName}'.");
+            }
+            else
+            {
+                if (argAsInt32.HasValue == false)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return argAsInt32.ValueAsInt32;
+                }
+            }
+        }
+    }
+
+    public static bool HasValue(
+        this ArgumentCollection args, string argumentName)
+    {
+        if (args.ContainsKey(argumentName) == false)
+        {
+            return false;
+        }
+        else
+        {
+            return args[argumentName].HasValue;
+        }
+    }
+
     public static string GetStringValue(
         this ArgumentCollection args, string argumentName)
     {

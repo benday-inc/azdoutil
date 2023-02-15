@@ -1,8 +1,11 @@
 ﻿using System.Text;
 
-namespace Benday.AzureDevOpsUtil.Api;
+namespace Benday.AzureDevOpsUtil.Api.ScriptGenerator;
 public class WorkItemScriptRow
 {
+    private string _refname = string.Empty;
+    private string _fieldValue = string.Empty;
+
     public bool IsComment
     {
         get
@@ -26,8 +29,37 @@ public class WorkItemScriptRow
     public int ActionDay { get; set; }
     public int ActionHour { get; set; }
     public int ActionMinute { get; set; }
-    public string Refname { get; set; } = string.Empty;
-    public string FieldValue { get; set; } = string.Empty;
+    public string Refname
+    {
+        get => _refname;
+        set
+        {
+            if (value == null)
+            {
+                _refname = string.Empty;
+            }
+            else
+            {
+                _refname = value.Trim();
+            }
+        }
+
+    }
+    public string FieldValue { get => _fieldValue;
+
+        set
+        {
+            if (value == null)
+            {
+                _fieldValue = string.Empty;
+            }
+            else
+            {
+                _fieldValue = value.Trim();
+            }
+        }
+
+    }
     public int ExcelRowId { get; set; }
 
     public override string ToString()

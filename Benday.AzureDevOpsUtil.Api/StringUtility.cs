@@ -14,6 +14,14 @@ public static class StringUtility
         }
     }
 
+    public static bool IsEqualsCaseInsensitive(
+        string value1,
+        string value2)
+    {
+        return string.Equals(
+            value1, value2, StringComparison.CurrentCultureIgnoreCase);
+    }
+
     public static bool ContainsControlCharacters(string input)
     {
         if (input == null)

@@ -1,4 +1,4 @@
-﻿namespace Benday.AzureDevOpsUtil.Api;
+﻿namespace Benday.AzureDevOpsUtil.Api.ScriptGenerator;
 
 public class WorkItemScriptAction
 {
@@ -10,12 +10,10 @@ public class WorkItemScriptAction
         {
             if (Rows.Count == 0)
             {
-                throw new InvalidOperationException("No definition row");
+                Rows.Add(new WorkItemScriptRow());
             }
-            else
-            {
-                return Rows[0];
-            }
+
+            return Rows[0];
         }
     }
     public DateTime GetActionDate(DateTime startDate)
@@ -25,6 +23,17 @@ public class WorkItemScriptAction
         startDate = startDate.AddMinutes(Definition.ActionMinute);
 
         return startDate;
+    }
+
+    public void SetValue(string refname, string value)
+    {
+        var temp = new WorkItemScriptRow()
+        {
+            Refname = refname,
+            FieldValue = value
+        };
+
+        Rows.Add(temp);
     }
 
     public bool Skip { get; set; } = false;

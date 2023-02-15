@@ -1,8 +1,8 @@
 ﻿using System.Text;
 
-namespace Benday.AzureDevOpsUtil.Api;
+namespace Benday.AzureDevOpsUtil.Api.ScriptGenerator;
 
-public static class CollectionExtensionMethods
+public static class RandomCollectionExtensionMethods
 {
     public static string Random(this List<string> strings)
     {
@@ -21,6 +21,62 @@ public static class CollectionExtensionMethods
             var randomIndex = rnd.GetNumberInRange(0, strings.Count - 1);
 
             return strings[randomIndex];
+        }
+    }
+
+    public static T? RandomItem<T>(this List<T> items) where T : class
+    {
+        if (items.Count == 0)
+        {
+            return null;
+        }
+
+        var rnd = new RandomNumGen();
+
+        var topOfRange = items.Count - 1;
+
+        if (topOfRange < 0)
+        {
+            topOfRange = 0;
+        }
+
+        var randomIndex = rnd.GetNumberInRange(0, topOfRange);
+
+        if (randomIndex < items.Count)
+        {
+            return items[randomIndex];
+        }
+        else
+        {
+            return null;
+        }       
+    }
+
+    public static int RandomItem(this List<int> items)
+    {
+        if (items.Count == 0)
+        {
+            return 0;
+        }
+
+        var rnd = new RandomNumGen();
+
+        var topOfRange = items.Count - 1;
+
+        if (topOfRange < 0)
+        {
+            topOfRange = 0;
+        }
+
+        var randomIndex = rnd.GetNumberInRange(0, topOfRange);
+
+        if (randomIndex < items.Count)
+        {
+            return items[randomIndex];
+        }
+        else
+        {
+            return 0;
         }
     }
 
@@ -54,7 +110,7 @@ public static class CollectionExtensionMethods
             else
             {
                 alreadyUsedIndexes.Add(randomIndex);
-                builder.Append(" ");
+                builder.Append(' ');
                 builder.Append(strings[randomIndex]);
             }
         }

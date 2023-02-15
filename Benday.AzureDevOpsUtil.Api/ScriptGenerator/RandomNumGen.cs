@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 
-namespace Benday.AzureDevOpsUtil.Api;
+namespace Benday.AzureDevOpsUtil.Api.ScriptGenerator;
 
 
 public class RandomNumGen
