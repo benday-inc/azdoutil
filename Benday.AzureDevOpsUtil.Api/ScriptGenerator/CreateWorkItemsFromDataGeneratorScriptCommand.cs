@@ -487,6 +487,8 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
     {
         WriteLine($"Team project: {_teamProjectName}");
 
+        bool createdNewProject = false;
+
         var getExistingProjectCommand = CreateGetTeamProjectCommandInstance();
 
         await getExistingProjectCommand.ExecuteAsync();
@@ -500,6 +502,8 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
         else if (_createProjectIfNotExists == true &&
             getExistingProjectCommand.LastResult == null)
         {
+            createdNewProject = true;
+
             var createProjectCommand = CreateCreateTeamProjectCommandInstance();
 
             await createProjectCommand.ExecuteAsync();
@@ -532,6 +536,18 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
                     }
                 }
             }
+        }
+
+        if (createdNewProject == true)
+        {
+            // wait before proceeding to let azdo catch up
+            WriteLine($"Project ready.  Calling backlog board to initialize...");
+
+            using var client = GetHttpClientInstanceForAzureDevOps();
+
+            await client.GetStringAsync($"{_teamProjectName}/_boards/board/t/{_teamProjectName}%20Team");
+
+            WriteLine($"Project ready.  Called backlog board to initialize...");
         }
     }
 }
