@@ -435,6 +435,8 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
 
     private async Task EnsureProjectExists()
     {
+        WriteLine($"Team project: {_teamProjectName}");
+
         var getExistingProjectCommand = CreateGetTeamProjectCommandInstance();
 
         await getExistingProjectCommand.ExecuteAsync();

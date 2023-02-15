@@ -2,7 +2,7 @@
   "profiles": {
     "Benday.AzureDevOpsUtil.ConsoleUi": {
       "commandName": "Project",
-      "commandLineArgs": "createfromgenerator /numberofsprints:7 /processname:\"scrum with backlog refinement\" /createproject:true /teamproject:test20230214f"
+      "commandLineArgs": "createfromgenerator /numberofsprints:1 /processname:\"scrum with backlog refinement\" /createproject:true /teamproject:test20230215e"
     }
   }
 }
