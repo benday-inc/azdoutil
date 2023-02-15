@@ -29,6 +29,7 @@ public static class Constants
     public const string CommandArg_Comment = "comment";
     public const string CommandArg_SkipFutureDates = "skipfuturedates";
     public const string CommandArg_PathToExcel = "pathtoexcel";
+    public const string CommandArg_SaveScriptFileTo = "savescriptto";
     public const string CommandArg_StartDate = "startdate";
     public const string CommandArg_TeamProjectName = "teamproject";
     public const string CommandArg_CreateProjectIfNotExists = "createproject";

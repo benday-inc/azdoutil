@@ -54,16 +54,38 @@ public class WorkItemFieldOperationValueCollection
     }
 
     public void AddValue(string referenceName, string value)
-    {
-        var temp = new WorkItemFieldOperationValue()
+    {                             
+        if (string.Equals("Microsoft.VSTS.Scheduling.RemainingWork",
+                referenceName, StringComparison.CurrentCultureIgnoreCase) == true)
         {
-            Operation = "add",
-            Path = $"/fields/{referenceName}",
-            Value = value,
-            Refname = referenceName
-        };
+            if (int.TryParse(value, out var resultAsInt) == false)
+            {
+                throw new InvalidOperationException(
+                    $"Could not convert '{value}' to int for {referenceName}.");
+            }
 
-        CheckForDuplicateAndAddValue(temp);
+            var temp = new WorkItemFieldOperationValue()
+            {
+                Operation = "add",
+                Path = $"/fields/{referenceName}",
+                Value = resultAsInt,
+                Refname = referenceName
+            };
+
+            CheckForDuplicateAndAddValue(temp);
+        }
+        else
+        {
+            var temp = new WorkItemFieldOperationValue()
+            {
+                Operation = "add",
+                Path = $"/fields/{referenceName}",
+                Value = value,
+                Refname = referenceName
+            };
+
+            CheckForDuplicateAndAddValue(temp);
+        }
     }
 
     public void AddValue(WorkItemFieldInfo field, string nowTicks, int index)

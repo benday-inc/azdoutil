@@ -303,7 +303,9 @@ public class WorkItemScriptGenerator
             action.Definition.Refname = "Status";
             action.Definition.FieldValue = "Done";
 
-            action.SetValue("RemainingWork", remainingWork.ToString());
+            // don't set remaining work when marking as 'Done'
+            // to avoid an error
+            // action.SetValue("RemainingWork", remainingWork.ToString());
         }
         else
         {
