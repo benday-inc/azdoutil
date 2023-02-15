@@ -197,9 +197,21 @@ public class WorkItemScriptGenerator
 
         ScriptSprintPlanning(sprint);
         
-        ScriptSprint(sprint);
+        ScriptDailySprintActivities(sprint);
 
-        MoveUndonePbisToBacklogAndReestimate(sprint);
+        var rnd = new RandomNumGen();
+
+        var lotteryNumber = rnd.GetNumberInRange(0, 4);
+
+        if (lotteryNumber == 1)
+        {
+            // have a great sprint...surprise...everything goes to done
+            MoveUndonePbisToDone(sprint);
+        }
+        else
+        {
+            MoveUndonePbisToBacklogAndReestimate(sprint);
+        }
 
         SprintTasks.Clear();
         ProductBacklogItemsInSprint.Clear();
@@ -325,6 +337,32 @@ public class WorkItemScriptGenerator
         Actions.Add(action);
     }
 
+    private void MoveUndonePbisToDone(WorkItemScriptSprint sprint)
+    {
+        foreach (var pbi in this.ProductBacklogItemsInSprint)
+        {
+            if (pbi.IsDone == false)
+            {
+                var action = new WorkItemScriptAction();
+
+                action.ActionId = GetNextActionNumber().ToString();
+                action.Definition.Operation = "Update";
+                action.Definition.Description = "PBI won the lottery and got done";
+                action.Definition.WorkItemId = pbi.Id;
+                action.Definition.WorkItemType = pbi.WorkItemType;
+
+                // last day of sprint
+                action.Definition.ActionDay =
+                    ((sprint.SprintNumber - 1) * SPRINT_DURATION) + 13;
+
+                action.Definition.Refname = "Status";
+                action.Definition.FieldValue = "Done";                
+
+                Actions.Add(action);
+            }
+        }
+    }
+
     private void MoveUndonePbisToBacklogAndReestimate(WorkItemScriptSprint sprint)
     {
         foreach (var pbi in this.ProductBacklogItemsInSprint)
@@ -441,7 +479,7 @@ public class WorkItemScriptGenerator
         }
     }
 
-    private void ScriptSprint(WorkItemScriptSprint sprint)
+    private void ScriptDailySprintActivities(WorkItemScriptSprint sprint)
     {
         // week 1
         // no daily scrum on first day because sprint planning
