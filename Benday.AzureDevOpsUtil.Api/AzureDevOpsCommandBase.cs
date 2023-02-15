@@ -134,6 +134,11 @@ public abstract class AzureDevOpsCommandBase : AsynchronousCommand
         {
             var responseContent = await result.Content.ReadAsStringAsync();
 
+            if (writeStringContentToInfo == true)
+            {
+                WriteLine(responseContent);
+            }
+
             var typedResponse = JsonUtilities.GetJsonValueAsType<T>(responseContent);
 
             return typedResponse!;

@@ -37,8 +37,13 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
             .AllowEmptyValue(false)
             .WithDescription("Creates the team project if it doesn't exist");
 
+        arguments.AddBoolean(Constants.CommandArg_AllPbisGoToDone)
+            .AsNotRequired()
+            .AllowEmptyValue(true)
+            .WithDescription("All PBIs in a sprint makes it to done");
+
         arguments.AddString(Constants.CommandArg_SaveScriptFileTo)
-            .WithDescription("Save generated script file to disk")
+            .WithDescription("Save generated script file to disk in this directory")
             .AsNotRequired();
 
         return arguments;
@@ -74,6 +79,8 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
         {
             var toPath = Arguments.GetStringValue(Constants.CommandArg_SaveScriptFileTo);
 
+            toPath = Path.Combine(toPath, $"workitem-script-{DateTime.Now.Ticks}.xlsx");
+
             // var toPath = Path.Combine(@"c:\temp\workitemscripttemp", $"workitem-script-{DateTime.Now.Ticks}.xlsx");
 
             new ExcelWorkItemScriptWriter().WriteToExcel(
@@ -105,9 +112,12 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
         //var sprintStartDate = ((sprintNumber - 1) * 14);
         //var sprintEndDate = (sprintNumber * 14) - 1;
 
+        var markAllPbisAsDone = Arguments.GetBooleanValue(
+            Constants.CommandArg_AllPbisGoToDone);
+
         var generator = new WorkItemScriptGenerator();
 
-        generator.GenerateScript(sprints);
+        generator.GenerateScript(sprints, markAllPbisAsDone);
 
         WriteScriptToDisk(generator);
 
@@ -195,25 +205,33 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
     private async Task CreatePbi(WorkItemScriptAction action)
     {
         WriteLine($"Action #{action.ActionId} - Create PBI - {action.Definition.Description} - {action.Rows.Count} steps");
-        await CreateWorkItem(action);
+        await CreateWorkItem(action, true);
     }
 
     private async Task UpdatePbi(WorkItemScriptAction action)
     {
         WriteLine($"Action #{action.ActionId} - Update PBI - {action.Definition.Description} - {action.Rows.Count} steps");
-        await ModifyWorkItem(action);
+        await ModifyWorkItem(action, true);
     }
 
-    private async Task CreateWorkItem(WorkItemScriptAction action)
+    private async Task CreateWorkItem(WorkItemScriptAction action, bool bypassRules)
     {
         var workItemTypeName = action.Definition.WorkItemType;
         var workItemTypeNameHtmlEncoded = workItemTypeName.Replace(" ", "%20");
 
         var actionDate = action.GetActionDate(_startDate);
 
-        // var requestUrl = $"{_teamProjectName}/_apis/wit/workitems/${workItemTypeNameHtmlEncoded}?api-version=6.0&bypassRules=true&supressNotifications=true";
-        var requestUrl = $"{_teamProjectName}/_apis/wit/workitems/${workItemTypeNameHtmlEncoded}?api-version=6.0&supressNotifications=true";
+        string requestUrl;
 
+        if (bypassRules == true)
+        {
+            requestUrl = $"{_teamProjectName}/_apis/wit/workitems/${workItemTypeNameHtmlEncoded}?api-version=6.0&bypassRules=true&supressNotifications=true";
+        }
+        else
+        {
+            requestUrl = $"{_teamProjectName}/_apis/wit/workitems/${workItemTypeNameHtmlEncoded}?api-version=6.0";
+        }
+        
         WorkItemFieldOperationValueCollection body = new();
 
         PopulateBody(action, actionDate, body);
@@ -281,19 +299,21 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
                     {
                         body.AddValue(GetFullRefname(row), $"In Progress");
                     }
+                    else if (row.FieldValue == "Done")
+                    {
+                        body.AddValue(GetFullRefname(row), row.FieldValue);
+                    }
                     else
                     {
                         body.AddValue(GetFullRefname(row), row.FieldValue);
                     }
 
-                    /*
                     if (row.FieldValue == "Done")
                     {
                         body.AddValue(
                             "Microsoft.VSTS.Common.ClosedDate",
                             actionDate.ToString());
                     }
-                    */
                 }
                 else
                 {
@@ -345,7 +365,7 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
     }
 
 
-    private async Task ModifyWorkItem(WorkItemScriptAction action)
+    private async Task ModifyWorkItem(WorkItemScriptAction action, bool bypassRules)
     {
         // convert placeholder work item id from excel to 
         // the real work item that was previously created
@@ -353,8 +373,17 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
 
         var actionDate = action.GetActionDate(_startDate);
 
-        // var requestUrl = $"{_teamProjectName}/_apis/wit/workitems/{realWorkItemId}?api-version=6.0&bypassRules=true&supressNotifications=true";
-        var requestUrl = $"{_teamProjectName}/_apis/wit/workitems/{realWorkItemId}?api-version=6.0&supressNotifications=true";
+        string requestUrl;
+
+        if (bypassRules == true)
+        {
+            requestUrl = 
+                $"{_teamProjectName}/_apis/wit/workitems/{realWorkItemId}?api-version=6.0&bypassRules=true&supressNotifications=true";
+        }
+        else
+        {
+            requestUrl = $"{_teamProjectName}/_apis/wit/workitems/{realWorkItemId}?api-version=6.0";
+        }
 
         WorkItemFieldOperationValueCollection body = new();
 

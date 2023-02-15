@@ -6,6 +6,7 @@ public class WorkItemScriptWorkItem
     public string Title { get; set; } = string.Empty;
     public string WorkItemType { get; set; } = string.Empty;
     public string State { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
     public string Iteration { get; set; } = string.Empty;
     public int RemainingWork { get; set; } = 0;
     public WorkItemScriptWorkItem? Parent { get; set; }

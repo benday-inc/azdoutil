@@ -169,7 +169,8 @@ public class WorkItemScriptGenerator
         toList.Add(moveThis);
     }
 
-    public void GenerateScript(WorkItemScriptSprint sprint)
+    public void GenerateScript(WorkItemScriptSprint sprint,
+        bool markAllSprintPbisAsDone = false)
     {
         if (sprint == null)
         {
@@ -203,10 +204,15 @@ public class WorkItemScriptGenerator
 
         var lotteryNumber = rnd.GetNumberInRange(0, 4);
 
-        if (lotteryNumber == 1)
+        if (markAllSprintPbisAsDone == true)
         {
-            // have a great sprint...surprise...everything goes to done
-            MoveUndonePbisToDone(sprint);
+            // had a great sprint...surprise...everything goes to done
+            MoveUndonePbisToDone(sprint, "mark all sprints as done mode;");
+        }
+        else if (lotteryNumber == 1)
+        {
+            // had a great sprint...surprise...everything goes to done
+            MoveUndonePbisToDone(sprint, "won the pbi lottery;");
         }
         else
         {
@@ -337,12 +343,14 @@ public class WorkItemScriptGenerator
         Actions.Add(action);
     }
 
-    private void MoveUndonePbisToDone(WorkItemScriptSprint sprint)
+    private void MoveUndonePbisToDone(WorkItemScriptSprint sprint, string reason)
     {
         foreach (var pbi in this.ProductBacklogItemsInSprint)
         {
             if (pbi.IsDone == false)
             {
+                pbi.Description = $"{pbi.Description}{reason}Sprint day number 13;";
+
                 var action = new WorkItemScriptAction();
 
                 action.ActionId = GetNextActionNumber().ToString();
@@ -355,8 +363,10 @@ public class WorkItemScriptGenerator
                 action.Definition.ActionDay =
                     ((sprint.SprintNumber - 1) * SPRINT_DURATION) + 13;
 
-                action.Definition.Refname = "Status";
-                action.Definition.FieldValue = "Done";                
+                action.Definition.Refname = FIELD_NAME_STATE;
+                action.Definition.FieldValue = STATE_DONE;
+
+                action.SetValue("System.Description", pbi.Description);
 
                 Actions.Add(action);
             }
@@ -408,6 +418,10 @@ public class WorkItemScriptGenerator
             ((sprint.SprintNumber - 1) * SPRINT_DURATION) + sprintDayNumber;
         action.Definition.Refname = FIELD_NAME_STATE;
         action.Definition.FieldValue = STATE_DONE;
+
+        pbi.Description = $"{pbi.Description} All work completed on sprint day #{sprintDayNumber};";
+
+        action.SetValue("System.Description", pbi.Description);
 
         Actions.Add(action);
     }
@@ -515,6 +529,8 @@ public class WorkItemScriptGenerator
                     sprint.SprintPbiCount);
         }
 
+        Console.WriteLine($"Sprint {sprint.SprintNumber}, Sprint Planning: Choosing {numberOfItemsToSelect} PBIs");
+
         for (int i = 0; i < numberOfItemsToSelect; i++)
         {
             var item = this.ProductBacklogItemsReadyForSprint.RandomItem();
@@ -534,6 +550,7 @@ public class WorkItemScriptGenerator
                 action.Definition.ActionDay =
                     ((sprint.SprintNumber - 1) * SPRINT_DURATION);
                 action.Definition.Refname = FIELD_NAME_STATE;
+                item.State = "Committed";
                 action.Definition.FieldValue = "Committed";
 
                 action.SetValue("IterationPath", $"Sprint {sprint.SprintNumber}");
@@ -598,6 +615,9 @@ public class WorkItemScriptGenerator
         returnValue.Definition.WorkItemId = item.Id;
         returnValue.Definition.WorkItemType = item.WorkItemType;
         
+        item.Description = $"Created by action id '{actionId}'; Work item script id '{item.Id}'";
+        item.State = "New";
+
         // always create the PBIs 1 week ahead of sprint
         // this avoids date problems in azdo
         returnValue.Definition.ActionDay =
@@ -606,7 +626,7 @@ public class WorkItemScriptGenerator
         returnValue.Definition.FieldValue = item.Title;
 
         returnValue.SetValue("System.Description",
-            $"Created by action id '{actionId}'; Work item script id '{item.Id}';");
+            item.Description);
 
         return returnValue;
     }
@@ -636,13 +656,14 @@ public class WorkItemScriptGenerator
         ScriptRefinementMeeting2(sprint, createDateOffset: -14);
     }
 
-    public void GenerateScript(List<WorkItemScriptSprint> sprints)
+    public void GenerateScript(List<WorkItemScriptSprint> sprints,
+        bool markAllSprintPbisAsDone = false)
     {
         AddBasicStartingInfo(sprints[0]);
 
         foreach (var item in sprints)
         {
-            GenerateScript(item);
+            GenerateScript(item, markAllSprintPbisAsDone);
         }
     }
 }
