@@ -19,8 +19,10 @@ public static class Constants
     public const string CommandName_ListProcessTemplates = "listprocesstemplates";
     public const string CommandName_SetIteration = "setiteration";
     public const string CommandName_GetWorkItemById = "getworkitem";
+    public const string CommandName_DeleteProject = "deleteproject";
 
     public const string ArgumentNameTeamProjectName = "name";
+    public const string ArgumentNameConfirm = "confirm";
     public const string ArgumentNameConfigurationName = "config";
     public const string ArgumentNameCollectionUrl = "url";
     public const string ArgumentNameToken = "pat";

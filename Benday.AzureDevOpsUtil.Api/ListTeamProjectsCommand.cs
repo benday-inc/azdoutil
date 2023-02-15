@@ -42,7 +42,7 @@ public class ListTeamProjectsCommand : AzureDevOpsCommandBase
         {
             WriteLine($"Project count: {LastResult!.Count}");
 
-            foreach (var item in LastResult.Projects)
+            foreach (var item in LastResult.Projects.OrderBy(p => p.Name))
             {
                 WriteLine($"{item.Name}");
             }
