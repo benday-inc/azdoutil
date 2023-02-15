@@ -26,6 +26,7 @@ public class ExcelWorkItemScriptWriter
             excel.SaveAs(filename);
         }
     }
+
     private void AddIterations(ExcelPackage excel, ExcelWorksheet worksheet)
     {
         worksheet.SetValue(1, 1, ExcelConstants.ColumnNameIterationName);

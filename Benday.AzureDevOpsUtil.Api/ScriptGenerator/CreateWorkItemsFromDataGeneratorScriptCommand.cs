@@ -37,6 +37,10 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
             .AllowEmptyValue(false)
             .WithDescription("Creates the team project if it doesn't exist");
 
+        arguments.AddString(Constants.CommandArg_SaveScriptFileTo)
+            .WithDescription("Save generated script file to disk")
+            .AsNotRequired();
+
         return arguments;
     }
 
@@ -63,13 +67,19 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
 
         return startOfSprint;
     }
+
     private void WriteScriptToDisk(WorkItemScriptGenerator generator)
     {
-        var toPath = Path.Combine(@"c:\temp\workitemscripttemp", $"workitem-script-{DateTime.Now.Ticks}.xlsx");
+        if (Arguments.HasValue(Constants.CommandArg_SaveScriptFileTo) == true)
+        {
+            var toPath = Arguments.GetStringValue(Constants.CommandArg_SaveScriptFileTo);
 
-        new ExcelWorkItemScriptWriter().WriteToExcel(
-            toPath,
-            generator.Actions);
+            // var toPath = Path.Combine(@"c:\temp\workitemscripttemp", $"workitem-script-{DateTime.Now.Ticks}.xlsx");
+
+            new ExcelWorkItemScriptWriter().WriteToExcel(
+                toPath,
+                generator.Actions);
+        }        
     }
 
     protected override async Task OnExecute()
@@ -201,7 +211,8 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
 
         var actionDate = action.GetActionDate(_startDate);
 
-        var requestUrl = $"{_teamProjectName}/_apis/wit/workitems/${workItemTypeNameHtmlEncoded}?api-version=6.0&bypassRules=true&supressNotifications=true";
+        // var requestUrl = $"{_teamProjectName}/_apis/wit/workitems/${workItemTypeNameHtmlEncoded}?api-version=6.0&bypassRules=true&supressNotifications=true";
+        var requestUrl = $"{_teamProjectName}/_apis/wit/workitems/${workItemTypeNameHtmlEncoded}?api-version=6.0&supressNotifications=true";
 
         WorkItemFieldOperationValueCollection body = new();
 
@@ -222,7 +233,9 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
         {
             return "System.Title";
         }
-        else if (row.Refname == "Status" || row.Refname == "State")
+        else if (
+            StringUtility.IsEqualsCaseInsensitive("Status", row.Refname) ||
+            StringUtility.IsEqualsCaseInsensitive("State", row.Refname))
         {
             return "System.State";
         }
@@ -336,7 +349,8 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
 
         var actionDate = action.GetActionDate(_startDate);
 
-        var requestUrl = $"{_teamProjectName}/_apis/wit/workitems/{realWorkItemId}?api-version=6.0&bypassRules=true&supressNotifications=true";
+        // var requestUrl = $"{_teamProjectName}/_apis/wit/workitems/{realWorkItemId}?api-version=6.0&bypassRules=true&supressNotifications=true";
+        var requestUrl = $"{_teamProjectName}/_apis/wit/workitems/{realWorkItemId}?api-version=6.0&supressNotifications=true";
 
         WorkItemFieldOperationValueCollection body = new();
 

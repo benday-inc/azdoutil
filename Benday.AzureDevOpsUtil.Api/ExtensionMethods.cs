@@ -113,6 +113,19 @@ public static class ExtensionMethods
         }
     }
 
+    public static bool HasValue(
+        this ArgumentCollection args, string argumentName)
+    {
+        if (args.ContainsKey(argumentName) == false)
+        {
+            return false;
+        }
+        else
+        {
+            return args[argumentName].HasValue;
+        }
+    }
+
     public static string GetStringValue(
         this ArgumentCollection args, string argumentName)
     {
