@@ -40,5 +40,6 @@ public static class Constants
     public const string CommandArg_SprintCount = "numberofsprints";
     public const string CommandArg_WorkItemId = "id";
     public const string CommandArg_AllPbisGoToDone = "alldone";
+    public const string CommandArg_AddSessionTag = "addsessiontag";
 
 }

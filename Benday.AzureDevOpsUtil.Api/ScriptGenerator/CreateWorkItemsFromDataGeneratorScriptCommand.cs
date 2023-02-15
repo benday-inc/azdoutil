@@ -42,6 +42,11 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
             .AllowEmptyValue(true)
             .WithDescription("All PBIs in a sprint makes it to done");
 
+        arguments.AddBoolean(Constants.CommandArg_AddSessionTag)
+            .AsNotRequired()
+            .AllowEmptyValue(true)
+            .WithDescription("Add a session tag to work items");
+
         arguments.AddString(Constants.CommandArg_SaveScriptFileTo)
             .WithDescription("Save generated script file to disk in this directory")
             .AsNotRequired();
@@ -54,6 +59,8 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
     private bool _createProjectIfNotExists = false;
     private List<WorkItemScriptAction>? _actions;
     private string _teamProjectName = string.Empty;
+
+    private bool _addSessionTag = false;
 
     private DateTime FindStartDate(List<WorkItemScriptSprint> sprints)
     {
@@ -89,6 +96,8 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
         }        
     }
 
+    private readonly string _sessionId = DateTime.Now.Ticks.ToString()[^5..];
+
     protected override async Task OnExecute()
     {
         var sprints = new List<WorkItemScriptSprint>();
@@ -114,6 +123,9 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
 
         var markAllPbisAsDone = Arguments.GetBooleanValue(
             Constants.CommandArg_AllPbisGoToDone);
+
+        _addSessionTag = Arguments.GetBooleanValue(
+            Constants.CommandArg_AddSessionTag);
 
         var generator = new WorkItemScriptGenerator();
 
@@ -204,18 +216,18 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
 
     private async Task CreatePbi(WorkItemScriptAction action)
     {
-        WriteLine($"Action #{action.ActionId} - Create PBI - {action.Definition.Description} - {action.Rows.Count} steps");
         await CreateWorkItem(action, true);
     }
 
     private async Task UpdatePbi(WorkItemScriptAction action)
-    {
-        WriteLine($"Action #{action.ActionId} - Update PBI - {action.Definition.Description} - {action.Rows.Count} steps");
+    {        
         await ModifyWorkItem(action, true);
     }
 
     private async Task CreateWorkItem(WorkItemScriptAction action, bool bypassRules)
     {
+        // WriteLine($"Action #{action.ActionId} - Create PBI - {action.Definition.Description} - {action.Rows.Count} steps");
+
         var workItemTypeName = action.Definition.WorkItemType;
         var workItemTypeNameHtmlEncoded = workItemTypeName.Replace(" ", "%20");
 
@@ -238,12 +250,17 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
 
         body.AddValue("System.CreatedDate", actionDate.ToString());
 
+        if (_addSessionTag == true)
+        {
+            body.AddValue("System.Tags", $"Session {_sessionId}");
+        }
+
         var savedWorkItemInfo =
             await SendPatchForBodyAndGetTypedResponse<ModifyWorkItemResponse>(
                 requestUrl, body);
 
-        WriteLine($"Modified {action.Definition.WorkItemType} for action id {action.ActionId} as work item id '{savedWorkItemInfo.Id}'...");
-
+        WriteLine($"Create PBI - {action.Definition.Description} -- {action.Definition.WorkItemType} for action id {action.ActionId} as work item id '{savedWorkItemInfo.Id}'...");
+        
         AddActionWorkItemIdMap(action, savedWorkItemInfo);
     }
 
@@ -369,6 +386,8 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
 
     private async Task ModifyWorkItem(WorkItemScriptAction action, bool bypassRules)
     {
+        // WriteLine($"Action #{action.ActionId} - Update PBI - {action.Definition.Description} - {action.Rows.Count} steps");
+
         // convert placeholder work item id from excel to 
         // the real work item that was previously created
         var realWorkItemId = GetActionWorkItemIdMap(action);
@@ -395,7 +414,7 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
             await SendPatchForBodyAndGetTypedResponse<ModifyWorkItemResponse>(
                 requestUrl, body);
 
-        WriteLine($"Modified {action.Definition.WorkItemType} for action id {action.ActionId} as work item id '{savedWorkItemInfo.Id}'...");
+        WriteLine($"Update PBI - {action.Definition.Description} -- {action.Definition.WorkItemType} for action id {action.ActionId} as work item id '{savedWorkItemInfo.Id}'...");
     }
 
 

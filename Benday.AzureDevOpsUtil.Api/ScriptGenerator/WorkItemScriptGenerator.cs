@@ -355,7 +355,7 @@ public class WorkItemScriptGenerator
 
                 action.ActionId = GetNextActionNumber().ToString();
                 action.Definition.Operation = "Update";
-                action.Definition.Description = "PBI won the lottery and got done";
+                action.Definition.Description = "PBI got to done because {reason}";
                 action.Definition.WorkItemId = pbi.Id;
                 action.Definition.WorkItemType = pbi.WorkItemType;
 
@@ -411,7 +411,7 @@ public class WorkItemScriptGenerator
 
         action.ActionId = GetNextActionNumber().ToString();
         action.Definition.Operation = ACTION_UPDATE;
-        action.Definition.Description = "PBI Done";
+        action.Definition.Description = "PBI Done because work is complete";
         action.Definition.WorkItemId = pbi.Id;
         action.Definition.WorkItemType = pbi.WorkItemType;
         action.Definition.ActionDay =
@@ -544,7 +544,7 @@ public class WorkItemScriptGenerator
 
                 action.ActionId = GetNextActionNumber().ToString();
                 action.Definition.Operation = ACTION_UPDATE;
-                action.Definition.Description = "PBI selected for sprint\r\n";
+                action.Definition.Description = $"PBI selected for sprint {sprint.SprintNumber}";
                 action.Definition.WorkItemId = item.Id;
                 action.Definition.WorkItemType = item.WorkItemType;
                 action.Definition.ActionDay =
