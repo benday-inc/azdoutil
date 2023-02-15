@@ -5,6 +5,9 @@ namespace Benday.AzureDevOpsUtil.Api.ScriptGenerator;
 public class WorkItemScriptGenerator
 {
     private const int SPRINT_DURATION = 14;
+    private const string FIELD_NAME_STATE = "State";
+    private const string STATE_DONE = "Done";
+    private const string ACTION_UPDATE = "Update";
     public readonly List<string> FibonacciValues =
         new() {
         "1", "2", "3", "5", "8", "13", "21"
@@ -233,13 +236,13 @@ public class WorkItemScriptGenerator
                 var action = new WorkItemScriptAction();
 
                 action.ActionId = GetNextActionNumber().ToString();
-                action.Definition.Operation = "Update";
+                action.Definition.Operation = ACTION_UPDATE;
                 action.Definition.Description = "Set PBI status to Needs Refinement";
                 action.Definition.WorkItemId = item.Id;
                 action.Definition.WorkItemType = item.WorkItemType;
                 action.Definition.ActionDay =
                     ((sprint.SprintNumber - 1) * SPRINT_DURATION) + 3 + createDateOffset;
-                action.Definition.Refname = "Status";
+                action.Definition.Refname = FIELD_NAME_STATE;
                 action.Definition.FieldValue = "Needs Refinement";
 
                 Actions.Add(action);
@@ -272,13 +275,13 @@ public class WorkItemScriptGenerator
                 var action = new WorkItemScriptAction();
 
                 action.ActionId = GetNextActionNumber().ToString();
-                action.Definition.Operation = "Update";
+                action.Definition.Operation = ACTION_UPDATE;
                 action.Definition.Description = "PBI Got Refined and is ready for sprint";
                 action.Definition.WorkItemId = item.Id;
                 action.Definition.WorkItemType = item.WorkItemType;
                 action.Definition.ActionDay =
                     ((sprint.SprintNumber - 1) * SPRINT_DURATION) + 10 + createDateOffset;
-                action.Definition.Refname = "Status";
+                action.Definition.Refname = FIELD_NAME_STATE;
                 action.Definition.FieldValue = "Ready for Sprint";
 
                 item.Effort = FibonacciValues.Random();
@@ -295,13 +298,13 @@ public class WorkItemScriptGenerator
         var action = new WorkItemScriptAction();
 
         action.ActionId = GetNextActionNumber().ToString();
-        action.Definition.Operation = "Update";
+        action.Definition.Operation = ACTION_UPDATE;
 
         if (remainingWork == 0)
         {
             action.Definition.Description = "Task Done";
-            action.Definition.Refname = "Status";
-            action.Definition.FieldValue = "Done";
+            action.Definition.Refname = FIELD_NAME_STATE;
+            action.Definition.FieldValue = STATE_DONE;
 
             // don't set remaining work when marking as 'Done'
             // to avoid an error
@@ -331,7 +334,7 @@ public class WorkItemScriptGenerator
                 var action = new WorkItemScriptAction();
 
                 action.ActionId = GetNextActionNumber().ToString();
-                action.Definition.Operation = "Update";
+                action.Definition.Operation = ACTION_UPDATE;
                 action.Definition.Description = "PBI not done in sprint";
                 action.Definition.WorkItemId = pbi.Id;
                 action.Definition.WorkItemType = pbi.WorkItemType;
@@ -340,7 +343,7 @@ public class WorkItemScriptGenerator
                 action.Definition.ActionDay =
                     ((sprint.SprintNumber - 1) * SPRINT_DURATION) + 13;
 
-                action.Definition.Refname = "Status";
+                action.Definition.Refname = FIELD_NAME_STATE;
                 action.Definition.FieldValue = "Ready for Sprint";
 
                 pbi.Effort = FibonacciValues.Random();
@@ -359,14 +362,14 @@ public class WorkItemScriptGenerator
         var action = new WorkItemScriptAction();
 
         action.ActionId = GetNextActionNumber().ToString();
-        action.Definition.Operation = "Update";
+        action.Definition.Operation = ACTION_UPDATE;
         action.Definition.Description = "PBI Done";
         action.Definition.WorkItemId = pbi.Id;
         action.Definition.WorkItemType = pbi.WorkItemType;
         action.Definition.ActionDay =
             ((sprint.SprintNumber - 1) * SPRINT_DURATION) + sprintDayNumber;
-        action.Definition.Refname = "Status";
-        action.Definition.FieldValue = "Done";
+        action.Definition.Refname = FIELD_NAME_STATE;
+        action.Definition.FieldValue = STATE_DONE;
 
         Actions.Add(action);
     }
@@ -486,13 +489,13 @@ public class WorkItemScriptGenerator
                 var action = new WorkItemScriptAction();
 
                 action.ActionId = GetNextActionNumber().ToString();
-                action.Definition.Operation = "Update";
+                action.Definition.Operation = ACTION_UPDATE;
                 action.Definition.Description = "PBI selected for sprint\r\n";
                 action.Definition.WorkItemId = item.Id;
                 action.Definition.WorkItemType = item.WorkItemType;
                 action.Definition.ActionDay =
                     ((sprint.SprintNumber - 1) * SPRINT_DURATION);
-                action.Definition.Refname = "Status";
+                action.Definition.Refname = FIELD_NAME_STATE;
                 action.Definition.FieldValue = "Committed";
 
                 action.SetValue("IterationPath", $"Sprint {sprint.SprintNumber}");

@@ -269,7 +269,9 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
                 {
                     body.AddValue(GetFullRefname(row), $"{_teamProjectName}\\{row.FieldValue}");
                 }
-                else if (row.Refname == "Status" || row.Refname == "State")
+                else if (StringUtility.IsEqualsCaseInsensitive("State", row.Refname) ||
+                    StringUtility.IsEqualsCaseInsensitive("Status", row.Refname)
+                    )
                 {
                     if (row.FieldValue == "Active" && action.Definition.WorkItemType == "Product Backlog Item")
                     {
@@ -284,12 +286,14 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
                         body.AddValue(GetFullRefname(row), row.FieldValue);
                     }
 
+                    /*
                     if (row.FieldValue == "Done")
                     {
                         body.AddValue(
                             "Microsoft.VSTS.Common.ClosedDate",
                             actionDate.ToString());
                     }
+                    */
                 }
                 else
                 {
@@ -448,7 +452,7 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
 
             await createProjectCommand.ExecuteAsync();
 
-            Console.WriteLine($"Queued project create.  Waiting for 5 seconds...");
+            WriteLine($"Queued project create.  Waiting for 5 seconds...");
             await Task.Delay(5000);
 
             await getExistingProjectCommand.ExecuteAsync();
@@ -456,7 +460,7 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
             if (getExistingProjectCommand.LastResult == null ||
                 getExistingProjectCommand.LastResult.State != "wellFormed")
             {
-                Console.WriteLine($"Project still not ready.  Waiting for 5 seconds...");
+                WriteLine($"Project still not ready.  Waiting for 5 seconds...");
                 await Task.Delay(5000);
 
                 await getExistingProjectCommand.ExecuteAsync();
@@ -464,7 +468,7 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
                 if (getExistingProjectCommand.LastResult == null ||
                     getExistingProjectCommand.LastResult.State != "wellFormed")
                 {
-                    Console.WriteLine($"Project still not ready.  Waiting for 5 seconds...");
+                    WriteLine($"Project still not ready.  Waiting for 5 seconds...");
                     await Task.Delay(5000);
 
                     await getExistingProjectCommand.ExecuteAsync();
