@@ -73,6 +73,11 @@ class Program
 
     private static void DisplayUsage(CommandAttributeUtility util)
     {
+        Console.WriteLine($"Azure DevOps Utilities");
+        Console.WriteLine($"https://www.benday.com");
+        Console.WriteLine();
+        Console.WriteLine($"Available commands:");
+
         var assembly = typeof(StringUtility).Assembly;
 
         var commands = util.GetAvailableCommandNames(assembly);
