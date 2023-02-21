@@ -11,7 +11,7 @@ public static class Constants
     public const string CommandArgumentNameRemoveConfig = "removeconfig";
     public const string CommandArgumentNameListConfig = "listconfig";
     public const string CommandArgumentName_ListGitRepos = "listgitrepos";
-    public const string CommandArgumentNameCreateAzdoGitRepository = "creategitrepo";
+    public const string CommandArgumentNameCreateGitRepository = "creategitrepo";
 
 
     public const string CommandName_ListProjects = "listprojects";
@@ -28,6 +28,7 @@ public static class Constants
     public const string CommandName_ExportWorkItemQuery = "exportworkitemquery";
 
     public const string ArgumentNameTeamProjectName = "name";
+    public const string ArgumentNameRepositoryName = "reponame";
     public const string ArgumentNameWorkItemQueryName = "queryname";
     public const string ArgumentNameConfirm = "confirm";
     public const string ArgumentNameConfigurationName = "config";

@@ -9,8 +9,11 @@ namespace Benday.AzureDevOpsUtil.Api;
 [Command(Name = Constants.CommandArgumentName_ListGitRepos,
     IsAsync = true,
     Description = "Gets list of Git repositories from an Azure DevOps Team Project.")]
-public class GetAzdoGitRepositoriesForProjectCommand : AzureDevOpsCommandBase
-{    public GetAzdoGitRepositoriesForProjectCommand(CommandExecutionInfo info, ITextOutputProvider outputProvider) :
+public class ListGitRepositoriesForProjectCommand : AzureDevOpsCommandBase
+{
+    public GitRepositoryInfo[]? LastResult { get; private set; }
+
+    public ListGitRepositoriesForProjectCommand(CommandExecutionInfo info, ITextOutputProvider outputProvider) :
         base(info, outputProvider)
     {
 
@@ -22,7 +25,7 @@ public class GetAzdoGitRepositoriesForProjectCommand : AzureDevOpsCommandBase
 
         AddCommonArguments(args);
         args.AddString(Constants.ArgumentNameTeamProjectName).AsRequired().
-            WithDescription("Team project name that contains the git repositories");
+            WithDescription("Team project name that contains the git repositories");      
 
         return args;
     }
@@ -32,8 +35,14 @@ public class GetAzdoGitRepositoriesForProjectCommand : AzureDevOpsCommandBase
         var projectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);
 
         var result = await GetGitRepositories(projectName);
-        
-        if (result == null)
+
+        LastResult = result;
+
+        if (IsQuietMode)
+        {
+            return;
+        }
+        else if (result == null)
         {
             WriteLine("Result is null");
         }
