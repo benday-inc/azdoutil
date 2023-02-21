@@ -38,6 +38,15 @@ public class RunWorkItemQueryCommand : AzureDevOpsCommandBase
         WorkItemQueryInfo = await GetWorkItemQuery();
 
         _ = await RunWorkItemQuery(WorkItemQueryInfo.Wiql);
+
+        if (LastResultContent != null)
+        {
+            WriteLine(LastResultContent);
+        }
+        else
+        {
+            WriteLine("No result");
+        }
     }
 
     private async Task<string> RunWorkItemQuery(string query)
@@ -69,11 +78,13 @@ public class RunWorkItemQueryCommand : AzureDevOpsCommandBase
 
         var responseContent = await result.Content.ReadAsStringAsync();
 
+        LastResultContent = responseContent;
         LastResult = JsonUtilities.GetJsonValueAsType<WorkItemQueryExecutionResult>(responseContent);
 
         return responseContent;
     }
 
+    public string LastResultContent { get; private set; }
     public WorkItemQueryExecutionResult? LastResult
     {
         get;
