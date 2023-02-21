@@ -5,10 +5,10 @@ namespace Benday.AzureDevOpsUtil.Api.Messages;
 public class ColumnInfo
 {
     [JsonPropertyName("referenceName")]
-    public string ReferenceName { get; set; }
+    public string ReferenceName { get; set; } = string.Empty;
     [JsonPropertyName("name")]
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     [JsonPropertyName("url")]
-    public string Url { get; set; }
+    public string Url { get; set; } = string.Empty;
 }

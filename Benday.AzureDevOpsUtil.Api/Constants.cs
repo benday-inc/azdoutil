@@ -10,6 +10,9 @@ public static class Constants
     public const string CommandArgumentNameAddUpdateConfig = "addconfig";
     public const string CommandArgumentNameRemoveConfig = "removeconfig";
     public const string CommandArgumentNameListConfig = "listconfig";
+    public const string CommandArgumentName_ListGitRepos = "listgitrepos";
+    public const string CommandArgumentNameCreateAzdoGitRepository = "creategitrepo";
+
 
     public const string CommandName_ListProjects = "listprojects";
     public const string CommandName_GetProject = "getproject";

@@ -1,4 +1,6 @@
-﻿using Benday.CommandsFramework;
+﻿using System.Text;
+
+using Benday.CommandsFramework;
 
 class Program
 {
@@ -80,11 +82,24 @@ class Program
 
         var assembly = typeof(StringUtility).Assembly;
 
-        var commands = util.GetAvailableCommandNames(assembly);
+        var commands = util.GetAvailableCommandAttributes(assembly);
 
-        foreach (var command in commands)
+        var longestName = commands.Max(x => x.Name.Length);
+
+        foreach (var command in commands.OrderBy(x => x.Name))
         {
-            Console.WriteLine(command);
+            Console.Write(GetNameWithPadding(command.Name, longestName));
+            Console.WriteLine($" - {command.Description}");
         }
+    }
+
+    private static string GetNameWithPadding(string name, int padToLength)
+    {
+        var builder = new StringBuilder();
+
+        builder.Append(name);
+        builder.Append(' ', padToLength - name.Length);
+
+        return builder.ToString();
     }
 }

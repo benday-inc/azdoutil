@@ -8,5 +8,5 @@ public partial class WorkItemDetailResponse
     public long Count { get; set; }
 
     [JsonPropertyName("value")]
-    public GetWorkItemByIdResponse[] Value { get; set; }
+    public GetWorkItemByIdResponse[] Value { get; set; } = new GetWorkItemByIdResponse[0];
 }
