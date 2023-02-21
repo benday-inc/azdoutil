@@ -3,9 +3,9 @@
 param([Parameter(HelpMessage='Uninstall before installing')]
     [ValidateNotNullOrEmpty()]
     [switch]
-    $uninstall)
+    $reinstall)
 
-if ($uninstall -eq $true)
+if ($reinstall -eq $true)
 {
     &.\uninstall.ps1
 }
