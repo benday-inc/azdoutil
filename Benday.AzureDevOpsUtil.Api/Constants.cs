@@ -20,8 +20,12 @@ public static class Constants
     public const string CommandName_SetIteration = "setiteration";
     public const string CommandName_GetWorkItemById = "getworkitem";
     public const string CommandName_DeleteProject = "deleteproject";
+    public const string CommandName_ShowWorkItemQuery = "showworkitemquery";
+    public const string CommandName_RunWorkItemQuery = "runworkitemquery";
+    public const string CommandName_ExportWorkItemQuery = "exportworkitemquery";
 
     public const string ArgumentNameTeamProjectName = "name";
+    public const string ArgumentNameWorkItemQueryName = "queryname";
     public const string ArgumentNameConfirm = "confirm";
     public const string ArgumentNameConfigurationName = "config";
     public const string ArgumentNameCollectionUrl = "url";
@@ -43,5 +47,7 @@ public static class Constants
     public const string CommandArg_WorkItemId = "id";
     public const string CommandArg_AllPbisGoToDone = "alldone";
     public const string CommandArg_AddSessionTag = "addsessiontag";
+    public const string ArgumentNameExportToPath = "exporttopath";
+    
 
 }
