@@ -41,4 +41,10 @@ public class WorkItemQueryInfo
 
     [JsonPropertyName("url")]
     public string Url { get; set; } = string.Empty;
+
+    [JsonPropertyName("hasChildren")]
+    public bool HasChildren { get; set; }
+
+    [JsonPropertyName("children")]
+    public WorkItemQueryInfo[] Children { get; set; } = new WorkItemQueryInfo[0];
 }

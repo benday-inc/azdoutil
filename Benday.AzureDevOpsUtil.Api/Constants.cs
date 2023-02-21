@@ -12,6 +12,7 @@ public static class Constants
     public const string CommandArgumentNameListConfig = "listconfig";
     public const string CommandArgumentName_ListGitRepos = "listgitrepos";
     public const string CommandArgumentNameCreateGitRepository = "creategitrepo";
+    public const string CommandArgumentNameListWorkItemQueries = "listworkitemqueries";
 
 
     public const string CommandName_ListProjects = "listprojects";
