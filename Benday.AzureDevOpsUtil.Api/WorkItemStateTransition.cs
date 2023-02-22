@@ -2,6 +2,13 @@ namespace Benday.AzureDevOpsUtil.Api
 {
     public class WorkItemStateTransition
     {
+        public WorkItemStateTransition()
+        {
+            From = string.Empty; 
+            To = string.Empty;
+            Reason= string.Empty;
+        }
+
         /// <summary>
         /// Initializes a new instance of the WorkItemStateTransition class.
         /// </summary>
