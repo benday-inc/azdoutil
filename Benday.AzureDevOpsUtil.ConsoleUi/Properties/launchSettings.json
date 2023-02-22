@@ -2,7 +2,7 @@
   "profiles": {
     "Benday.AzureDevOpsUtil.ConsoleUi": {
       "commandName": "Project",
-      "commandLineArgs": "getareas /teamproject:\"Metrics and Dashboards Research\" /verbose"
+      "commandLineArgs": "showworkitemquery /teamproject:\"Metrics and Dashboards Research\" /queryname:\"ready pbis\""
     }
   }
 }

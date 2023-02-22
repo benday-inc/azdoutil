@@ -37,8 +37,21 @@ public class ShowWorkItemQueryCommand : AzureDevOpsCommandBase
         var teamProjectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);
         var workItemQueryName = Arguments.GetStringValue(Constants.ArgumentNameWorkItemQueryName);
 
+        await RunWorkItemQuerySearch(teamProjectName, workItemQueryName);
 
-        var result = await RunWorkItemQuerySearch(teamProjectName, workItemQueryName);
+        if (LastResult != null && LastResult.Count > 0 && IsQuietMode == false)
+        {
+            Write(LastResult.Value[0]);
+        }
+    }
+
+    private void Write(WorkItemQueryInfo query)
+    {
+        WriteLine($"Name: {query.Name}");
+        WriteLine($"Path: {query.Path}");
+        WriteLine($"WIQL:");
+        WriteLine($"{query.Wiql}");
+        WriteLine($"Id: {query.Id}");
     }
 
     private async Task<string> RunWorkItemQuerySearch(
