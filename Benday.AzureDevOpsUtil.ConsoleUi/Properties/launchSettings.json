@@ -2,7 +2,7 @@
   "profiles": {
     "Benday.AzureDevOpsUtil.ConsoleUi": {
       "commandName": "Project",
-      "commandLineArgs": "setworkitemstate /id:2489 /state:\"ready for sprint\""
+      "commandLineArgs": "getareas /teamproject:\"Metrics and Dashboards Research\" /verbose"
     }
   }
 }

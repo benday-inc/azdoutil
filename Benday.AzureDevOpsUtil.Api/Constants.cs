@@ -13,6 +13,8 @@ public static class Constants
     public const string CommandArgumentName_ListGitRepos = "listgitrepos";
     public const string CommandArgumentNameCreateGitRepository = "creategitrepo";
     public const string CommandArgumentNameListWorkItemQueries = "listworkitemqueries";
+    public const string CommandArgumentNameGetIterations = "getiterations";
+    public const string CommandArgumentNameGetAreas = "getareas";
 
 
     public const string CommandName_ListProjects = "listprojects";
@@ -29,8 +31,8 @@ public static class Constants
     public const string CommandName_ExportWorkItemQuery = "exportworkitemquery";
     public const string CommandName_SetWorkItemState = "setworkitemstate";
     public const string CommandArgumentNameGetWorkItemStates = "getworkitemstates";
-    
 
+    public const string ArgumentNameVerbose = "verbose";
     public const string ArgumentNameTeamProjectName = "teamproject";
     public const string ArgumentNameRepositoryName = "reponame";
     public const string ArgumentNameWorkItemQueryName = "queryname";
@@ -45,7 +47,7 @@ public static class Constants
     public const string CommandArg_SkipFutureDates = "skipfuturedates";
     public const string CommandArg_PathToExcel = "pathtoexcel";
     public const string CommandArg_SaveScriptFileTo = "output";
-    public const string CommandArg_ScriptOnly = "scriptonly";    
+    public const string CommandArg_ScriptOnly = "scriptonly";
     public const string CommandArg_StartDate = "startdate";
     public const string CommandArg_TeamProjectName = "teamproject";
     public const string CommandArg_CreateProjectIfNotExists = "createproject";
@@ -62,7 +64,7 @@ public static class Constants
     public const string ArgumentNameWorkItemTypeName = "workitemtypename";
     public const string CommandArgumentNameOverride = "override";
 
-    
+
 
 
 }

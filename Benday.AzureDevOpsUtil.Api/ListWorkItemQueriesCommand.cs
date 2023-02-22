@@ -81,3 +81,4 @@ public class ListWorkItemQueriesCommand : AzureDevOpsCommandBase
         return returnValue!;
     }
 }
+
