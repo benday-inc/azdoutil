@@ -28,8 +28,10 @@ public static class Constants
     public const string CommandName_RunWorkItemQuery = "runworkitemquery";
     public const string CommandName_ExportWorkItemQuery = "exportworkitemquery";
     public const string CommandName_SetWorkItemState = "setworkitemstate";
+    public const string CommandArgumentNameGetWorkItemStates = "getworkitemstates";
+    
 
-    public const string ArgumentNameTeamProjectName = "name";
+    public const string ArgumentNameTeamProjectName = "teamproject";
     public const string ArgumentNameRepositoryName = "reponame";
     public const string ArgumentNameWorkItemQueryName = "queryname";
     public const string ArgumentNameConfirm = "confirm";
@@ -57,6 +59,10 @@ public static class Constants
     public const string ArgumentNameExportToPath = "exporttopath";
     public const string CommandArg_State = "state";
     public const string CommandArg_StateTransitionDate = "date";
+    public const string ArgumentNameWorkItemTypeName = "workitemtypename";
+    public const string CommandArgumentNameOverride = "override";
+
+    
 
 
 }

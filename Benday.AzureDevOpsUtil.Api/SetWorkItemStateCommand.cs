@@ -24,7 +24,7 @@ public class SetWorkItemStateCommand : AzureDevOpsCommandBase
         arguments.AddString(Constants.CommandArg_State).WithDescription("Work item state value");
         arguments.AddInt32(Constants.CommandArg_WorkItemId).WithDescription("Work item id for the work item to be updated");
         arguments.AddDateTime(Constants.CommandArg_StateTransitionDate).AsNotRequired().WithDescription("Iteration end date");
-
+        arguments.AddBoolean(Constants.CommandArgumentNameOverride).AsNotRequired().AllowEmptyValue().WithDescription("Override non-matching state values and force set the value you want");
         return arguments;
     }
 
@@ -54,6 +54,23 @@ public class SetWorkItemStateCommand : AzureDevOpsCommandBase
         }
         else
         {
+            var args = ExecutionInfo.GetCloneOfArguments(
+                Constants.CommandArgumentNameGetWorkItemStates, true);
+
+            args.AddArgumentValue(Constants.ArgumentNameTeamProjectName, getWorkItem.WorkItem.FieldsAsStrings["System.TeamProject"]);
+            args.AddArgumentValue(Constants.ArgumentNameWorkItemTypeName, getWorkItem.WorkItem.FieldsAsStrings["System.WorkItemType"]);
+
+            var getStates = new GetWorkItemStatesCommand(args, _OutputProvider);
+
+            await getStates.ExecuteAsync();
+
+            var states = getStates.LastResult;
+
+            if (states != null)
+            {
+                toState = GetOfficialStateValue(states, toState);
+            }
+
             var workItemInfo = getWorkItem.WorkItem;
 
             WriteLine($"Updating state for work item id '{workItemId}' to '{toState}' on date '{stateTransitionDate}'...");
@@ -61,7 +78,24 @@ public class SetWorkItemStateCommand : AzureDevOpsCommandBase
             await UpdateState(workItemInfo, toState, stateTransitionDate);
         }
     }
-    
+
+    private string GetOfficialStateValue(GetWorkItemTypeStatesResponse states, string toState)
+    {
+        var match = states.States.Where(x => x.Name.Equals(toState, StringComparison.CurrentCultureIgnoreCase)).FirstOrDefault();
+
+        if (match != null)
+        {
+            return match.Name;
+        }
+        else if (Arguments.GetBooleanValue(Constants.CommandArgumentNameOverride) == true)
+        {
+            return toState;
+        }
+        else
+        {
+            throw new KnownException($"Work item type does not have a state '{toState}'. Use /{Constants.CommandArgumentNameOverride} to force set the value.");
+        }
+    }
 
     private async Task UpdateState(GetWorkItemByIdResponse item, string stateValue, DateTime stateTransitionDate)
     {
