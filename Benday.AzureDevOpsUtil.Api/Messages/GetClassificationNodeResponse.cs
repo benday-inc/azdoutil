@@ -9,4 +9,4 @@ public class GetClassificationNodeResponse
 
     [JsonPropertyName("value")]
     public ClassificationNode[] Value { get; set; } = new ClassificationNode[0];
-}
+}                                                              

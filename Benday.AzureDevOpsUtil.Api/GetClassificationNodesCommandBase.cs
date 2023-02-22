@@ -12,70 +12,87 @@ public abstract class GetClassificationNodesCommandBase : AzureDevOpsCommandBase
 
     protected async Task GetNodes(string teamProjectName, string filterStructureType, bool verbose)
     {
-        var requestUrl = $"{teamProjectName}/_apis/wit/classificationnodes?api-version=5.0&$depth=5";
+        
+        string requestUrl;
 
-        var result = await CallEndpointViaGetAndGetResult<GetClassificationNodeResponse>(requestUrl, false);
+        if (filterStructureType == "area")
+        {
+            requestUrl = $"{teamProjectName.Replace(" ", "%20")}/_apis/wit/classificationnodes/Areas?api-version=7.0&$depth=5";
+        }
+        else if (filterStructureType == "iteration")
+        {
+            requestUrl = $"{teamProjectName.Replace(" ", "%20")}/_apis/wit/classificationnodes/Iterations?api-version=7.0&$depth=5";
+        }
+        else
+        {
+            throw new NotImplementedException($"Filter structure type '{filterStructureType}' not supported.");
+        }
+
+        var result = await CallEndpointViaGetAndGetResult<ClassificationNode>(requestUrl, false);
 
         if (result != null && IsQuietMode == false)
         {
-            foreach (var item in result.Value)
-            {
-                if (filterStructureType != null && item.StructureType != filterStructureType)
-                {
-                    continue;
-                }
 
-                WriteLine($"Name: {item.Name}");
-                WriteLine($"Path: {item.Path}");
-                WriteLine($"StructureType: {item.StructureType}");
+            WriteClassificationNode(result, verbose);
+        }
+        else
+        {
+            WriteLine($"No {filterStructureType}s found.");
+        }
+    }
+
+    private void WriteClassificationNode(ClassificationNode item, bool verbose)
+    {
+        WriteLine($"Name: {item.Name}");
+        WriteLine($"Path: {item.Path}");
+        WriteLine($"StructureType: {item.StructureType}");
+
+        if (verbose)
+        {
+            WriteLine($"Id: {item.Id}");
+            WriteLine($"Url: {item.Url}");
+            WriteLine($"Identifier: {item.Identifier}");
+            WriteLine($"HasChildren: {item.HasChildren}");
+            WriteLine($"Url: {item.Url}");
+        }
+
+        WriteLine(string.Empty);
+
+        WriteClassificationNodeChildren(item, verbose, 1);
+    }
+
+    private void WriteClassificationNodeChildren(
+        ClassificationNode item, bool verbose, int indentLevel)
+    {
+        if (item.Children != null)
+        {
+            var indentString = new String('\t', indentLevel);
+
+            foreach (var child in item.Children)
+            {
+                WriteLine($"{indentString}Name: {child.Name}");
+                WriteLine($"{indentString}StructureType: {child.StructureType}");
+                WriteLine($"{indentString}Path: {child.Path}");
 
                 if (verbose)
                 {
-                    WriteLine($"Id: {item.Id}");
-                    WriteLine($"Url: {item.Url}");
-                    WriteLine($"Identifier: {item.Identifier}");
-                    WriteLine($"HasChildren: {item.HasChildren}");
-                    WriteLine($"Url: {item.Url}");
+                    WriteLine($"{indentString}Id: {child.Id}");
+                    WriteLine($"{indentString}Url: {child.Url}");
+                    WriteLine($"{indentString}Identifier: {child.Identifier}");
+                    WriteLine($"{indentString}HasChildren: {child.HasChildren}");
+                    WriteLine($"{indentString}Url: {child.Url}");
+                }
+
+                if (child.Attributes != null)
+                {
+                    WriteLine($"{indentString}StartDate: {child.Attributes.StartDate}");
+                    WriteLine($"{indentString}FinishDate: {child.Attributes.FinishDate}");
                 }
 
                 WriteLine(string.Empty);
 
-                if (item.Children != null)
-                {
-                    foreach (var child in item.Children)
-                    {
-                        if (filterStructureType != null && child.StructureType != filterStructureType)
-                        {
-                            continue;
-                        }
-
-                        WriteLine($"\tName: {child.Name}");
-                        WriteLine($"\tStructureType: {child.StructureType}");
-                        WriteLine($"\tPath: {child.Path}");
-
-                        if (verbose)
-                        {
-                            WriteLine($"\tId: {child.Id}");
-                            WriteLine($"\tUrl: {child.Url}");
-                            WriteLine($"\tIdentifier: {child.Identifier}");
-                            WriteLine($"\tHasChildren: {child.HasChildren}");
-                            WriteLine($"\tUrl: {child.Url}");
-                        }
-
-                        if (child.Attributes != null)
-                        {
-                            WriteLine($"\tStartDate: {child.Attributes.StartDate}");
-                            WriteLine($"\tFinishDate: {child.Attributes.FinishDate}");
-                        }
-
-                        WriteLine(string.Empty);
-                    }
-                }
+                WriteClassificationNodeChildren(child, verbose, indentLevel + 1);
             }
-        }
-        else
-        {
-            WriteLine($"No iterations");
         }
     }
 }
