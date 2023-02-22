@@ -48,11 +48,16 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
             .WithDescription("Add a session tag to work items");
 
         arguments.AddString(Constants.CommandArg_SaveScriptFileTo)
-            .WithDescription("Save generated script file to disk in this directory")
+            .WithDescription("Save generated script file to disk in this directory. Note the filename will be auto-generated.")
             .AsNotRequired();
 
+        arguments.AddBoolean(Constants.CommandArg_ScriptOnly)
+          .AsNotRequired()
+          .AllowEmptyValue(true)
+          .WithDescription($"Creates the excel export script. Requires an arg value for '{Constants.CommandArg_SaveScriptFileTo}'");
+
         return arguments;
-    }
+    }    
 
     private bool _skipFutureDates = false;
     private DateTime _startDate;
@@ -80,7 +85,7 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
         return startOfSprint;
     }
 
-    private void WriteScriptToDisk(WorkItemScriptGenerator generator)
+    private string? WriteScriptToDisk(WorkItemScriptGenerator generator)
     {
         if (Arguments.HasValue(Constants.CommandArg_SaveScriptFileTo) == true)
         {
@@ -93,13 +98,43 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
             new ExcelWorkItemScriptWriter().WriteToExcel(
                 toPath,
                 generator.Actions);
+
+            return toPath;
         }        
+        else
+        {
+            return null;
+        }
     }
 
     private readonly string _sessionId = DateTime.Now.Ticks.ToString()[^5..];
 
     protected override async Task OnExecute()
     {
+        var scriptOnly = Arguments.GetBooleanValue(Constants.CommandArg_ScriptOnly);
+
+        if (scriptOnly == true && Arguments[Constants.CommandArg_SaveScriptFileTo].HasValue == false)
+        {
+            throw new KnownException($"When running in script only mode, a value for '{Constants.CommandArg_SaveScriptFileTo}' is required.");
+        }
+
+        var processTemplateName = Arguments.GetStringValue(Constants.CommandArg_ProcessTemplateName);
+
+        bool useScrumWithBacklogRefinement;
+
+        if (processTemplateName.Equals("Scrum", StringComparison.CurrentCultureIgnoreCase) == true)
+        {
+            useScrumWithBacklogRefinement = false;
+        }
+        else if (processTemplateName.Equals("Scrum with Backlog Refinement", StringComparison.CurrentCultureIgnoreCase) == true)
+        {
+            useScrumWithBacklogRefinement = true;
+        }
+        else
+        {
+            throw new KnownException($"Process template '{processTemplateName}' not supported. Work item script generation only supported for 'Scrum' or 'Scrum with Backlog Refinement'.");
+        }
+
         var sprints = new List<WorkItemScriptSprint>();
 
         for (int i = 0; i < Arguments.GetInt32Value(Constants.CommandArg_SprintCount); i++)
@@ -127,33 +162,48 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
         _addSessionTag = Arguments.GetBooleanValue(
             Constants.CommandArg_AddSessionTag);
 
-        var generator = new WorkItemScriptGenerator();
+        var generator = new WorkItemScriptGenerator(useScrumWithBacklogRefinement);
 
         generator.GenerateScript(sprints, markAllPbisAsDone);
 
-        WriteScriptToDisk(generator);
+        var outputPathAndFileName = WriteScriptToDisk(generator);
 
-        _startDate = FindStartDate(sprints);
-
-        _skipFutureDates = Arguments.GetBooleanValue(Constants.CommandArg_SkipFutureDates);
-
-        if (_skipFutureDates == true)
+        if (scriptOnly == true)
         {
-            WriteLine("Skip future dates is true. Skipping instructions that are in the future.");
+            WriteLine("Running in script-only mode. Skipping write to Azure DevOps.");
+            WriteLine($"Script written to '{outputPathAndFileName}'");
         }
+        else
+        {
+            _startDate = FindStartDate(sprints);
 
-        _teamProjectName = Arguments.GetStringValue(Constants.CommandArg_TeamProjectName);
+            _skipFutureDates = Arguments.GetBooleanValue(Constants.CommandArg_SkipFutureDates);
 
-        _createProjectIfNotExists = Arguments.GetBooleanValue(Constants.CommandArg_CreateProjectIfNotExists);
+            if (_skipFutureDates == true)
+            {
+                WriteLine("Skip future dates is true. Skipping instructions that are in the future.");
+            }
 
-        PopulateActions(generator);
+            _teamProjectName = Arguments.GetStringValue(Constants.CommandArg_TeamProjectName);
 
-        _skipFutureDates = Arguments.GetBooleanValue(Constants.CommandArg_SkipFutureDates);
-        _createProjectIfNotExists = Arguments.GetBooleanValue(Constants.CommandArg_CreateProjectIfNotExists);
+            _createProjectIfNotExists = Arguments.GetBooleanValue(Constants.CommandArg_CreateProjectIfNotExists);
 
-        await EnsureProjectExists();
-        await PopulateIterations(sprints, _startDate);
-        await RunScript();
+            PopulateActions(generator);
+
+            _skipFutureDates = Arguments.GetBooleanValue(Constants.CommandArg_SkipFutureDates);
+            _createProjectIfNotExists = Arguments.GetBooleanValue(Constants.CommandArg_CreateProjectIfNotExists);
+
+            await EnsureProjectExists();
+            await PopulateIterations(sprints, _startDate);
+            await RunScript();
+
+            if (outputPathAndFileName != null)
+            {
+                WriteLine($"Script written to '{outputPathAndFileName}'");
+            }
+
+            WriteLine($"Done.");
+        }
     }
 
     private void PopulateActions(WorkItemScriptGenerator generator)

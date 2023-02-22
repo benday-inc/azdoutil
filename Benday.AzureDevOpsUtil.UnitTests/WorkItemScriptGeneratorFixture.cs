@@ -19,7 +19,7 @@ public class WorkItemScriptGeneratorFixture
         {
             if (_systemUnderTest == null)
             {
-                _systemUnderTest = new WorkItemScriptGenerator();
+                _systemUnderTest = new WorkItemScriptGenerator(true);
             }
 
             return _systemUnderTest;

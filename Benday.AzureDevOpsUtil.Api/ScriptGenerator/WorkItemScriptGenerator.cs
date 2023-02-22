@@ -21,14 +21,16 @@ public class WorkItemScriptGenerator
     private readonly List<string> _actionWords;
     private readonly List<string> _endingWords;
     private readonly List<string> _randomWords;
+    private readonly bool _useScrumWithBacklogRefinement;
     private int _createdWorkItemNumber = 100;
     private int _createdActionNumber = 100;
 
-    public WorkItemScriptGenerator()
+    public WorkItemScriptGenerator(bool useScrumWithBacklogRefinement)
     {
         _actionWords = GetActionWords();
         _randomWords = GetRandomWords();
         _endingWords = GetEndingWords();
+        _useScrumWithBacklogRefinement = useScrumWithBacklogRefinement;
     }
 
     public string GetRandomTitle()
@@ -169,6 +171,35 @@ public class WorkItemScriptGenerator
         toList.Add(moveThis);
     }
 
+    private string GetNeedsRefinementStateValue()
+    {
+        if (_useScrumWithBacklogRefinement == true)
+        {
+            return "Needs Refinement";
+        }
+        else
+        {
+            return "Approved";
+        }
+    }
+
+    private string GetReadyForSprintStateValue()
+    {
+        if (_useScrumWithBacklogRefinement == true)
+        {
+            return "Ready for Sprint";
+        }
+        else
+        {
+            return "Approved";
+        }
+    }
+
+    private string GetAcceptedOnToSprintBacklogStateValue()
+    {
+        return "Committed";
+    }
+
     public void GenerateScript(WorkItemScriptSprint sprint,
         bool markAllSprintPbisAsDone = false)
     {
@@ -197,7 +228,7 @@ public class WorkItemScriptGenerator
         }
 
         ScriptSprintPlanning(sprint);
-        
+
         ScriptDailySprintActivities(sprint);
 
         var rnd = new RandomNumGen();
@@ -229,7 +260,7 @@ public class WorkItemScriptGenerator
         return ((++_createdActionNumber) * 100);
     }
 
-    private void ScriptRefinementMeeting1(WorkItemScriptSprint sprint, 
+    private void ScriptRefinementMeeting1(WorkItemScriptSprint sprint,
         bool randomizeNumber = false, int createDateOffset = 0)
     {
         var rnd = new RandomNumGen();
@@ -261,14 +292,16 @@ public class WorkItemScriptGenerator
                 action.Definition.ActionDay =
                     ((sprint.SprintNumber - 1) * SPRINT_DURATION) + 3 + createDateOffset;
                 action.Definition.Refname = FIELD_NAME_STATE;
-                action.Definition.FieldValue = "Needs Refinement";
+                action.Definition.FieldValue = GetNeedsRefinementStateValue();
 
                 Actions.Add(action);
             }
         }
     }
 
-    private void ScriptRefinementMeeting2(WorkItemScriptSprint sprint, 
+
+
+    private void ScriptRefinementMeeting2(WorkItemScriptSprint sprint,
         bool randomizeNumber = false, int createDateOffset = 0)
     {
         var rnd = new RandomNumGen();
@@ -300,7 +333,7 @@ public class WorkItemScriptGenerator
                 action.Definition.ActionDay =
                     ((sprint.SprintNumber - 1) * SPRINT_DURATION) + 10 + createDateOffset;
                 action.Definition.Refname = FIELD_NAME_STATE;
-                action.Definition.FieldValue = "Ready for Sprint";
+                action.Definition.FieldValue = GetReadyForSprintStateValue();
 
                 item.Effort = FibonacciValues.Random();
                 action.SetValue("Effort", item.Effort);
@@ -392,7 +425,7 @@ public class WorkItemScriptGenerator
                     ((sprint.SprintNumber - 1) * SPRINT_DURATION) + 13;
 
                 action.Definition.Refname = FIELD_NAME_STATE;
-                action.Definition.FieldValue = "Ready for Sprint";
+                action.Definition.FieldValue = GetReadyForSprintStateValue();
 
                 pbi.Effort = FibonacciValues.Random();
 
@@ -401,7 +434,7 @@ public class WorkItemScriptGenerator
 
                 Actions.Add(action);
             }
-        }        
+        }
     }
     private void MarkPbiAsDone(WorkItemScriptSprint sprint, WorkItemScriptWorkItem pbi, int sprintDayNumber)
     {
@@ -487,7 +520,7 @@ public class WorkItemScriptGenerator
                     }
                 }
 
-                Console.WriteLine($"Sprint {sprint.SprintNumber}: pbi {pbi.Id} -- remaining burndown: {todaysBurndownAmount}");
+                // Console.WriteLine($"Sprint {sprint.SprintNumber}: pbi {pbi.Id} -- remaining burndown: {todaysBurndownAmount}");
 
             }
         }
@@ -509,7 +542,7 @@ public class WorkItemScriptGenerator
         ScriptDailyScrum(sprint, 8);
         ScriptDailyScrum(sprint, 9);
         ScriptDailyScrum(sprint, 10);
-        ScriptRefinementMeeting2(sprint); 
+        ScriptRefinementMeeting2(sprint);
         ScriptDailyScrum(sprint, 11);
         ScriptDailyScrum(sprint, 12);
 
@@ -529,7 +562,7 @@ public class WorkItemScriptGenerator
                     sprint.SprintPbiCount);
         }
 
-        Console.WriteLine($"Sprint {sprint.SprintNumber}, Sprint Planning: Choosing {numberOfItemsToSelect} PBIs");
+        // Console.WriteLine($"Sprint {sprint.SprintNumber}, Sprint Planning: Choosing {numberOfItemsToSelect} PBIs");
 
         for (int i = 0; i < numberOfItemsToSelect; i++)
         {
@@ -550,8 +583,8 @@ public class WorkItemScriptGenerator
                 action.Definition.ActionDay =
                     ((sprint.SprintNumber - 1) * SPRINT_DURATION);
                 action.Definition.Refname = FIELD_NAME_STATE;
-                item.State = "Committed";
-                action.Definition.FieldValue = "Committed";
+                item.State = GetAcceptedOnToSprintBacklogStateValue();
+                action.Definition.FieldValue = GetAcceptedOnToSprintBacklogStateValue();
 
                 action.SetValue("IterationPath", $"Sprint {sprint.SprintNumber}");
                 action.SetValue("Effort", FibonacciValues.Random().ToString());
@@ -602,6 +635,7 @@ public class WorkItemScriptGenerator
         }
     }
 
+
     private WorkItemScriptAction GetCreateAction(
         WorkItemScriptWorkItem item,
         WorkItemScriptSprint sprint,
@@ -614,7 +648,7 @@ public class WorkItemScriptGenerator
         returnValue.Definition.Description = "Create PBI";
         returnValue.Definition.WorkItemId = item.Id;
         returnValue.Definition.WorkItemType = item.WorkItemType;
-        
+
         item.Description = $"Created by action id '{actionId}'; Work item script id '{item.Id}'";
         item.State = "New";
 
