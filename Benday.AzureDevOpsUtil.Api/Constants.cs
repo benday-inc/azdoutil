@@ -15,6 +15,7 @@ public static class Constants
     public const string CommandArgumentNameListWorkItemQueries = "listworkitemqueries";
     public const string CommandArgumentNameGetIterations = "getiterations";
     public const string CommandArgumentNameGetAreas = "getareas";
+    public const string CommandArgumentNameGetWorkItemFields = "getfields";
 
 
     public const string CommandName_ListProjects = "listprojects";
