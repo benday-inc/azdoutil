@@ -18,7 +18,7 @@ public class GetWorkItemByIdResponse
     [JsonPropertyName("url")]
     public Uri? Url { get; set; }
 
-    private Dictionary<string, string> _fieldsAsStrings = new();
+    private Dictionary<string, string>? _fieldsAsStrings;
 
     [JsonIgnore]
     public Dictionary<string, string> FieldsAsStrings

@@ -2,7 +2,7 @@
   "profiles": {
     "Benday.AzureDevOpsUtil.ConsoleUi": {
       "commandName": "Project",
-      "commandLineArgs": "runworkitemquery /name:\"Metrics and Dashboards Research\" /queryname:\"Ready PBIs\""
+      "commandLineArgs": "setworkitemstate /id:2489 /state:committed"
     }
   }
 }
