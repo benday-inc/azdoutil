@@ -18,7 +18,7 @@ public class CreateGitRepositoryCommand : AzureDevOpsCommandBase
 
     }
 
-    protected override ArgumentCollection GetAvailableArguments()
+    public override ArgumentCollection GetArguments()
     {
         var args = new ArgumentCollection();
 

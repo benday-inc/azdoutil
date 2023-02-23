@@ -12,7 +12,7 @@ public class GetAreasCommand : GetClassificationNodesCommandBase
 
     }
 
-    protected override ArgumentCollection GetAvailableArguments()
+    public override ArgumentCollection GetArguments()
     {
         var args = new ArgumentCollection();
 

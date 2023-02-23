@@ -18,7 +18,7 @@ public class SetIterationCommand : AzureDevOpsCommandBase
     private string _iterationName = string.Empty;
     private string _teamProjectName = string.Empty;
 
-    protected override ArgumentCollection GetAvailableArguments()
+    public override ArgumentCollection GetArguments()
     {
         var arguments = new ArgumentCollection();
 

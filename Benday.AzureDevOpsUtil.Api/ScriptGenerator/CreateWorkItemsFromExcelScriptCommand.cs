@@ -15,7 +15,7 @@ public class CreateWorkItemsFromExcelScriptCommand : AzureDevOpsCommandBase
     {
     }
 
-    protected override ArgumentCollection GetAvailableArguments()
+    public override ArgumentCollection GetArguments()
     {
         var arguments = new ArgumentCollection();
 

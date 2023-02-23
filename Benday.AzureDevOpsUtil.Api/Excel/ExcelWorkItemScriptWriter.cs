@@ -23,6 +23,13 @@ public class ExcelWorkItemScriptWriter
             AddIterations(excel, worksheetIterations);
             AddActions(excel, worksheetScript, actions);
 
+            var dir = Path.GetDirectoryName(filename);
+
+            if (!Directory.Exists(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
+
             excel.SaveAs(filename);
         }
     }

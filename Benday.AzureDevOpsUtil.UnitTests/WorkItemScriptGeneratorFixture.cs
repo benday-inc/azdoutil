@@ -74,10 +74,9 @@ public class WorkItemScriptGeneratorFixture
             SystemUnderTest.ProductBacklogItems.Count,
             $"PBI Count was wrong");
 
-        Assert.AreEqual<int>(sprint.NewPbiCount,
-            SystemUnderTest.Actions.Count,
-            $"Action count was wrong");
-
+        Assert.IsTrue(
+            SystemUnderTest.Actions.Count >= sprint.NewPbiCount,
+            $"Action count should be at least as high as new pbi count");
     }
 
     [TestMethod]

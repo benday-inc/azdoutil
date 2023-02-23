@@ -21,7 +21,7 @@ public class GetWorkItemStatesCommand : AzureDevOpsCommandBase
 
     public GetWorkItemTypeStatesResponse LastResult { get; private set; }
 
-    protected override ArgumentCollection GetAvailableArguments()
+    public override ArgumentCollection GetArguments()
     {
         var args = new ArgumentCollection();
 
