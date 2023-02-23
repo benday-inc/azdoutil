@@ -10,7 +10,7 @@
         <AssemblyName>azdoutil</AssemblyName>
         <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
         <Authors>benday</Authors>
-        <PackageProjectUrl>https://github.com/benday-inc/azdoutil.git</PackageProjectUrl>
+        <PackageProjectUrl>https://github.com/benday-inc/azdoutil</PackageProjectUrl>
         <Copyright>2023</Copyright>
         <RepositoryUrl>https://github.com/benday-inc/azdoutil.git</RepositoryUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
