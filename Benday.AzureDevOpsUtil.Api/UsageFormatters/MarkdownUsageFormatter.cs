@@ -29,6 +29,7 @@ public class MarkdownUsageFormatter
         builder.AppendLine("### Arguments");
 
         builder.AppendLine("| Argument | Is Optional | Data Type | Description |");
+        builder.AppendLine("| --- | --- | --- | --- |");
 
         foreach (var arg in usage.Arguments)
         {
