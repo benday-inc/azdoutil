@@ -12,6 +12,9 @@ info@benday.com
 The azdoutil is distributed as a .NET Core Tool via NuGet. To install it go to the command prompt and type  
 `dotnet tool install azdoutil -g`
 
+### Prerequisites
+- You'll need to install .NET Core 7 from https://dotnet.microsoft.com/
+
 ## Getting Started
 Everything starts with a configuration. After you've installed azdoutil, you'll need to run `azdoutil addconfig` to add a configuration. A configuration is how you store the URL for your Azure DevOps instance and the personal access token (PAT) for authenticating to that instance.  
 
