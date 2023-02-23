@@ -34,31 +34,31 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 ## Commands
 | Command Name | Description |
 | --- | --- |
-| addconfig | Add or update an Azure DevOps configuration. For example, which server or account plus auth information. |
-| creategitrepo | Creates a Git repository in an Azure DevOps Team Project. |
-| createproject | List team projects |
-| deleteproject | Delete team project |
-| exportworkitemquery | Export work item query results |
-| getareas | Gets a list of areas in an Azure DevOps Team Project. |
-| getiterations | Gets a list of iterations in an Azure DevOps Team Project. |
-| getproject | Get team project info |
-| getworkitem | Get work item by id |
-| getfields | Gets a list of work item fields for a work item type in an Azure DevOps Team Project. |
-| getworkitemstates | Gets the list of states for a work item type in an Azure DevOps Team Project. |
-| getworkitemtypes | Gets a list of work item types in an Azure DevOps Team Project. |
-| listconfig | List an Azure DevOps configuration. For example, which server or account plus auth information. |
-| listgitrepos | Gets list of Git repositories from an Azure DevOps Team Project. |
-| listprocesstemplates | List process templates |
-| listprojects | List team projects |
-| listworkitemqueries | Gets a list of all work item queries in an Azure DevOps Team Project. |
-| removeconfig | Remove an Azure DevOps configuration. For example, which server or account plus auth information. |
-| runworkitemquery | Run work item query |
-| setiteration | Create iteration including start and end date |
-| setworkitemstate | Set the state value on an existing work item |
-| showworkitemquery | Show work item query |
-| createfromgenerator | Create work items using random data generator |
-| createfromexcel | Create work items using Excel script |
-## addconfig
+| [addconfig](#addconfig) | Add or update an Azure DevOps configuration. For example, which server or account plus auth information. |
+| [creategitrepo](#creategitrepo) | Creates a Git repository in an Azure DevOps Team Project. |
+| [createproject](#createproject) | List team projects |
+| [deleteproject](#deleteproject) | Delete team project |
+| [exportworkitemquery](#exportworkitemquery) | Export work item query results |
+| [getareas](#getareas) | Gets a list of areas in an Azure DevOps Team Project. |
+| [getiterations](#getiterations) | Gets a list of iterations in an Azure DevOps Team Project. |
+| [getproject](#getproject) | Get team project info |
+| [getworkitem](#getworkitem) | Get work item by id |
+| [getfields](#getfields) | Gets a list of work item fields for a work item type in an Azure DevOps Team Project. |
+| [getworkitemstates](#getworkitemstates) | Gets the list of states for a work item type in an Azure DevOps Team Project. |
+| [getworkitemtypes](#getworkitemtypes) | Gets a list of work item types in an Azure DevOps Team Project. |
+| [listconfig](#listconfig) | List an Azure DevOps configuration. For example, which server or account plus auth information. |
+| [listgitrepos](#listgitrepos) | Gets list of Git repositories from an Azure DevOps Team Project. |
+| [listprocesstemplates](#listprocesstemplates) | List process templates |
+| [listprojects](#listprojects) | List team projects |
+| [listworkitemqueries](#listworkitemqueries) | Gets a list of all work item queries in an Azure DevOps Team Project. |
+| [removeconfig](#removeconfig) | Remove an Azure DevOps configuration. For example, which server or account plus auth information. |
+| [runworkitemquery](#runworkitemquery) | Run work item query |
+| [setiteration](#setiteration) | Create iteration including start and end date |
+| [setworkitemstate](#setworkitemstate) | Set the state value on an existing work item |
+| [showworkitemquery](#showworkitemquery) | Show work item query |
+| [createfromgenerator](#createfromgenerator) | Create work items using random data generator |
+| [createfromexcel](#createfromexcel) | Create work items using Excel script |
+## <a name="addconfig"></a> addconfig
 **Add or update an Azure DevOps configuration. For example, which server or account plus auth information.**
 ### Arguments
 | Argument | Is Optional | Data Type | Description |
@@ -66,7 +66,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | config | Optional | String | Name of the configuration |
 | pat | Required | String | PAT for this collection |
 | url | Required | String | URL for this collection (example: https://dev.azure.com/accountname) |
-## creategitrepo
+## <a name="creategitrepo"></a> creategitrepo
 **Creates a Git repository in an Azure DevOps Team Project.**
 ### Arguments
 | Argument | Is Optional | Data Type | Description |
@@ -75,7 +75,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | config | Optional | String | Configuration name to use |
 | teamproject | Required | String | Team project name that contains the git repositories |
 | reponame | Required | String | Name of the new git repository |
-## createproject
+## <a name="createproject"></a> createproject
 **List team projects**
 ### Arguments
 | Argument | Is Optional | Data Type | Description |
@@ -84,7 +84,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | config | Optional | String | Configuration name to use |
 | teamproject | Required | String | Team project name |
 | processname | Required | String | Process template name |
-## deleteproject
+## <a name="deleteproject"></a> deleteproject
 **Delete team project**
 ### Arguments
 | Argument | Is Optional | Data Type | Description |
@@ -93,7 +93,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | config | Optional | String | Configuration name to use |
 | teamproject | Required | String | Team project name to delete |
 | confirm | Optional | Boolean | Confirm delete |
-## exportworkitemquery
+## <a name="exportworkitemquery"></a> exportworkitemquery
 **Export work item query results**
 ### Arguments
 | Argument | Is Optional | Data Type | Description |
@@ -103,7 +103,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | teamproject | Required | String | Team project name to delete |
 | queryname | Required | String | Work item query name |
 | exporttopath | Required | String | Export to path |
-## getareas
+## <a name="getareas"></a> getareas
 **Gets a list of areas in an Azure DevOps Team Project.**
 ### Arguments
 | Argument | Is Optional | Data Type | Description |
@@ -112,7 +112,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | config | Optional | String | Configuration name to use |
 | teamproject | Required | String | Team project name that contains the iterations |
 | verbose | Optional | Boolean | Verbose output |
-## getiterations
+## <a name="getiterations"></a> getiterations
 **Gets a list of iterations in an Azure DevOps Team Project.**
 ### Arguments
 | Argument | Is Optional | Data Type | Description |
@@ -121,7 +121,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | config | Optional | String | Configuration name to use |
 | teamproject | Required | String | Team project name that contains the iterations |
 | verbose | Optional | Boolean | Verbose output |
-## getproject
+## <a name="getproject"></a> getproject
 **Get team project info**
 ### Arguments
 | Argument | Is Optional | Data Type | Description |
@@ -129,7 +129,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | quiet | Optional | Boolean | Quiet mode |
 | config | Optional | String | Configuration name to use |
 | teamproject | Required | String | Team project name |
-## getworkitem
+## <a name="getworkitem"></a> getworkitem
 **Get work item by id**
 ### Arguments
 | Argument | Is Optional | Data Type | Description |
@@ -137,7 +137,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | quiet | Optional | Boolean | Quiet mode |
 | config | Optional | String | Configuration name to use |
 | id | Required | Int32 | Work item id |
-## getfields
+## <a name="getfields"></a> getfields
 **Gets a list of work item fields for a work item type in an Azure DevOps Team Project.**
 ### Arguments
 | Argument | Is Optional | Data Type | Description |
@@ -146,7 +146,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | config | Optional | String | Configuration name to use |
 | teamproject | Required | String | Team project name that contains the work item type |
 | workitemtypename | Required | String | Name of the work item type |
-## getworkitemstates
+## <a name="getworkitemstates"></a> getworkitemstates
 **Gets the list of states for a work item type in an Azure DevOps Team Project.**
 ### Arguments
 | Argument | Is Optional | Data Type | Description |
@@ -155,7 +155,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | config | Optional | String | Configuration name to use |
 | teamproject | Required | String | Team project name that contains the work item type |
 | workitemtypename | Required | String | Name of the work item type |
-## getworkitemtypes
+## <a name="getworkitemtypes"></a> getworkitemtypes
 **Gets a list of work item types in an Azure DevOps Team Project.**
 ### Arguments
 | Argument | Is Optional | Data Type | Description |
@@ -163,13 +163,13 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | quiet | Optional | Boolean | Quiet mode |
 | config | Optional | String | Configuration name to use |
 | teamproject | Required | String | Team project name that contains the work item types |
-## listconfig
+## <a name="listconfig"></a> listconfig
 **List an Azure DevOps configuration. For example, which server or account plus auth information.**
 ### Arguments
 | Argument | Is Optional | Data Type | Description |
 | --- | --- | --- | --- |
 | config | Optional | String | Name of the configuration |
-## listgitrepos
+## <a name="listgitrepos"></a> listgitrepos
 **Gets list of Git repositories from an Azure DevOps Team Project.**
 ### Arguments
 | Argument | Is Optional | Data Type | Description |
@@ -177,21 +177,21 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | quiet | Optional | Boolean | Quiet mode |
 | config | Optional | String | Configuration name to use |
 | teamproject | Required | String | Team project name that contains the git repositories |
-## listprocesstemplates
+## <a name="listprocesstemplates"></a> listprocesstemplates
 **List process templates**
 ### Arguments
 | Argument | Is Optional | Data Type | Description |
 | --- | --- | --- | --- |
 | quiet | Optional | Boolean | Quiet mode |
 | config | Optional | String | Configuration name to use |
-## listprojects
+## <a name="listprojects"></a> listprojects
 **List team projects**
 ### Arguments
 | Argument | Is Optional | Data Type | Description |
 | --- | --- | --- | --- |
 | quiet | Optional | Boolean | Quiet mode |
 | config | Optional | String | Configuration name to use |
-## listworkitemqueries
+## <a name="listworkitemqueries"></a> listworkitemqueries
 **Gets a list of all work item queries in an Azure DevOps Team Project.**
 ### Arguments
 | Argument | Is Optional | Data Type | Description |
@@ -199,13 +199,13 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | quiet | Optional | Boolean | Quiet mode |
 | config | Optional | String | Configuration name to use |
 | teamproject | Required | String | Team project name that contains the work item queries |
-## removeconfig
+## <a name="removeconfig"></a> removeconfig
 **Remove an Azure DevOps configuration. For example, which server or account plus auth information.**
 ### Arguments
 | Argument | Is Optional | Data Type | Description |
 | --- | --- | --- | --- |
 | config | Required | String | Name of the configuration |
-## runworkitemquery
+## <a name="runworkitemquery"></a> runworkitemquery
 **Run work item query**
 ### Arguments
 | Argument | Is Optional | Data Type | Description |
@@ -214,7 +214,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | config | Optional | String | Configuration name to use |
 | teamproject | Required | String | Team project name containing the qork item query to run |
 | queryname | Required | String | Work item query name |
-## setiteration
+## <a name="setiteration"></a> setiteration
 **Create iteration including start and end date**
 ### Arguments
 | Argument | Is Optional | Data Type | Description |
@@ -225,7 +225,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | startdate | Required | DateTime | Iteration start date |
 | enddate | Required | DateTime | Iteration end date |
 | name | Required | String | Iteration name |
-## setworkitemstate
+## <a name="setworkitemstate"></a> setworkitemstate
 **Set the state value on an existing work item**
 ### Arguments
 | Argument | Is Optional | Data Type | Description |
@@ -236,7 +236,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | id | Required | Int32 | Work item id for the work item to be updated |
 | date | Optional | DateTime | Iteration end date |
 | override | Optional | Boolean | Override non-matching state values and force set the value you want |
-## showworkitemquery
+## <a name="showworkitemquery"></a> showworkitemquery
 **Show work item query**
 ### Arguments
 | Argument | Is Optional | Data Type | Description |
@@ -245,7 +245,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | config | Optional | String | Configuration name to use |
 | teamproject | Required | String | Team project that contains the work item query |
 | queryname | Required | String | Work item query name |
-## createfromgenerator
+## <a name="createfromgenerator"></a> createfromgenerator
 **Create work items using random data generator**
 ### Arguments
 | Argument | Is Optional | Data Type | Description |
@@ -261,7 +261,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | addsessiontag | Optional | Boolean | Add a session tag to work items |
 | output | Optional | String | Save generated script file to disk in this directory. Note the filename will be auto-generated. |
 | scriptonly | Optional | Boolean | Creates the excel export script. Requires an arg value for 'output' |
-## createfromexcel
+## <a name="createfromexcel"></a> createfromexcel
 **Create work items using Excel script**
 ### Arguments
 | Argument | Is Optional | Data Type | Description |

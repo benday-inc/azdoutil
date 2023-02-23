@@ -32,13 +32,13 @@ public class MarkdownUsageFormatter
 
         foreach (var usage in usages)
         {
-            builder.AppendLine($"| {usage.Name} | {usage.Description} |");
+            builder.AppendLine($"| [{usage.Name}](#{usage.Name}) | {usage.Description} |");
         }
     }
 
     private void AppendUsage(StringBuilder builder, CommandInfo usage)
     {
-        builder.AppendLine($"## {usage.Name}");
+        builder.AppendLine($"## <a name=\"{usage.Name}\"></a> {usage.Name}");
         builder.AppendLine($"**{usage.Description}**");
         
         builder.AppendLine("### Arguments");
