@@ -13,12 +13,27 @@ public class MarkdownUsageFormatter
     {
         var builder = new StringBuilder();
 
+        AppendCommandList(usages, builder);
+
         foreach (var usage in usages)
         {
             AppendUsage(builder, usage);
         }
 
         return builder.ToString();
+    }
+
+    private void AppendCommandList(List<CommandInfo> usages, StringBuilder builder)
+    {
+        builder.AppendLine($"## Commands");
+
+        builder.AppendLine("| Command Name | Description |");
+        builder.AppendLine("| --- | --- |");
+
+        foreach (var usage in usages)
+        {
+            builder.AppendLine($"| {usage.Name} | {usage.Description} |");
+        }
     }
 
     private void AppendUsage(StringBuilder builder, CommandInfo usage)

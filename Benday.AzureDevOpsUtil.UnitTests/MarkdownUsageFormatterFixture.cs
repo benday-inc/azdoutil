@@ -40,6 +40,12 @@ public class MarkdownUsageFormatterFixture
         Assert.IsNotNull(actual, "actual markdown was null");
         Assert.IsFalse(string.IsNullOrEmpty(actual), "actual markdown was empty");
 
-        Console.WriteLine($"{actual}");
+        var filename = Path.Combine(Path.GetTempPath(), $"markdown-{DateTime.Now.Ticks}.md");
+
+        Console.WriteLine($"Writing markdown file to {filename}");
+
+        File.WriteAllText(filename, actual);
+
+        // Console.WriteLine($"{actual}");
     }
 }

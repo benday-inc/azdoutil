@@ -1,7 +1,63 @@
 # azdoutil
 A collection of useful Azure DevOps utilities.
 
+Written by Benjamin Day  
+Pluralsight Author | Microsoft MVP | Scrum.org Professional Scrum Trainer  
+https://www.benday.com  
+info@benday.com 
 
+*Got ideas for Azure DevOps utilities you'd like to see? Found a bug? Let us know by submitting an issue https://github.com/benday-inc/azdoutil/issues*. *Want to contribute? Submit a pull request.*
+
+## Installing
+The azdoutil is distributed as a .NET Core Tool via NuGet. To install it go to the command prompt and type  
+`dotnet tool install azdoutil -g`
+
+## Getting Started
+Everything starts with a configuration. After you've installed azdoutil, you'll need to run `azdoutil addconfig` to add a configuration. A configuration is how you store the URL for your Azure DevOps instance and the personal access token (PAT) for authenticating to that instance.  
+
+Configurations are named and you can have as many as you'd like.
+
+### Set a Default Configuration
+There's one default configuration named `(default)`. If you only work with one Azure DevOps instance, then all you'll need to do is to is run `azdoutil addconfig /url:{url} /pat:{pat}` and that will set your default configuration. 
+
+### Additional Named Configurations
+If you want to add additional named configurations, you'll run `azdoutil addconfig /config:{name} /url:{url} /pat:{pat}`. 
+
+### Running Commands
+Once you've set a default configuration, you can run any azdoutil command without having to specify any additional URL or PAT info.  
+
+If you want to run a command against an Azure DevOps instance that is NOT your default, you'll need to supply the `/config:{name}`.
+
+### Managing Configurations
+To add new configuration or modify an existing configuration, use the `azdoutil addconfig` command. You can list your configurations using the `azdoutil listconfig` command. To delete a configuration, use the `azdoutil removeconfig` command.
+
+## Commands
+| Command Name | Description |
+| --- | --- |
+| addconfig | Add or update an Azure DevOps configuration. For example, which server or account plus auth information. |
+| creategitrepo | Creates a Git repository in an Azure DevOps Team Project. |
+| createproject | List team projects |
+| deleteproject | Delete team project |
+| exportworkitemquery | Export work item query results |
+| getareas | Gets a list of areas in an Azure DevOps Team Project. |
+| getiterations | Gets a list of iterations in an Azure DevOps Team Project. |
+| getproject | Get team project info |
+| getworkitem | Get work item by id |
+| getfields | Gets a list of work item fields for a work item type in an Azure DevOps Team Project. |
+| getworkitemstates | Gets the list of states for a work item type in an Azure DevOps Team Project. |
+| getworkitemtypes | Gets a list of work item types in an Azure DevOps Team Project. |
+| listconfig | List an Azure DevOps configuration. For example, which server or account plus auth information. |
+| listgitrepos | Gets list of Git repositories from an Azure DevOps Team Project. |
+| listprocesstemplates | List process templates |
+| listprojects | List team projects |
+| listworkitemqueries | Gets a list of all work item queries in an Azure DevOps Team Project. |
+| removeconfig | Remove an Azure DevOps configuration. For example, which server or account plus auth information. |
+| runworkitemquery | Run work item query |
+| setiteration | Create iteration including start and end date |
+| setworkitemstate | Set the state value on an existing work item |
+| showworkitemquery | Show work item query |
+| createfromgenerator | Create work items using random data generator |
+| createfromexcel | Create work items using Excel script |
 ## addconfig
 **Add or update an Azure DevOps configuration. For example, which server or account plus auth information.**
 ### Arguments
