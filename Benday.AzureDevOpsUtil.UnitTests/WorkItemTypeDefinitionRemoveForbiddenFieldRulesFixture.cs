@@ -1,4 +1,7 @@
 using Benday.AzureDevOpsUtil.Api;
+
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using System.Text;
 
 namespace Benday.AzureDevOpsUtil.UnitTests
