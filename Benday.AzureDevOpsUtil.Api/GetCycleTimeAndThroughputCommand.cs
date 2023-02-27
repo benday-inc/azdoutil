@@ -1,7 +1,10 @@
-﻿using System.Web;
+﻿using System.Globalization;
+using System.Web;
 
 using Benday.AzureDevOpsUtil.Api.Messages;
 using Benday.CommandsFramework;
+
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Benday.AzureDevOpsUtil.Api;
 
@@ -49,13 +52,51 @@ public class GetCycleTimeAndThroughputCommand : AzureDevOpsCommandBase
         }
         else
         {
-            WriteLine($"Number of completed items: {Data.Items.Length}");
+            WriteLine($"Total throughput: {Data.Items.Length}");
+
+            WriteThroughputByWeek();
+        }
+    }
+
+    private void WriteThroughputByWeek()
+    {
+        _GroupedByWeek = new Dictionary<string, List<WorkItemCycleTimeData>>();
+
+        foreach (var item in Data.Items)
+        {
+            AddToWeek(item);
+        }
+
+        WriteLine($"Number of weeks: {_GroupedByWeek.Count}");
+    }
+
+    private void AddToWeek(WorkItemCycleTimeData item)
+    {
+        var dateValueString = item.CompletedDateSK.ToString();
+
+        var completedDate = DateTime.ParseExact(dateValueString, "yyyyMMdd",
+                CultureInfo.InvariantCulture);
+
+        var weekOfYear = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(
+            completedDate, CalendarWeekRule.FirstDay, DayOfWeek.Monday);
+
+        var weekOfYearAsKey = weekOfYear.ToString("00");
+
+        AddToWeek(weekOfYearAsKey, item);
+    }
+
+    private void AddToWeek(string weekOfYearAsKey, WorkItemCycleTimeData item)
+    {
+        if (_GroupedByWeek.ContainsKey(weekOfYearAsKey) == false)
+        {
+            _GroupedByWeek.Add(weekOfYearAsKey, new());
         }
     }
 
     private int _NumberOfDaysOfHistory;
     private string _TeamProjectName;
     private DateTime _StartOfRange;
+    private Dictionary<string, List<WorkItemCycleTimeData>> _GroupedByWeek;
 
     private async Task GetData()
     {
