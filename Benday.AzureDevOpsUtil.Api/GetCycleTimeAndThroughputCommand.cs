@@ -60,7 +60,7 @@ public class GetCycleTimeAndThroughputCommand : AzureDevOpsCommandBase
 
     private void WriteThroughputByWeek()
     {
-        _GroupedByWeek = new Dictionary<string, List<WorkItemCycleTimeData>>();
+        _GroupedByWeek = new Dictionary<DateTime, ThroughputIteration>();
 
         foreach (var item in Data.Items)
         {
@@ -68,6 +68,21 @@ public class GetCycleTimeAndThroughputCommand : AzureDevOpsCommandBase
         }
 
         WriteLine($"Number of weeks: {_GroupedByWeek.Count}");
+
+        var keysOrderedByAscending = _GroupedByWeek.Keys.OrderBy(x => x);
+
+        foreach (var key in keysOrderedByAscending)
+        {
+            WriteThroughputForWeek(_GroupedByWeek[key]);
+        }
+    }
+
+    private void WriteThroughputForWeek(ThroughputIteration throughputIteration)
+    {
+        WriteLine(string.Empty);
+        WriteLine($"* Week Starting {throughputIteration.StartOfWeek.ToShortDateString()}:");
+        WriteLine($"Throughput    : {throughputIteration.Items.Count}");
+        WriteLine($"Avg Cycle Time: {throughputIteration.AverageCycleTime}");
     }
 
     private void AddToWeek(WorkItemCycleTimeData item)
@@ -80,23 +95,35 @@ public class GetCycleTimeAndThroughputCommand : AzureDevOpsCommandBase
         var weekOfYear = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(
             completedDate, CalendarWeekRule.FirstDay, DayOfWeek.Monday);
 
-        var weekOfYearAsKey = weekOfYear.ToString("00");
+        var firstDayOfWeek = GetMondayOfWeek(completedDate);
 
-        AddToWeek(weekOfYearAsKey, item);
+        AddToWeek(firstDayOfWeek, weekOfYear, item, completedDate);
     }
 
-    private void AddToWeek(string weekOfYearAsKey, WorkItemCycleTimeData item)
+    public static DateTime GetMondayOfWeek(DateTime fromDate)
     {
-        if (_GroupedByWeek.ContainsKey(weekOfYearAsKey) == false)
+        int diff = (7 + (fromDate.DayOfWeek - DayOfWeek.Monday)) % 7;
+
+        return fromDate.AddDays(-1 * diff).Date;
+    }
+
+    private void AddToWeek(DateTime startOfWeek, int weekOfYear, WorkItemCycleTimeData item, DateTime completedDate)
+    {
+        if (_GroupedByWeek.ContainsKey(startOfWeek) == false)
         {
-            _GroupedByWeek.Add(weekOfYearAsKey, new());
+            _GroupedByWeek.Add(startOfWeek, 
+                new ThroughputIteration(weekOfYear, startOfWeek));
         }
+
+        var iteration = _GroupedByWeek[startOfWeek];
+
+        iteration.Add(item);
     }
 
     private int _NumberOfDaysOfHistory;
     private string _TeamProjectName;
     private DateTime _StartOfRange;
-    private Dictionary<string, List<WorkItemCycleTimeData>> _GroupedByWeek;
+    private Dictionary<DateTime, ThroughputIteration> _GroupedByWeek;
 
     private async Task GetData()
     {
