@@ -52,6 +52,8 @@ public static class Constants
 
     public const int RetryDelayInMillisecs = 100;
     public const int ForecastNumberOfSimulations = 1000;
+    public const int ForecastNumberOfSimulationsFiftyPercent = 500;
+    public const int ForecastNumberOfSimulationsEightyPercent = 800;
 
     public const string CommandArg_Comment = "comment";
     public const string CommandArg_SkipFutureDates = "skipfuturedates";

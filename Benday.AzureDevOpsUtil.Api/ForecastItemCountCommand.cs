@@ -63,11 +63,19 @@ public class ForecastItemCountCommand : AzureDevOpsCommandBase
     {        
         var distribution = GetDistribution();
 
+        var throughput50PercentChance = GetThroughput(distribution, 
+            Constants.ForecastNumberOfSimulationsFiftyPercent);
+
+        var throughput80PercentChance = GetThroughput(distribution,
+            Constants.ForecastNumberOfSimulationsEightyPercent);
+
         var sortedKeys = distribution.Keys.OrderBy(x => x);
 
         var maxOccurrences = distribution.Values.Max();
 
-        WriteLine($"Max occurrences: {maxOccurrences}");
+        // WriteLine($"Max occurrences: {maxOccurrences}");
+        WriteLine($"50% confidence threshold: {throughput50PercentChance} item(s)");
+        WriteLine($"80% confidence threshold: {throughput80PercentChance} item(s)");
 
         foreach (var key in sortedKeys)
         {
@@ -84,6 +92,28 @@ public class ForecastItemCountCommand : AzureDevOpsCommandBase
                 WriteLine($"Throughput '{key}' --> {value} occurrence(s)");
             }            
         }
+    }
+
+    private int GetThroughput(Dictionary<int, int> distribution, 
+        int getThroughputAtSimulationCount)
+    {
+        var sortedKeys = distribution.Keys.OrderByDescending(x => x);
+
+        int total = 0;
+
+        foreach (var key in sortedKeys)
+        {
+            var value = distribution[key];
+
+            total+= value;
+
+            if (total >= getThroughputAtSimulationCount)
+            {
+                return key;
+            }
+        }
+
+        throw new InvalidOperationException($"Something went wrong. Never found a simulation count >= {getThroughputAtSimulationCount}.");
     }
 
     private Dictionary<int, int> GetDistribution()
