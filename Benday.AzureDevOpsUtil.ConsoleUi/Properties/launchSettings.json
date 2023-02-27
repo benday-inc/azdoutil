@@ -1,8 +1,14 @@
-                {
+{
   "profiles": {
     "Benday.AzureDevOpsUtil.ConsoleUi": {
       "commandName": "Project",
       "commandLineArgs": "forecastdurationforitemcount /teamproject:\"Metrics and Dashboards Research\" /numberofdays:120 /forecastitemcount:50"
+    },
+    "items-in-weeks": {
+      "commandName": "Project",
+      "commandLineArgs": "forecastitemsinweeks /teamproject:\"Metrics and Dashboards Research\" /numberofdays:120 /forecastweeks:8"
     }
+
+
   }
 }
