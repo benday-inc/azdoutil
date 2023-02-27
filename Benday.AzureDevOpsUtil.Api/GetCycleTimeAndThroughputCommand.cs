@@ -43,37 +43,52 @@ public class GetCycleTimeAndThroughputCommand : AzureDevOpsCommandBase
 
         await GetData();
 
-        WriteLine($"Number of days: {(now - _StartOfRange).TotalDays}");
-
-
         if (Data == null || Data.Items == null)
         {
-            WriteLine("No data.");
+           
         }
         else
         {
-            WriteLine($"Total throughput: {Data.Items.Length}");
+            GroupData();
+        }
 
-            WriteThroughputByWeek();
+        if (IsQuietMode == false)
+        {
+            WriteLine($"Number of days: {(now - _StartOfRange).TotalDays}");
+
+            if (Data == null || Data.Items == null)
+            {
+                WriteLine("No data.");
+            }
+            else
+            {
+                WriteLine($"Total throughput: {Data.Items.Length}");
+
+                WriteThroughputByWeek();
+            }
         }
     }
 
-    private void WriteThroughputByWeek()
+    private void GroupData()
     {
-        _GroupedByWeek = new Dictionary<DateTime, ThroughputIteration>();
+        GroupedByWeek = new Dictionary<DateTime, ThroughputIteration>();
 
         foreach (var item in Data.Items)
         {
             AddToWeek(item);
         }
+    }
 
-        WriteLine($"Number of weeks: {_GroupedByWeek.Count}");
+    private void WriteThroughputByWeek()
+    {       
 
-        var keysOrderedByAscending = _GroupedByWeek.Keys.OrderBy(x => x);
+        WriteLine($"Number of weeks: {GroupedByWeek.Count}");
+
+        var keysOrderedByAscending = GroupedByWeek.Keys.OrderBy(x => x);
 
         foreach (var key in keysOrderedByAscending)
         {
-            WriteThroughputForWeek(_GroupedByWeek[key]);
+            WriteThroughputForWeek(GroupedByWeek[key]);
         }
     }
 
@@ -109,13 +124,13 @@ public class GetCycleTimeAndThroughputCommand : AzureDevOpsCommandBase
 
     private void AddToWeek(DateTime startOfWeek, int weekOfYear, WorkItemCycleTimeData item, DateTime completedDate)
     {
-        if (_GroupedByWeek.ContainsKey(startOfWeek) == false)
+        if (GroupedByWeek.ContainsKey(startOfWeek) == false)
         {
-            _GroupedByWeek.Add(startOfWeek, 
+            GroupedByWeek.Add(startOfWeek, 
                 new ThroughputIteration(weekOfYear, startOfWeek));
         }
 
-        var iteration = _GroupedByWeek[startOfWeek];
+        var iteration = GroupedByWeek[startOfWeek];
 
         iteration.Add(item);
     }
@@ -123,7 +138,6 @@ public class GetCycleTimeAndThroughputCommand : AzureDevOpsCommandBase
     private int _NumberOfDaysOfHistory;
     private string _TeamProjectName;
     private DateTime _StartOfRange;
-    private Dictionary<DateTime, ThroughputIteration> _GroupedByWeek;
 
     private async Task GetData()
     {
@@ -140,4 +154,5 @@ public class GetCycleTimeAndThroughputCommand : AzureDevOpsCommandBase
     }
 
     public CycleTimeDataResponse? Data { get; private set; }
+    public Dictionary<DateTime, ThroughputIteration> GroupedByWeek { get; private set; } = new();
 }
