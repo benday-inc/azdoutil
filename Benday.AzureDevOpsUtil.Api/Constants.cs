@@ -35,7 +35,7 @@ public static class Constants
     public const string CommandArgumentNameGetWorkItemStates = "getworkitemstates";
 
     public const string CommandArgumentNameGetCycleTimeAndThroughput = "throughputcycletime";
-    public const string CommandArgumentNameGetForecastItemCount = "forecastitemcount";
+    public const string CommandArgumentNameGetForecastItemCountInWeeks = "forecastitemsinweeks";
 
     public const string ArgumentNameVerbose = "verbose";
     public const string ArgumentNameTeamProjectName = "teamproject";

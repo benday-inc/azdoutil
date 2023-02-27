@@ -6,12 +6,12 @@ using Benday.CommandsFramework;
 
 namespace Benday.AzureDevOpsUtil.Api;
 
-[Command(Name = Constants.CommandArgumentNameGetForecastItemCount,
+[Command(Name = Constants.CommandArgumentNameGetForecastItemCountInWeeks,
         Description = "Use throughput data to forecast likely number of items done in given number of weeks using Monte Carlo simulation",
         IsAsync = true)]
-public class ForecastItemCountCommand : AzureDevOpsCommandBase
+public class ForecastItemCountInWeeksCommand : AzureDevOpsCommandBase
 {
-    public ForecastItemCountCommand(
+    public ForecastItemCountInWeeksCommand(
         CommandExecutionInfo info, ITextOutputProvider outputProvider) : base(info, outputProvider)
     {
     }
