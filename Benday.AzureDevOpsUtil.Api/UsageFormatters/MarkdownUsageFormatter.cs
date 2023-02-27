@@ -9,21 +9,21 @@ using Benday.CommandsFramework;
 namespace Benday.AzureDevOpsUtil.Api.UsageFormatters;
 public class MarkdownUsageFormatter
 {
-    public string Format(List<CommandInfo> usages)
+    public string Format(List<CommandInfo> usages, bool skipCommandAnchors)
     {
         var builder = new StringBuilder();
 
-        AppendCommandList(usages, builder);
+        AppendCommandList(usages, builder, skipCommandAnchors);
 
         foreach (var usage in usages)
         {
-            AppendUsage(builder, usage);
+            AppendUsage(builder, usage, skipCommandAnchors);
         }
 
         return builder.ToString();
-    }
+    }    
 
-    private void AppendCommandList(List<CommandInfo> usages, StringBuilder builder)
+    private void AppendCommandList(List<CommandInfo> usages, StringBuilder builder, bool skipCommandAnchors)
     {
         builder.AppendLine($"## Commands");
 
@@ -32,13 +32,28 @@ public class MarkdownUsageFormatter
 
         foreach (var usage in usages)
         {
-            builder.AppendLine($"| [{usage.Name}](#{usage.Name}) | {usage.Description} |");
+            if (skipCommandAnchors)
+            {
+                builder.AppendLine($"| {usage.Name} | {usage.Description} |");
+            }
+            else
+            {
+                builder.AppendLine($"| [{usage.Name}](#{usage.Name}) | {usage.Description} |");
+            }            
         }
     }
 
-    private void AppendUsage(StringBuilder builder, CommandInfo usage)
+    private void AppendUsage(StringBuilder builder, CommandInfo usage, bool skipCommandAnchors)
     {
-        builder.AppendLine($"## <a name=\"{usage.Name}\"></a> {usage.Name}");
+        if (!skipCommandAnchors)
+        {
+            builder.AppendLine($"## <a name=\"{usage.Name}\"></a> {usage.Name}");
+        }
+        else
+        {
+            builder.AppendLine($"## {usage.Name}");
+        }
+
         builder.AppendLine($"**{usage.Description}**");
         
         builder.AppendLine("### Arguments");

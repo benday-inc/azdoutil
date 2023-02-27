@@ -14,10 +14,10 @@
         <Copyright>2023</Copyright>
         <RepositoryUrl>https://github.com/benday-inc/azdoutil.git</RepositoryUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageReadmeFile>README-for-nuget.md</PackageReadmeFile>
         <PackageIcon>bdc_mark_128_128.png</PackageIcon>
-        <AssemblyVersion>1.0.0.0</AssemblyVersion>
-        <Version>$(VersionPrefix)1.0.0</Version>
+        <AssemblyVersion>1.1.0.0</AssemblyVersion>
+        <Version>$(VersionPrefix)1.1.0</Version>
         <Description>A collection of useful command line utilities for Azure DevOps</Description>
     </PropertyGroup>
 
@@ -26,7 +26,7 @@
             <Pack>True</Pack>
             <PackagePath>\</PackagePath>
         </None>
-        <None Include="..\README.md">
+        <None Include="..\README-for-nuget.md">
           <Pack>True</Pack>
           <PackagePath>\</PackagePath>
         </None>

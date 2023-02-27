@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
+using System.Reflection;
+using System.Text;
 
 using Benday.CommandsFramework;
 
@@ -75,8 +77,12 @@ class Program
 
     private static void DisplayUsage(CommandAttributeUtility util)
     {
+        var versionInfo = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location);
+        
         Console.WriteLine($"Azure DevOps Utilities");
         Console.WriteLine($"https://www.benday.com");
+        Console.WriteLine();
+        Console.WriteLine($"v{versionInfo.FileVersion}");
         Console.WriteLine();
         Console.WriteLine($"Available commands:");
 
