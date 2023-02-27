@@ -34,7 +34,31 @@ public class MarkdownUsageFormatterFixture
         var usages = new CommandAttributeUtility().GetAllCommandUsages(assembly);
 
         // act
-        var actual = SystemUnderTest.Format(usages);
+        var actual = SystemUnderTest.Format(usages, false);
+
+        // assert
+        Assert.IsNotNull(actual, "actual markdown was null");
+        Assert.IsFalse(string.IsNullOrEmpty(actual), "actual markdown was empty");
+
+        var filename = Path.Combine(Path.GetTempPath(), $"markdown-{DateTime.Now.Ticks}.md");
+
+        Console.WriteLine($"Writing markdown file to {filename}");
+
+        File.WriteAllText(filename, actual);
+
+        // Console.WriteLine($"{actual}");
+    }
+
+    [TestMethod]
+    public void FormatUsagesAsMarkdown_NoIntraDocumentAnchors()
+    {
+        // arrange
+        var assembly = typeof(StringUtility).Assembly;
+
+        var usages = new CommandAttributeUtility().GetAllCommandUsages(assembly);
+
+        // act
+        var actual = SystemUnderTest.Format(usages, true);
 
         // assert
         Assert.IsNotNull(actual, "actual markdown was null");

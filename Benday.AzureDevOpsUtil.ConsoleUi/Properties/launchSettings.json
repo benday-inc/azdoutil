@@ -7,6 +7,11 @@
     "items-in-weeks": {
       "commandName": "Project",
       "commandLineArgs": "forecastitemsinweeks /teamproject:\"Metrics and Dashboards Research\" /numberofdays:120 /forecastweeks:8"
+    },
+
+    "no-args": {
+      "commandName": "Project",
+      "commandLineArgs": ""
     }
 
 
