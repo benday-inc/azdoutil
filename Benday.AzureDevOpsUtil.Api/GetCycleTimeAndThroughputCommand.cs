@@ -45,7 +45,7 @@ public class GetCycleTimeAndThroughputCommand : AzureDevOpsCommandBase
 
         if (Data == null || Data.Items == null)
         {
-           
+
         }
         else
         {
@@ -80,7 +80,7 @@ public class GetCycleTimeAndThroughputCommand : AzureDevOpsCommandBase
     }
 
     private void WriteThroughputByWeek()
-    {       
+    {
 
         WriteLine($"Number of weeks: {GroupedByWeek.Count}");
 
@@ -126,7 +126,7 @@ public class GetCycleTimeAndThroughputCommand : AzureDevOpsCommandBase
     {
         if (GroupedByWeek.ContainsKey(startOfWeek) == false)
         {
-            GroupedByWeek.Add(startOfWeek, 
+            GroupedByWeek.Add(startOfWeek,
                 new ThroughputIteration(weekOfYear, startOfWeek));
         }
 
@@ -149,7 +149,7 @@ public class GetCycleTimeAndThroughputCommand : AzureDevOpsCommandBase
             "$select=WorkItemId,Title,CycleTimeDays,CompletedDateSK&" +
             "$filter=" +
             HttpUtility.UrlEncode($"WorkItemType eq 'Product Backlog Item' and State eq 'Done' and CompletedDateSK ge {startOfRangeODataFormatted}");
-        
+
         Data = await CallEndpointViaGetAndGetResult<CycleTimeDataResponse>(requestUrl, false);
     }
 

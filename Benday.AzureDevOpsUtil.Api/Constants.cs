@@ -34,7 +34,8 @@ public static class Constants
     public const string CommandName_SetWorkItemState = "setworkitemstate";
     public const string CommandArgumentNameGetWorkItemStates = "getworkitemstates";
 
-    public const string CommandArgumentNameGetCycleTimeAndThroughput = "cycletime";
+    public const string CommandArgumentNameGetCycleTimeAndThroughput = "throughputcycletime";
+    public const string CommandArgumentNameGetForecastItemCount = "forecastitemcount";
 
     public const string ArgumentNameVerbose = "verbose";
     public const string ArgumentNameTeamProjectName = "teamproject";
@@ -47,8 +48,10 @@ public static class Constants
     public const string ArgumentNameQuietMode = "quiet";
 
     public const string ArgumentNameCycleTimeNumberOfDays = "numberofdays";
+    public const string ArgumentNameForecastNumberOfWeeks = "forecastweeks";
 
     public const int RetryDelayInMillisecs = 100;
+    public const int ForecastNumberOfSimulations = 1000;
 
     public const string CommandArg_Comment = "comment";
     public const string CommandArg_SkipFutureDates = "skipfuturedates";
