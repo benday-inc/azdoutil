@@ -60,7 +60,10 @@ public class ForecastDurationForItemCountCommand : AzureDevOpsCommandBase
     }
 
     private void DisplayForecast()
-    {        
+    {
+        WriteLine($"How many weeks will it take us to get {_NumberOfItemsToForecast} item(s) done?");
+        WriteLine(string.Empty);
+
         var distribution = GetDistribution();
 
         var throughput50PercentChance = GetIterationCount(distribution, 

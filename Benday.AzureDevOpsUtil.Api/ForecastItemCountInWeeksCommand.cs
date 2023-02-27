@@ -63,6 +63,9 @@ public class ForecastItemCountInWeeksCommand : AzureDevOpsCommandBase
     {        
         var distribution = GetDistribution();
 
+        WriteLine($"How many items will we likely get done in {_NumberOfWeeksOfForecast} week(s)?");
+        WriteLine(string.Empty);
+
         var throughput50PercentChance = GetThroughput(distribution, 
             Constants.ForecastNumberOfSimulationsFiftyPercent);
 
