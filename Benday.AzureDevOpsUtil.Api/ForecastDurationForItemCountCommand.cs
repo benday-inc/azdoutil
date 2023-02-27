@@ -6,12 +6,12 @@ using Benday.CommandsFramework;
 
 namespace Benday.AzureDevOpsUtil.Api;
 
-[Command(Name = Constants.CommandArgumentNameGetForecastItemCountInWeeks,
-        Description = "Use throughput data to forecast likely number of items done in given number of weeks using Monte Carlo simulation",
+[Command(Name = Constants.CommandArgumentNameGetForecastDurationForItemCount,
+        Description = "Use throughput data to forecast likely number of weeks to get given number of items done using Monte Carlo simulation",
         IsAsync = true)]
-public class ForecastItemCountInWeeksCommand : AzureDevOpsCommandBase
+public class ForecastDurationForItemCountCommand : AzureDevOpsCommandBase
 {
-    public ForecastItemCountInWeeksCommand(
+    public ForecastDurationForItemCountCommand(
         CommandExecutionInfo info, ITextOutputProvider outputProvider) : base(info, outputProvider)
     {
     }
@@ -27,16 +27,16 @@ public class ForecastItemCountInWeeksCommand : AzureDevOpsCommandBase
         arguments.AddString(Constants.ArgumentNameTeamProjectName)
             .AsRequired()
             .WithDescription("Team project name");
-        arguments.AddInt32(Constants.ArgumentNameForecastNumberOfWeeks)
+        arguments.AddInt32(Constants.ArgumentNameForecastNumberOfItems)
             .AsRequired()
-            .WithDescription("Number of weeks into the future to forecast");
+            .WithDescription("Number of items to forecast duration for");
 
         return arguments;
     }
 
     protected override async Task OnExecute()
     {
-        _NumberOfWeeksOfForecast = Arguments.GetInt32Value(Constants.ArgumentNameForecastNumberOfWeeks);
+        _NumberOfItemsToForecast = Arguments.GetInt32Value(Constants.ArgumentNameForecastNumberOfItems);
         _NumberOfDaysOfHistory = Arguments.GetInt32Value(Constants.ArgumentNameCycleTimeNumberOfDays);
         _TeamProjectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);
 
@@ -63,10 +63,10 @@ public class ForecastItemCountInWeeksCommand : AzureDevOpsCommandBase
     {        
         var distribution = GetDistribution();
 
-        var throughput50PercentChance = GetThroughput(distribution, 
+        var throughput50PercentChance = GetIterationCount(distribution, 
             Constants.ForecastNumberOfSimulationsFiftyPercent);
 
-        var throughput80PercentChance = GetThroughput(distribution,
+        var throughput80PercentChance = GetIterationCount(distribution,
             Constants.ForecastNumberOfSimulationsEightyPercent);
 
         var sortedKeys = distribution.Keys.OrderBy(x => x);
@@ -74,8 +74,8 @@ public class ForecastItemCountInWeeksCommand : AzureDevOpsCommandBase
         var maxOccurrences = distribution.Values.Max();
 
         // WriteLine($"Max occurrences: {maxOccurrences}");
-        WriteLine($"50% confidence threshold: {throughput50PercentChance} item(s)");
-        WriteLine($"80% confidence threshold: {throughput80PercentChance} item(s)");
+        WriteLine($"50% confidence threshold: {throughput50PercentChance} week(s)");
+        WriteLine($"80% confidence threshold: {throughput80PercentChance} week(s)");
         WriteLine(string.Empty);
 
         foreach (var key in sortedKeys)
@@ -85,20 +85,20 @@ public class ForecastItemCountInWeeksCommand : AzureDevOpsCommandBase
             if (value == maxOccurrences)
             {
                 WriteLine("***");
-                WriteLine($"Throughput '{key}' --> {value} occurrence(s)");
+                WriteLine($"Week count '{key}' --> {value} occurrence(s)");
                 WriteLine("***");
             }
             else
             {
-                WriteLine($"Throughput '{key}' --> {value} occurrence(s)");
+                WriteLine($"Week count '{key}' --> {value} occurrence(s)");
             }            
         }
     }
 
-    private int GetThroughput(Dictionary<int, int> distribution, 
+    private int GetIterationCount(Dictionary<int, int> distribution, 
         int getThroughputAtSimulationCount)
     {
-        var sortedKeys = distribution.Keys.OrderByDescending(x => x);
+        var sortedKeys = distribution.Keys.OrderBy(x => x);
 
         int total = 0;
 
@@ -119,22 +119,22 @@ public class ForecastItemCountInWeeksCommand : AzureDevOpsCommandBase
 
     private Dictionary<int, int> GetDistribution()
     {
-        // key = throughput
+        // key = weeks to complete item count
         // value = number of times this thruput happened
 
         var distribution = new Dictionary<int, int>();
 
         foreach (var group in _forecasts)
         {
-            int throughput = group.TotalThroughput;
+            int numberOfWeeks = group.Forecasts.Count;
 
-            if (distribution.ContainsKey(throughput) == false)
+            if (distribution.ContainsKey(numberOfWeeks) == false)
             {
-                distribution.Add(throughput, 1);
+                distribution.Add(numberOfWeeks, 1);
             }
             else
             {
-                distribution[throughput] += 1;
+                distribution[numberOfWeeks] += 1;
             }
         }
 
@@ -157,21 +157,21 @@ public class ForecastItemCountInWeeksCommand : AzureDevOpsCommandBase
         {
             forecastGroup = new ForecastGroup();
 
-            for (int x = 0; x < _NumberOfWeeksOfForecast; x++)
+            do
             {
                 iterationIndex = rnd.GetNumberInRange(0, numberOfHistoryWeeks - 1);
 
                 var iteration = DataGroupedByWeek[iterationKeys[iterationIndex]];
 
                 forecastGroup.Add(new IterationForecast(
-                    iteration.Items.Count));                
-            }
-
+                    iteration.Items.Count));
+            } while (forecastGroup.TotalThroughput < _NumberOfItemsToForecast);
+            
             _forecasts.Add(forecastGroup);
         }
     }
 
-    private int _NumberOfWeeksOfForecast;
+    private int _NumberOfItemsToForecast;
     private int _NumberOfDaysOfHistory;
     private string _TeamProjectName;
 

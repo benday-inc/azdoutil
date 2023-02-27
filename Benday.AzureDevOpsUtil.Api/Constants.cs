@@ -36,6 +36,7 @@ public static class Constants
 
     public const string CommandArgumentNameGetCycleTimeAndThroughput = "throughputcycletime";
     public const string CommandArgumentNameGetForecastItemCountInWeeks = "forecastitemsinweeks";
+    public const string CommandArgumentNameGetForecastDurationForItemCount = "forecastdurationforitemcount";
 
     public const string ArgumentNameVerbose = "verbose";
     public const string ArgumentNameTeamProjectName = "teamproject";
@@ -49,6 +50,7 @@ public static class Constants
 
     public const string ArgumentNameCycleTimeNumberOfDays = "numberofdays";
     public const string ArgumentNameForecastNumberOfWeeks = "forecastweeks";
+    public const string ArgumentNameForecastNumberOfItems = "forecastitemcount";
 
     public const int RetryDelayInMillisecs = 100;
     public const int ForecastNumberOfSimulations = 1000;
