@@ -34,6 +34,8 @@ public static class Constants
     public const string CommandName_SetWorkItemState = "setworkitemstate";
     public const string CommandArgumentNameGetWorkItemStates = "getworkitemstates";
 
+    public const string CommandArgumentNameGetCycleTimeAndThroughput = "cycletime";
+
     public const string ArgumentNameVerbose = "verbose";
     public const string ArgumentNameTeamProjectName = "teamproject";
     public const string ArgumentNameRepositoryName = "reponame";
@@ -43,6 +45,9 @@ public static class Constants
     public const string ArgumentNameCollectionUrl = "url";
     public const string ArgumentNameToken = "pat";
     public const string ArgumentNameQuietMode = "quiet";
+
+    public const string ArgumentNameCycleTimeNumberOfDays = "numberofdays";
+
     public const int RetryDelayInMillisecs = 100;
 
     public const string CommandArg_Comment = "comment";

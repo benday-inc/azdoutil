@@ -2,7 +2,7 @@
   "profiles": {
     "Benday.AzureDevOpsUtil.ConsoleUi": {
       "commandName": "Project",
-      "commandLineArgs": "getworkitemtypes /teamproject:\"Metrics and Dashboards Research\""
+      "commandLineArgs": "cycletime /teamproject:\"Metrics and Dashboards Research\" /numberofdays:120"
     }
   }
 }
