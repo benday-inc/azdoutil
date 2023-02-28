@@ -8,5 +8,5 @@ public class ListProcessTemplatesResponse
     public int Count { get; set; }
 
     [JsonPropertyName("value")]
-    public ProcessTemplateInfo[] Values { get; set; } = new ProcessTemplateInfo[0];
+    public ProcessTemplateDetailInfo[] Values { get; set; } = new ProcessTemplateDetailInfo[0];
 }

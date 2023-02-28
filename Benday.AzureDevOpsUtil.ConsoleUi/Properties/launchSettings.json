@@ -12,8 +12,22 @@
     "no-args": {
       "commandName": "Project",
       "commandLineArgs": ""
+    },
+    "get-project": {
+      "commandName": "Project",
+      "commandLineArgs": "getproject /teamproject:\"Metrics and Dashboards Research\""
+    },
+    "list-process-templates": {
+      "commandName": "Project",
+      "commandLineArgs": "listprocesstemplates"
+    },
+    "addrefinementprocess": {
+      "commandName": "Project",
+      "commandLineArgs": "addrefinementprocess"
+    },
+    "change-process": {
+      "commandName": "Project",
+      "commandLineArgs": "changeprocess /teamproject:ScrumGit20221216a /processname:\"Scrum with Backlog Refinement\""
     }
-
-
   }
 }

@@ -1,5 +1,6 @@
 ﻿using Benday.AzureDevOpsUtil.Api.Messages;
 using Benday.CommandsFramework;
+
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
@@ -176,7 +177,7 @@ public abstract class AzureDevOpsCommandBase : AsynchronousCommand
             if (optionalDebuggingMessageInfo == null)
             {
                 throw new InvalidOperationException(
-                        $"Problem with server call to {requestUrl}. {result.StatusCode} {result.ReasonPhrase} - {content}");
+                    $"Problem with server call to {requestUrl}. {result.StatusCode} {result.ReasonPhrase} - {content}");
             }
             else
             {

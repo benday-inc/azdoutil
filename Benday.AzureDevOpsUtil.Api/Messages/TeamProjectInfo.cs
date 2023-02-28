@@ -23,4 +23,11 @@ public class TeamProjectInfo
 
     [JsonPropertyName("lastUpdateTime")]
     public DateTime LastUpdateTime { get; set; }
+
+    [JsonPropertyName("capabilities")]
+    public TeamProjectCapabilities? Capabilities { get; set; }
+
+    [JsonPropertyName("defaultTeam")]
+    public DefaultTeamInfo? DefaultTeam { get; set; }
 }
+

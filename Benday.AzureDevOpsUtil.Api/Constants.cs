@@ -17,7 +17,7 @@ public static class Constants
     public const string CommandArgumentNameGetAreas = "getareas";
     public const string CommandArgumentNameGetWorkItemFields = "getfields";
     public const string CommandArgumentNameGetWorkItemTypes = "getworkitemtypes";
-
+    public const string CommandArgumentNameCreateBacklogRefinementProcessTemplate = "addrefinementprocess";
 
     public const string CommandName_ListProjects = "listprojects";
     public const string CommandName_GetProject = "getproject";
@@ -33,6 +33,7 @@ public static class Constants
     public const string CommandName_ExportWorkItemQuery = "exportworkitemquery";
     public const string CommandName_SetWorkItemState = "setworkitemstate";
     public const string CommandArgumentNameGetWorkItemStates = "getworkitemstates";
+    public const string CommandName_ChangeProjectProcess = "changeprocess";
 
     public const string CommandArgumentNameGetCycleTimeAndThroughput = "throughputcycletime";
     public const string CommandArgumentNameGetForecastItemCountInWeeks = "forecastitemsinweeks";
@@ -40,6 +41,7 @@ public static class Constants
 
     public const string ArgumentNameVerbose = "verbose";
     public const string ArgumentNameTeamProjectName = "teamproject";
+    public const string ArgumentNameProcessName = "processname";
     public const string ArgumentNameRepositoryName = "reponame";
     public const string ArgumentNameWorkItemQueryName = "queryname";
     public const string ArgumentNameConfirm = "confirm";
@@ -56,6 +58,9 @@ public static class Constants
     public const int ForecastNumberOfSimulations = 1000;
     public const int ForecastNumberOfSimulationsFiftyPercent = 500;
     public const int ForecastNumberOfSimulationsEightyPercent = 800;
+    public const string ProcessTemplateName_ScrumWithBacklogRefinement = "Scrum with Backlog Refinement";
+    public const string ProcessTemplateRefName_ScrumWithBacklogRefinement = "Inherited.ScrumWithBacklogRefinement";
+    public const string ProcessTemplateName_Scrum = "Scrum";
 
     public const string CommandArg_Comment = "comment";
     public const string CommandArg_SkipFutureDates = "skipfuturedates";
