@@ -38,6 +38,8 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | Command Name | Description |
 | --- | --- |
 | [addconfig](#addconfig) | Add or update an Azure DevOps configuration. For example, which server or account plus auth information. |
+| [changeprocess](#changeprocess) | Change the process for a Team Project |
+| [addrefinementprocess](#addrefinementprocess) | Creates backlog refinement process template as described at https://www.benday.com/2022/09/29/streamlining-backlog-refinement-with-azure-devops/ |
 | [creategitrepo](#creategitrepo) | Creates a Git repository in an Azure DevOps Team Project. |
 | [createproject](#createproject) | List team projects |
 | [deleteproject](#deleteproject) | Delete team project |
@@ -72,6 +74,22 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | config | Optional | String | Name of the configuration |
 | pat | Required | String | PAT for this collection |
 | url | Required | String | URL for this collection (example: https://dev.azure.com/accountname) |
+## <a name="changeprocess"></a> changeprocess
+**Change the process for a Team Project**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Required | String | Team project name |
+| processname | Required | String | New process name |
+## <a name="addrefinementprocess"></a> addrefinementprocess
+**Creates backlog refinement process template as described at https://www.benday.com/2022/09/29/streamlining-backlog-refinement-with-azure-devops/**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
 ## <a name="creategitrepo"></a> creategitrepo
 **Creates a Git repository in an Azure DevOps Team Project.**
 ### Arguments

@@ -38,6 +38,8 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | Command Name | Description |
 | --- | --- |
 | addconfig | Add or update an Azure DevOps configuration. For example, which server or account plus auth information. |
+| changeprocess | Change the process for a Team Project |
+| addrefinementprocess | Creates backlog refinement process template as described at https://www.benday.com/2022/09/29/streamlining-backlog-refinement-with-azure-devops/ |
 | creategitrepo | Creates a Git repository in an Azure DevOps Team Project. |
 | createproject | List team projects |
 | deleteproject | Delete team project |
@@ -72,6 +74,22 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | config | Optional | String | Name of the configuration |
 | pat | Required | String | PAT for this collection |
 | url | Required | String | URL for this collection (example: https://dev.azure.com/accountname) |
+## changeprocess
+**Change the process for a Team Project**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Required | String | Team project name |
+| processname | Required | String | New process name |
+## addrefinementprocess
+**Creates backlog refinement process template as described at https://www.benday.com/2022/09/29/streamlining-backlog-refinement-with-azure-devops/**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
 ## creategitrepo
 **Creates a Git repository in an Azure DevOps Team Project.**
 ### Arguments
