@@ -12,8 +12,11 @@
     "no-args": {
       "commandName": "Project",
       "commandLineArgs": ""
+    },
+    "get-project": {
+      "commandName": "Project",
+      "commandLineArgs": "getproject /teamproject:\"Metrics and Dashboards Research\""
     }
-
 
   }
 }

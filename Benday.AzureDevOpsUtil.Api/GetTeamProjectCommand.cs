@@ -46,6 +46,29 @@ public class GetTeamProjectCommand : AzureDevOpsCommandBase
                 WriteLine($"Url: {project.Url}");
                 WriteLine($"LastUpdateTime: {project.LastUpdateTime}");
                 WriteLine($"State: {project.State}");
+
+                if (project.DefaultTeam == null)
+                {
+                    WriteLine($"Default team: (n/a)");
+                }
+                else
+                {
+                    WriteLine($"Default team name: {project.DefaultTeam.Name}");
+                    WriteLine($"Default team id: {project.DefaultTeam.Id}");
+                }
+
+                if (project.Capabilities == null)
+                {
+                    WriteLine($"Capabilities: (n/a)");
+                }
+                else
+                {
+                    WriteLine($"Process Template Id: {project.Capabilities.ProcessTemplate.TemplateTypeId}");
+                    WriteLine($"Process Template Name: {project.Capabilities.ProcessTemplate.Name}");
+                    WriteLine($"Source Control Type: {project.Capabilities.VersionControl.SourceControlType}");
+                    WriteLine($"Git Enabled: {project.Capabilities.VersionControl.GitEnabled}");
+                    WriteLine($"TFVC Enabled: {project.Capabilities.VersionControl.TfvcEnabled}");
+                }
             }
         }
     }
@@ -54,7 +77,7 @@ public class GetTeamProjectCommand : AzureDevOpsCommandBase
     {
         var teamProjectNameEncoded = teamProjectName.Replace(" ", "%20");
 
-        var requestUrl = $"_apis/projects/{teamProjectNameEncoded}?api-version=7.0";
+        var requestUrl = $"_apis/projects/{teamProjectNameEncoded}?api-version=7.0&includeCapabilities=true";
 
         try
         {
