@@ -82,7 +82,7 @@ public class CreateTeamProjectCommand : AzureDevOpsCommandBase
         }
     }
 
-    private async Task<ProcessTemplateInfo?> GetProcessTemplate(string processTemplateName)
+    private async Task<ProcessTemplateDetailInfo?> GetProcessTemplate(string processTemplateName)
     {
         var args = ExecutionInfo.GetCloneOfArguments(Constants.CommandName_ListProjects, true);
         var command = new ListProcessTemplatesCommand(args, _OutputProvider);
@@ -103,7 +103,7 @@ public class CreateTeamProjectCommand : AzureDevOpsCommandBase
         }
     }
 
-    private async Task CreateNewTeamProject(string name, ProcessTemplateInfo processTemplate)
+    private async Task CreateNewTeamProject(string name, ProcessTemplateDetailInfo processTemplate)
     {
         CreateTeamProjectRequest request = new();
         request.Capabilities = new();

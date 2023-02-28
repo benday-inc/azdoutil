@@ -30,7 +30,7 @@ public class ListProcessTemplatesCommand : AzureDevOpsCommandBase
     {
         // GET https://dev.azure.com/{organization}/_apis/process/processes?api-version=7.0
 
-        var requestUrl = $"_apis/process/processes?api-version=7.0";
+        var requestUrl = $"_apis/work/processes?api-version=7.0";
 
         var result = await CallEndpointViaGetAndGetResult<ListProcessTemplatesResponse>(requestUrl);
 
@@ -44,13 +44,40 @@ public class ListProcessTemplatesCommand : AzureDevOpsCommandBase
             }
             else
             {
+                var parentProcessInfo = new Dictionary<string, ProcessTemplateDetailInfo>();
+
+                foreach (var processType in result.Values)
+                {
+                    parentProcessInfo.TryAdd(processType.Id, processType);
+                }
+
+                foreach (var processType in result.Values)
+                {
+                    if (processType.CustomizationType == "inherited" &&
+                        parentProcessInfo.ContainsKey(processType.ParentProcessTypeId) == true)
+                    {
+                        processType.ParentProcessName =
+                            parentProcessInfo[processType.ParentProcessTypeId].Name;
+
+                        processType.Parent = parentProcessInfo[processType.ParentProcessTypeId];
+                    }
+                }
+
                 foreach (var item in result.Values)
                 {
                     WriteLine($"Name: {item.Name}");
                     WriteLine($"Description: {item.Description}");
-                    WriteLine($"IsDefault: {item.IsDefault}");
+                    WriteLine($"Is Default: {item.IsDefault}");
                     WriteLine($"Id: {item.Id}");
-                    WriteLine($"Url: {item.Url}");
+                    WriteLine($"Customization Type: {item.CustomizationType}");
+
+                    if (item.CustomizationType == "inherited")
+                    {
+                        WriteLine($"Reference Name: {item.ReferenceName}");
+                        WriteLine($"Parent Process Id: {item.ParentProcessTypeId}");
+                        WriteLine($"Parent Process Name: {item.ParentProcessName}");
+                    }
+
                     WriteLine(string.Empty);
                 }
             }

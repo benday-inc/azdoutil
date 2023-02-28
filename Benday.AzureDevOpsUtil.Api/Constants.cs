@@ -17,7 +17,7 @@ public static class Constants
     public const string CommandArgumentNameGetAreas = "getareas";
     public const string CommandArgumentNameGetWorkItemFields = "getfields";
     public const string CommandArgumentNameGetWorkItemTypes = "getworkitemtypes";
-
+    public const string CommandArgumentNameCreateBacklogRefinementProcessTemplate = "addrefinementprocess";
 
     public const string CommandName_ListProjects = "listprojects";
     public const string CommandName_GetProject = "getproject";

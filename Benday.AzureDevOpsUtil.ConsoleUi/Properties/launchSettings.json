@@ -16,6 +16,10 @@
     "get-project": {
       "commandName": "Project",
       "commandLineArgs": "getproject /teamproject:\"Metrics and Dashboards Research\""
+    },
+    "list-process-templates": {
+      "commandName": "Project",
+      "commandLineArgs": "listprocesstemplates"
     }
 
   }
