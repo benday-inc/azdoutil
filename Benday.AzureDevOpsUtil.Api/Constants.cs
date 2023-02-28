@@ -56,6 +56,9 @@ public static class Constants
     public const int ForecastNumberOfSimulations = 1000;
     public const int ForecastNumberOfSimulationsFiftyPercent = 500;
     public const int ForecastNumberOfSimulationsEightyPercent = 800;
+    public const string ProcessTemplateName_ScrumWithBacklogRefinement = "Scrum with Backlog Refinement";
+    public const string ProcessTemplateRefName_ScrumWithBacklogRefinement = "Inherited.ScrumWithBacklogRefinement";
+    public const string ProcessTemplateName_Scrum = "Scrum";
 
     public const string CommandArg_Comment = "comment";
     public const string CommandArg_SkipFutureDates = "skipfuturedates";
