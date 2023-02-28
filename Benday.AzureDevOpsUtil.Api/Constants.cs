@@ -33,6 +33,7 @@ public static class Constants
     public const string CommandName_ExportWorkItemQuery = "exportworkitemquery";
     public const string CommandName_SetWorkItemState = "setworkitemstate";
     public const string CommandArgumentNameGetWorkItemStates = "getworkitemstates";
+    public const string CommandName_ChangeProjectProcess = "changeprocess";
 
     public const string CommandArgumentNameGetCycleTimeAndThroughput = "throughputcycletime";
     public const string CommandArgumentNameGetForecastItemCountInWeeks = "forecastitemsinweeks";
@@ -40,6 +41,7 @@ public static class Constants
 
     public const string ArgumentNameVerbose = "verbose";
     public const string ArgumentNameTeamProjectName = "teamproject";
+    public const string ArgumentNameProcessName = "processname";
     public const string ArgumentNameRepositoryName = "reponame";
     public const string ArgumentNameWorkItemQueryName = "queryname";
     public const string ArgumentNameConfirm = "confirm";

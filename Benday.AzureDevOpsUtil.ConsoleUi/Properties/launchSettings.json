@@ -24,6 +24,10 @@
     "addrefinementprocess": {
       "commandName": "Project",
       "commandLineArgs": "addrefinementprocess"
+    },
+    "change-process": {
+      "commandName": "Project",
+      "commandLineArgs": "changeprocess /teamproject:ScrumGit20221216a /processname:\"Scrum with Backlog Refinement\""
     }
   }
 }
