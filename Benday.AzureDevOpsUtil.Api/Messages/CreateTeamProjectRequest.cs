@@ -11,5 +11,5 @@ public class CreateTeamProjectRequest
     public string Description { get; set; } = string.Empty;
 
     [JsonPropertyName("capabilities")]
-    public TeamProjectCapabilities Capabilities { get; set; } = new();
+    public TeamProjectCapabilitiesForCreate Capabilities { get; set; } = new();
 }

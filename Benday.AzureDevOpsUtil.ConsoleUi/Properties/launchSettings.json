@@ -28,6 +28,13 @@
     "change-process": {
       "commandName": "Project",
       "commandLineArgs": "changeprocess /teamproject:ScrumGit20221216a /processname:\"Scrum with Backlog Refinement\""
+    },
+    "create-project": {
+      "commandName": "Project",
+      "commandLineArgs": "createproject /config:demo2 /teamproject:test20230228a /processname:Scrum"
     }
+
+
+    
   }
 }
