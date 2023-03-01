@@ -1,5 +1,9 @@
 {
   "profiles": {
+    "forecast-workitem-delivery": {
+      "commandName": "Project",
+      "commandLineArgs": "forecastworkitem /id:2489 /numberofdays:120"
+    },
     "Benday.AzureDevOpsUtil.ConsoleUi": {
       "commandName": "Project",
       "commandLineArgs": "forecastdurationforitemcount /teamproject:\"Metrics and Dashboards Research\" /numberofdays:120 /forecastitemcount:50"
@@ -34,7 +38,5 @@
       "commandLineArgs": "createproject /config:demo2 /teamproject:test20230228a /processname:Scrum"
     }
 
-
-    
   }
 }

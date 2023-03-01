@@ -56,12 +56,22 @@ public class ForecastDurationForItemCountCommand : AzureDevOpsCommandBase
         DataGroupedByWeek = getDataCommand.GroupedByWeek;
 
         CreateForecast();
-        DisplayForecast();
+        if (IsQuietMode == false)
+        {
+            DisplayForecast();
+        }
     }
 
-    private void DisplayForecast()
+    public void DisplayForecast()
     {
-        WriteLine($"How many weeks will it take us to get {_NumberOfItemsToForecast} item(s) done?");
+        var desc = $"How many weeks will it take us to get {_NumberOfItemsToForecast} item(s) done?";
+
+        DisplayForecast(desc);
+    }
+
+    public void DisplayForecast(string forecastDescription)
+    {
+        WriteLine(forecastDescription);
         WriteLine(string.Empty);
 
         var distribution = GetDistribution();
