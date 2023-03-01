@@ -46,6 +46,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | [exportworkitemquery](#exportworkitemquery) | Export work item query results |
 | [forecastdurationforitemcount](#forecastdurationforitemcount) | Use throughput data to forecast likely number of weeks to get given number of items done using Monte Carlo simulation |
 | [forecastitemsinweeks](#forecastitemsinweeks) | Use throughput data to forecast likely number of items done in given number of weeks using Monte Carlo simulation |
+| [forecastworkitem](#forecastworkitem) | Use throughput data to forecast when a work item is likely to be done based on the current backlog priority using Monte Carlo simulation |
 | [getareas](#getareas) | Gets a list of areas in an Azure DevOps Team Project. |
 | [throughputcycletime](#throughputcycletime) | Get cycle time and throughput data for a team project for a date range |
 | [getiterations](#getiterations) | Gets a list of iterations in an Azure DevOps Team Project. |
@@ -147,6 +148,15 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | numberofdays | Required | Int32 | Number of days of history to compute |
 | teamproject | Required | String | Team project name |
 | forecastweeks | Required | Int32 | Number of weeks into the future to forecast |
+## <a name="forecastworkitem"></a> forecastworkitem
+**Use throughput data to forecast when a work item is likely to be done based on the current backlog priority using Monte Carlo simulation**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| numberofdays | Required | Int32 | Number of days of history to compute |
+| id | Required | Int32 | Id of the work item to forecast |
 ## <a name="getareas"></a> getareas
 **Gets a list of areas in an Azure DevOps Team Project.**
 ### Arguments
