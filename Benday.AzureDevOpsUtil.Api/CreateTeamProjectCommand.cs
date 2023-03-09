@@ -5,7 +5,7 @@ namespace Benday.AzureDevOpsUtil.Api;
 
 
 [Command(Name = Constants.CommandName_CreateProject,
-        Description = "List team projects",
+        Description = "Create team projects",
         IsAsync = true)]
 public class CreateTeamProjectCommand : AzureDevOpsCommandBase
 {
