@@ -41,7 +41,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | [changeprocess](#changeprocess) | Change the process for a Team Project |
 | [addrefinementprocess](#addrefinementprocess) | Creates backlog refinement process template as described at https://www.benday.com/2022/09/29/streamlining-backlog-refinement-with-azure-devops/ |
 | [creategitrepo](#creategitrepo) | Creates a Git repository in an Azure DevOps Team Project. |
-| [createproject](#createproject) | List team projects |
+| [createproject](#createproject) | Create team project |
 | [deleteproject](#deleteproject) | Delete team project |
 | [exportworkitemquery](#exportworkitemquery) | Export work item query results |
 | [forecastdurationforitemcount](#forecastdurationforitemcount) | Use throughput data to forecast likely number of weeks to get given number of items done using Monte Carlo simulation |
