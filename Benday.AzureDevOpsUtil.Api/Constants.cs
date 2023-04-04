@@ -11,6 +11,7 @@ public static class Constants
     public const string CommandArgumentNameRemoveConfig = "removeconfig";
     public const string CommandArgumentNameListConfig = "listconfig";
     public const string CommandArgumentName_ListGitRepos = "listgitrepos";
+    public const string CommandArgumentNameListBuildDefinitions = "listbuilddefs";
     public const string CommandArgumentNameCreateGitRepository = "creategitrepo";
     public const string CommandArgumentNameListWorkItemQueries = "listworkitemqueries";
     public const string CommandArgumentNameGetIterations = "getiterations";
@@ -50,6 +51,7 @@ public static class Constants
     public const string ArgumentNameCollectionUrl = "url";
     public const string ArgumentNameToken = "pat";
     public const string ArgumentNameQuietMode = "quiet";
+    public const string ArgumentNameNameOnly = "nameonly";
 
     public const string ArgumentNameCycleTimeNumberOfDays = "numberofdays";
     public const string ArgumentNameForecastNumberOfWeeks = "forecastweeks";
