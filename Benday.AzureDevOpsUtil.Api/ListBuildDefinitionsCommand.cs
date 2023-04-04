@@ -11,7 +11,7 @@ namespace Benday.AzureDevOpsUtil.Api;
         IsAsync = true)]
 public class ListBuildDefinitionsCommand : AzureDevOpsCommandBase
 {
-    private string _TeamProjectName;
+    private string _TeamProjectName = string.Empty;
 
     public BuildDefinitionInfoResponse? LastResult { get; private set; }
 
@@ -30,6 +30,11 @@ public class ListBuildDefinitionsCommand : AzureDevOpsCommandBase
         arguments.AddBoolean(Constants.ArgumentNameNameOnly)
             .AllowEmptyValue()
             .WithDescription("Only display the build definition name")
+            .AsNotRequired();
+
+        arguments.AddBoolean(Constants.ArgumentNameXaml)
+            .AllowEmptyValue()
+            .WithDescription("List XAML build definitions")
             .AsNotRequired();
 
         return arguments;
@@ -58,7 +63,17 @@ public class ListBuildDefinitionsCommand : AzureDevOpsCommandBase
 
     private async Task<List<BuildDefinitionInfo>?> GetResult()
     {
-        var requestUrl = $"{_TeamProjectName}/_apis/build/definition?api-version=7.0";
+        string requestUrl;
+
+        if (Arguments.GetBooleanValue(Constants.ArgumentNameXaml) == true)
+        {
+            WriteLine("** GETTING XAML BUILD DEFINITIONS **");
+            requestUrl = $"{_TeamProjectName}/_apis/build/definitions?api-version=2.2";
+        }
+        else
+        {
+            requestUrl = $"{_TeamProjectName}/_apis/build/definitions?api-version=7.0";
+        }
 
         var result = await CallEndpointViaGetAndGetResult<BuildDefinitionInfoResponse>(requestUrl);
 

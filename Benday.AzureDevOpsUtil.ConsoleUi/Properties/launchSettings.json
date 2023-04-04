@@ -36,6 +36,10 @@
     "create-project": {
       "commandName": "Project",
       "commandLineArgs": "createproject /config:demo2 /teamproject:test20230228a /processname:Scrum"
+    },
+    "list-build-defs": {
+      "commandName": "Project",
+      "commandLineArgs": "listbuilddefs /teamproject:lesa-it /xaml"
     }
 
   }

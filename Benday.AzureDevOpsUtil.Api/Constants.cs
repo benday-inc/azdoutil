@@ -52,6 +52,7 @@ public static class Constants
     public const string ArgumentNameToken = "pat";
     public const string ArgumentNameQuietMode = "quiet";
     public const string ArgumentNameNameOnly = "nameonly";
+    public const string ArgumentNameXaml = "xaml";
 
     public const string ArgumentNameCycleTimeNumberOfDays = "numberofdays";
     public const string ArgumentNameForecastNumberOfWeeks = "forecastweeks";

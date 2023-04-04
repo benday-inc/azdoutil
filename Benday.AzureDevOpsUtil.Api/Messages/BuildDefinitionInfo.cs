@@ -2,7 +2,7 @@
 
 namespace Benday.AzureDevOpsUtil.Api.Messages;
 
-public class BuildDefinitionInfo : INamed
+public class BuildDefinitionInfo 
 {
     [JsonPropertyName("quality")]
     public string Quality { get; set; } = string.Empty;
@@ -17,7 +17,7 @@ public class BuildDefinitionInfo : INamed
     public string Revision { get; set; } = string.Empty;
 
     [JsonPropertyName("id")]
-    public string Id { get; set; } = string.Empty;
+    public int Id { get; set; }
 
     [JsonPropertyName("name")] 
     public string Name { get; set; } = string.Empty;
