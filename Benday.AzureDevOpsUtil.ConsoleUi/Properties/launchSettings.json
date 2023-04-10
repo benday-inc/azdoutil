@@ -40,6 +40,10 @@
     "list-build-defs": {
       "commandName": "Project",
       "commandLineArgs": "listbuilddefs /teamproject:Test20230405 /xaml"
+    },
+    "export-build-def": {
+      "commandName": "Project",
+      "commandLineArgs": "exportbuilddef /teamproject:Test20230405 /xaml /name:helloworld"
     }
 
   }
