@@ -45,8 +45,32 @@ public static class ExtensionMethods
     public static void AppendLabeledValue(this StringBuilder builder, string label, DateTime value)
     {
         builder.Append(label);
-        builder.Append(": ");
+        builder.Append(",");
         builder.Append(value);
         builder.AppendLine();
+    }
+
+    public static void AppendCsv(this StringBuilder builder, string label, string value)
+    {
+        builder.Append(value);
+        builder.Append(',');
+    }
+
+    public static void AppendCsvHeader(this StringBuilder builder, string label)
+    {
+        builder.Append(label);
+        builder.Append(',');
+    }
+
+    public static void AppendCsv(this StringBuilder builder, string label, int value)
+    {
+        builder.Append(value);
+        builder.Append(',');
+    }
+
+    public static void AppendCsv(this StringBuilder builder, string label, DateTime value)
+    {
+        builder.Append(value);
+        builder.Append(',');
     }
 }

@@ -44,6 +44,10 @@
     "export-build-def": {
       "commandName": "Project",
       "commandLineArgs": "exportbuilddef /teamproject:Test20230405 /xaml /name:helloworld /showlastruninfo"
+    },
+    "export-build-def-csv": {
+      "commandName": "Project",
+      "commandLineArgs": "exportbuilddef /teamproject:Test20230405 /xaml /name:helloworld /showlastruninfo /csv"
     }
 
   }

@@ -58,6 +58,8 @@ public static class Constants
     public const string ArgumentNameOutputRaw = "raw";
     public const string ArgumentNameBuildDefinitionName = "name";
     public const string ArgumentNameShowLastRunInfo = "showlastruninfo";
+    public const string ArgumentNameOutputCsv = "csv";
+    public const string ArgumentNameNoCsvHeader = "csv-noheader";
 
     public const string ArgumentNameCycleTimeNumberOfDays = "numberofdays";
     public const string ArgumentNameForecastNumberOfWeeks = "forecastweeks";
