@@ -49,6 +49,7 @@ public static class Constants
     public const string ArgumentNameConfirm = "confirm";
     public const string ArgumentNameConfigurationName = "config";
     public const string ArgumentNameCollectionUrl = "url";
+    public const string ArgumentNameWindowsAuth = "windowsauth";
     public const string ArgumentNameToken = "pat";
     public const string ArgumentNameQuietMode = "quiet";
     public const string ArgumentNameNameOnly = "nameonly";

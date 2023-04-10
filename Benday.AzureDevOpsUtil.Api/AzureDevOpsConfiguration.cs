@@ -24,6 +24,7 @@ public class AzureDevOpsConfiguration
         set => _CollectionUrl = value;
     }
     public string Token { get; set; } = string.Empty;
+    public bool IsWindowsAuth { get; set; }
 
     public string GetTokenBase64Encoded()
     {

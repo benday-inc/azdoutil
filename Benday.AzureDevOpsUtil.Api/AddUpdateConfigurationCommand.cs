@@ -1,4 +1,6 @@
-﻿using Benday.CommandsFramework;
+﻿using System.Linq.Expressions;
+
+using Benday.CommandsFramework;
 
 using OfficeOpenXml.Utils;
 
@@ -23,16 +25,33 @@ public class AddUpdateConfigurationCommand : SynchronousCommand
             .AsNotRequired();
         arguments.AddString(Constants.ArgumentNameToken)
             .WithDescription("PAT for this collection")
-            .AsRequired();
+            .AsNotRequired();
+        
+        arguments.AddBoolean(Constants.ArgumentNameWindowsAuth)
+            .WithDescription("Use windows authentication with the current logged in user")
+            .AsNotRequired()
+            .AllowEmptyValue();
+
         arguments.AddString(Constants.ArgumentNameCollectionUrl)
             .WithDescription("URL for this collection (example: https://dev.azure.com/accountname)")
             .AsRequired();
 
         return arguments;
     }
-
+    
     protected override void OnExecute()
     {
+        if (Arguments.HasValue(Constants.ArgumentNameToken) == true &&
+            Arguments.HasValue(Constants.ArgumentNameWindowsAuth) == true)
+        {
+            throw new KnownException($"Cannot set both /{Constants.ArgumentNameToken} and /{Constants.ArgumentNameWindowsAuth}");
+        }
+        else if (Arguments.HasValue(Constants.ArgumentNameToken) == false &&
+            Arguments.HasValue(Constants.ArgumentNameWindowsAuth) == false)
+        {
+            throw new KnownException($"You must set either /{Constants.ArgumentNameToken} or /{Constants.ArgumentNameWindowsAuth}");
+        }
+
         var configName = Constants.DefaultConfigurationName;
 
         if (Arguments[Constants.ArgumentNameConfigurationName].HasValue == true)
@@ -41,11 +60,19 @@ public class AddUpdateConfigurationCommand : SynchronousCommand
                 Arguments[Constants.ArgumentNameConfigurationName].Value;
         }
 
+        var token = string.Empty;
+        
+        if (Arguments.HasValue(Constants.ArgumentNameToken) == true)
+        {
+            token = Arguments.GetStringValue(Constants.ArgumentNameToken);
+        }
+
         var config = new AzureDevOpsConfiguration()
         {
-            CollectionUrl = Arguments[Constants.ArgumentNameCollectionUrl].Value,
-            Token = Arguments[Constants.ArgumentNameToken].Value,
-            Name = configName
+            CollectionUrl = Arguments.GetStringValue(Constants.ArgumentNameCollectionUrl),
+            Token = token,
+            Name = configName,
+            IsWindowsAuth = Arguments.GetBooleanValue(Constants.ArgumentNameWindowsAuth)
         };
 
         AzureDevOpsConfigurationManager.Instance.Save(config);
