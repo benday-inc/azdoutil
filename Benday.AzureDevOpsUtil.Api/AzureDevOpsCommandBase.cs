@@ -130,6 +130,39 @@ public abstract class AzureDevOpsCommandBase : AsynchronousCommand
         }
     }
 
+    protected async Task<string?> GetStringAsync(
+        string requestUrl, bool writeStringContentToInfo = false, bool throwExceptionOnError = true)
+    {
+        using var client = GetHttpClientInstanceForAzureDevOps();
+
+        var result = await client.GetAsync(requestUrl);
+
+        if (result.IsSuccessStatusCode == false && throwExceptionOnError == true)
+        {
+            throw new InvalidOperationException($"Problem with server call to {requestUrl}. {result.StatusCode} {result.ReasonPhrase}");
+        }
+        else if (result.IsSuccessStatusCode == false && throwExceptionOnError == false)
+        {
+            return default;
+        }
+        else
+        {
+            var responseContent = await result.Content.ReadAsStringAsync();
+
+            if (writeStringContentToInfo == true)
+            {
+                WriteLine(responseContent);
+            }
+
+            return responseContent;
+        }
+    }
+
+    protected virtual void WriteLine()
+    {
+        _OutputProvider.WriteLine();
+    }
+
     private async Task<T?> CallEndpointViaGetAndGetResultSingleAttempt<T>(
         string requestUrl, bool writeStringContentToInfo = false, bool throwExceptionOnError = true)
     {

@@ -12,6 +12,7 @@ public static class Constants
     public const string CommandArgumentNameListConfig = "listconfig";
     public const string CommandArgumentName_ListGitRepos = "listgitrepos";
     public const string CommandArgumentNameListBuildDefinitions = "listbuilddefs";
+    public const string CommandArgumentNameExportBuildDefinition = "exportbuilddef";
     public const string CommandArgumentNameCreateGitRepository = "creategitrepo";
     public const string CommandArgumentNameListWorkItemQueries = "listworkitemqueries";
     public const string CommandArgumentNameGetIterations = "getiterations";
@@ -54,6 +55,7 @@ public static class Constants
     public const string ArgumentNameQuietMode = "quiet";
     public const string ArgumentNameNameOnly = "nameonly";
     public const string ArgumentNameXaml = "xaml";
+    public const string ArgumentNameBuildDefinitionName = "name";
 
     public const string ArgumentNameCycleTimeNumberOfDays = "numberofdays";
     public const string ArgumentNameForecastNumberOfWeeks = "forecastweeks";
