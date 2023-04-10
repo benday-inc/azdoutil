@@ -55,6 +55,7 @@ public static class Constants
     public const string ArgumentNameQuietMode = "quiet";
     public const string ArgumentNameNameOnly = "nameonly";
     public const string ArgumentNameXaml = "xaml";
+    public const string ArgumentNameOutputRaw = "raw";
     public const string ArgumentNameBuildDefinitionName = "name";
 
     public const string ArgumentNameCycleTimeNumberOfDays = "numberofdays";

@@ -36,6 +36,12 @@ public class ExportBuildDefinitionCommand : AzureDevOpsCommandBase
             .WithDescription("List XAML build definitions")
             .AsNotRequired();
 
+        arguments.AddBoolean(Constants.ArgumentNameOutputRaw)
+            .AllowEmptyValue()
+            .AsNotRequired()
+            .WithDescription("Output raw build definition")
+            .AsNotRequired();
+
         return arguments;
     }
 
@@ -44,6 +50,7 @@ public class ExportBuildDefinitionCommand : AzureDevOpsCommandBase
         _TeamProjectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);
         _BuildDefinitionName = Arguments.GetStringValue(Constants.ArgumentNameBuildDefinitionName);
         var isXamlMode = Arguments.GetBooleanValue(Constants.ArgumentNameXaml);
+        var outputRaw = Arguments.GetBooleanValue(Constants.ArgumentNameOutputRaw);
 
         var buildId = await GetBuildIdByBuildName(_BuildDefinitionName);
 
@@ -71,9 +78,80 @@ public class ExportBuildDefinitionCommand : AzureDevOpsCommandBase
             {
                 WriteLine("** Result was null **");
             }
-            else
+            else if (outputRaw == true)
             {
                 WriteLine(json);
+            }
+            else
+            {
+                var data = JsonUtilities.GetJsonValueAsType<XamlBuildDefinitionDetail>(json);
+
+                var builder = new StringBuilder();
+
+                builder.AppendLabeledValue("Id", data.Id);
+                builder.AppendLabeledValue("Name", data.Name);
+                builder.AppendLabeledValue("BuildType", data.BuildType);
+                builder.AppendLabeledValue("DefaultDropLocation", data.DefaultDropLocation);
+                builder.AppendLabeledValue("BuildArgs", data.BuildArgs);
+                builder.AppendLabeledValue("CreatedOn", data.CreatedOn);
+                builder.AppendLabeledValue("LastBuild Id", data.LastBuild.Id);
+                builder.AppendLabeledValue("LastBuild Url", data.LastBuild.Url);
+                builder.AppendLabeledValue("Repository Type", data.Repository.RepositoryType);
+
+                if (string.IsNullOrWhiteSpace(data.Repository.Properties.TfvcMapping) == false)
+                {
+                    try
+                    {
+                        var mappings = JsonUtilities.GetJsonValueAsType<XamlBuildTfvcMappings>(
+                            data.Repository.Properties.TfvcMapping);
+
+                        if (mappings == null)
+                        {
+                            builder.AppendLabeledValue("Repository Properties", "(n/a)");
+                        }
+                        else
+                        {
+                            builder.AppendLabeledValue("Repository Properties", string.Empty);
+
+                            var count = 0;
+
+                            foreach (var mapping in mappings.Mappings)
+                            {
+                                count++;
+
+                                builder.AppendLabeledValue($"\tMapping #{count}", string.Empty);
+                                builder.AppendLabeledValue("\tMapping Type", mapping.MappingType);
+                                builder.AppendLabeledValue("\tServer Path", mapping.ServerPath);
+                                builder.AppendLabeledValue("\tLocal Path", mapping.LocalPath ?? string.Empty);
+                                builder.AppendLine();
+                            }
+                        }
+                    }
+                    catch 
+                    {
+                        builder.AppendLabeledValue("Repository Properties",
+                            data.Repository.Properties.TfvcMapping);
+                    }                    
+                }
+                else
+                {
+                    builder.AppendLabeledValue("Repository Properties", "(n/a)");
+                }
+                
+
+
+
+
+
+
+
+
+                builder.AppendLabeledValue("Project Name", data.Project.Name);
+                builder.AppendLabeledValue("Project Id", data.Project.Id);
+                builder.AppendLabeledValue("Controller Id", data.Controller.Id);
+                builder.AppendLabeledValue("Controller Name", data.Controller.Name);
+
+                WriteLine(builder.ToString());
             }
         }
     }
@@ -115,41 +193,5 @@ public class ExportBuildDefinitionCommand : AzureDevOpsCommandBase
         {
             return result.Values[0];
         }
-    }
-
-    private async Task<List<BuildDefinitionInfo>?> GetResult()
-    {
-        string requestUrl;
-
-        if (Arguments.GetBooleanValue(Constants.ArgumentNameXaml) == true)
-        {
-            WriteLine("** GETTING XAML BUILD DEFINITIONS **");
-            requestUrl = $"{_TeamProjectName}/_apis/build/definitions?api-version=2.2";
-        }
-        else
-        {
-            requestUrl = $"{_TeamProjectName}/_apis/build/definitions?api-version=7.0";
-        }
-
-        var result = await CallEndpointViaGetAndGetResult<BuildDefinitionInfoResponse>(requestUrl);
-
-        LastResult = result;
-
-        return result?.Values;
-    }
-
-    private string ToString(BuildDefinitionInfo definition)
-    {
-        var builder = new StringBuilder();
-        builder.Append(definition.Name);
-
-        if (Arguments.GetBooleanValue(Constants.ArgumentNameNameOnly) == false)
-        {
-            builder.Append(" (");
-            builder.Append(definition.Id);
-            builder.Append(")");
-        }
-
-        return builder.ToString();
-    }
+    }        
 }

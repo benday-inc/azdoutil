@@ -1,4 +1,6 @@
-﻿using Benday.CommandsFramework;
+﻿using System.Text;
+
+using Benday.CommandsFramework;
 
 namespace Benday.AzureDevOpsUtil.Api;
 public static class ExtensionMethods
@@ -23,5 +25,28 @@ public static class ExtensionMethods
         returnValue.CommandName = commandName;
 
         return returnValue;
+    }
+
+    public static void AppendLabeledValue(this StringBuilder builder, string label, string value)
+    {
+        builder.Append(label);
+        builder.Append(": ");
+        builder.AppendLine(value);
+    }
+
+    public static void AppendLabeledValue(this StringBuilder builder, string label, int value)
+    {
+        builder.Append(label);
+        builder.Append(": ");
+        builder.Append(value);
+        builder.AppendLine();
+    }
+
+    public static void AppendLabeledValue(this StringBuilder builder, string label, DateTime value)
+    {
+        builder.Append(label);
+        builder.Append(": ");
+        builder.Append(value);
+        builder.AppendLine();
     }
 }
