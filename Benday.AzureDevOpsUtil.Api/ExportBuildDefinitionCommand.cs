@@ -12,7 +12,7 @@ namespace Benday.AzureDevOpsUtil.Api;
 public class ExportBuildDefinitionCommand : AzureDevOpsCommandBase
 {
     private string _TeamProjectName = string.Empty;
-    private string _BuildDefinitionName;
+    private string _BuildDefinitionName = string.Empty;
 
     public BuildDefinitionInfoResponse? LastResult { get; private set; }
 
