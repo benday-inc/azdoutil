@@ -23,7 +23,7 @@ public class XamlBuildDefinitionDetail
     public DateTime CreatedOn { get; set; }
 
     [JsonPropertyName("supportedReasons")]
-    public string SupportedReasons { get; set; } = string.Empty;
+    public int SupportedReasons { get; set; }
 
     [JsonPropertyName("lastBuild")]
     public XamlBuildLastBuildInfo LastBuild { get; set; } = new();
