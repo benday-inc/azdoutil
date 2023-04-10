@@ -87,17 +87,31 @@ public abstract class AzureDevOpsCommandBase : AsynchronousCommand
 
     protected HttpClient GetHttpClientInstanceForAzureDevOps()
     {
-        var client = new HttpClient();
+        if (Configuration.IsWindowsAuth == true)
+        {
+            var client = new HttpClient(
+                new HttpClientHandler() {  UseDefaultCredentials = true });
 
-        var baseUri = new Uri(Configuration.CollectionUrl);
+            var baseUri = new Uri(Configuration.CollectionUrl);
 
-        client.BaseAddress = baseUri;
+            client.BaseAddress = baseUri;
 
-        client.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("Basic",
-            Configuration.GetTokenBase64Encoded());
+            return client;
+        }
+        else
+        {
+            var client = new HttpClient();
 
-        return client;
+            var baseUri = new Uri(Configuration.CollectionUrl);
+
+            client.BaseAddress = baseUri;
+
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Basic",
+                Configuration.GetTokenBase64Encoded());
+
+            return client;
+        }        
     }
 
     protected async Task<T?> CallEndpointViaGetAndGetResult<T>(string requestUrl, bool writeStringContentToInfo = false, bool throwExceptionOnError = true)

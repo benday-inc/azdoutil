@@ -39,7 +39,7 @@
     },
     "list-build-defs": {
       "commandName": "Project",
-      "commandLineArgs": "listbuilddefs /teamproject:lesa-it /xaml"
+      "commandLineArgs": "listbuilddefs /teamproject:Test20230405 /xaml"
     }
 
   }
