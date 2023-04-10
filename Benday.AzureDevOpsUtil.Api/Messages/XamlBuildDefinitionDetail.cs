@@ -22,8 +22,8 @@ public class XamlBuildDefinitionDetail
     [JsonPropertyName("createdOn")]
     public DateTime CreatedOn { get; set; }
 
-    [JsonPropertyName("supportedReasons")]
-    public int SupportedReasons { get; set; }
+    //[JsonPropertyName("supportedReasons")]
+    //public int SupportedReasons { get; set; }
 
     [JsonPropertyName("lastBuild")]
     public XamlBuildLastBuildInfo LastBuild { get; set; } = new();

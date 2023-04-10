@@ -36,6 +36,11 @@ public class ExportBuildDefinitionCommand : AzureDevOpsCommandBase
             .WithDescription("List XAML build definitions")
             .AsNotRequired();
 
+        arguments.AddBoolean(Constants.ArgumentNameShowLastRunInfo)
+            .AllowEmptyValue()
+            .WithDescription("Show last build run info")
+            .AsNotRequired();
+        
         arguments.AddBoolean(Constants.ArgumentNameOutputRaw)
             .AllowEmptyValue()
             .AsNotRequired()
@@ -47,10 +52,12 @@ public class ExportBuildDefinitionCommand : AzureDevOpsCommandBase
 
     protected override async Task OnExecute()
     {
+        // XamlBuildRunInfo
         _TeamProjectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);
         _BuildDefinitionName = Arguments.GetStringValue(Constants.ArgumentNameBuildDefinitionName);
         var isXamlMode = Arguments.GetBooleanValue(Constants.ArgumentNameXaml);
         var outputRaw = Arguments.GetBooleanValue(Constants.ArgumentNameOutputRaw);
+        var showLastRunInfo = Arguments.GetBooleanValue(Constants.ArgumentNameShowLastRunInfo);
 
         var buildId = await GetBuildIdByBuildName(_BuildDefinitionName);
 
@@ -138,21 +145,49 @@ public class ExportBuildDefinitionCommand : AzureDevOpsCommandBase
                     builder.AppendLabeledValue("Repository Properties", "(n/a)");
                 }
                 
-
-
-
-
-
-
-
-
                 builder.AppendLabeledValue("Project Name", data.Project.Name);
                 builder.AppendLabeledValue("Project Id", data.Project.Id);
                 builder.AppendLabeledValue("Controller Id", data.Controller.Id);
                 builder.AppendLabeledValue("Controller Name", data.Controller.Name);
 
+                if (showLastRunInfo == true)
+                {
+                    await AppendLastRunInfo(builder, data);
+                }
+
+
                 WriteLine(builder.ToString());
             }
+        }
+    }
+
+    private async Task AppendLastRunInfo(StringBuilder builder, XamlBuildDefinitionDetail definition)
+    {
+        string requestUrl;
+
+        if (Arguments.GetBooleanValue(Constants.ArgumentNameXaml) == true)
+        {
+            requestUrl = $"{definition.LastBuild.Url}?api-version=2.2";
+        }
+        else
+        {
+            requestUrl = $"{definition.LastBuild.Url}";
+        }
+
+        var result = await CallEndpointViaGetAndGetResult<XamlBuildRunInfo>(requestUrl);
+
+        if (result == null)
+        {
+            return;
+        }
+        else
+        {
+            builder.AppendLabeledValue("Build Number", result.BuildNumber);
+            builder.AppendLabeledValue("Build Reason", result.BuildReason);
+            builder.AppendLabeledValue("Queued At", result.QueueTime);
+            builder.AppendLabeledValue("Started At", result.StartTime);
+            builder.AppendLabeledValue("Finished At", result.FinishTime);
+            builder.AppendLabeledValue("Last Changed Date", result.LastChangedDate);
         }
     }
 
