@@ -109,7 +109,19 @@ public class ExportBuildDefinitionCommand : AzureDevOpsCommandBase
 
                 await WriteToCsv(showLastRunInfo, data, builder, noCsvHeader);
 
-                WriteLine(builder.ToString());
+                using var reader = new StringReader(builder.ToString());
+
+                var line = reader.ReadLine();
+
+                while (line != null)
+                {
+                    if (string.IsNullOrWhiteSpace(line) == false)
+                    {
+                        WriteLine(line.Trim());
+                    }
+
+                    line = reader.ReadLine();
+                }
             }
             else
             {
@@ -216,6 +228,7 @@ public class ExportBuildDefinitionCommand : AzureDevOpsCommandBase
                 builder.AppendCsvHeader("Last Changed Date");
             }
 
+            builder.AppendLine();
         }
 
         builder.AppendCsv("Id", data.Id);
