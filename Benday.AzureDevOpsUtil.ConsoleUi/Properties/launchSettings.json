@@ -59,7 +59,7 @@
     },
     "import-tfvc-to-git": {
       "commandName": "Project",
-      "commandLineArgs": "tfvc-to-git /teamproject:build-migration-research-tfvc /tfvc-path:main /reponame:test2"
+      "commandLineArgs": "tfvc-to-git /teamproject:build-migration-research-tfvc /tfvc-path:$/build-migration-research-tfvc/main /reponame:test4"
     }
   }
 }

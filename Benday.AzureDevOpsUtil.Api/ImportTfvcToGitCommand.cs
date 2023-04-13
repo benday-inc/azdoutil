@@ -61,19 +61,22 @@ public class ImportTfvcToGitCommand : AzureDevOpsCommandBase
         }
     }
 
-    private Task ImportTfvcToGit(
+    private async Task ImportTfvcToGit(
         TeamProjectInfo project, 
         GitRepositoryInfo gitRepoCreateResult, 
         TfvcToGitImportRequest tfvcValidationResult)
     {
         var requestUrl =
-            $"{project.Id}/_apis/git/repositories/{gitRepoCreateResult.Id}/importRequests?api-version=7.0";
-
+            $"{project.Id}/_apis/git/repositories/{gitRepoCreateResult.Name}/importRequests?api-version=7.0";
+        //                /_apis/git/repositories/{repositoryId}/importRequests?api-version=7.0
+        
         var body = new TfvcToGitImportExecuteRequest();
-        body.DeleteServiceEndpointAfterImportIsDone = true;
-        body.TfvcSource.Path = tfvcValidationResult.TfvcSource.Path;
-        body.TfvcSource.ImportHistory = tfvcValidationResult.TfvcSource.ImportHistory;
-        body.TfvcSource.ImportHistoryDurationInDays = body.TfvcSource.ImportHistoryDurationInDays;
+        var parameters = body.Parameters;
+
+        parameters.DeleteServiceEndpointAfterImportIsDone = true;
+        parameters.TfvcSource.Path = tfvcValidationResult.TfvcSource.Path;
+        parameters.TfvcSource.ImportHistory = tfvcValidationResult.TfvcSource.ImportHistory;
+        parameters.TfvcSource.ImportHistoryDurationInDays = tfvcValidationResult.TfvcSource.ImportHistoryDurationInDays;
 
         var returnValue = await SendPostForBodyAndGetTypedResponseSingleAttempt<
             TfvcToGitImportExecuteResponse, TfvcToGitImportExecuteRequest> (
@@ -83,7 +86,7 @@ public class ImportTfvcToGitCommand : AzureDevOpsCommandBase
     private async Task<TfvcToGitImportRequest> ValidateImport(TeamProjectInfo project, string tfvcPath)
     {
         var requestUrl = 
-            $"{project.Id}/_apis/git/import/ImportRepositoryValidations?api-version=7.0";
+            $"{project.Name}/_apis/git/import/ImportRepositoryValidations?api-version=5.0-preview.1";
 
         var body = new TfvcToGitImportRequest();
 

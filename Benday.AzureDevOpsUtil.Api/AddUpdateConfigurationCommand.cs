@@ -26,7 +26,7 @@ public class AddUpdateConfigurationCommand : SynchronousCommand
         arguments.AddString(Constants.ArgumentNameToken)
             .WithDescription("PAT for this collection")
             .AsNotRequired();
-        
+
         arguments.AddBoolean(Constants.ArgumentNameWindowsAuth)
             .WithDescription("Use windows authentication with the current logged in user")
             .AsNotRequired()
@@ -38,7 +38,7 @@ public class AddUpdateConfigurationCommand : SynchronousCommand
 
         return arguments;
     }
-    
+
     protected override void OnExecute()
     {
         if (Arguments.HasValue(Constants.ArgumentNameToken) == true &&
@@ -61,7 +61,7 @@ public class AddUpdateConfigurationCommand : SynchronousCommand
         }
 
         var token = string.Empty;
-        
+
         if (Arguments.HasValue(Constants.ArgumentNameToken) == true)
         {
             token = Arguments.GetStringValue(Constants.ArgumentNameToken);
