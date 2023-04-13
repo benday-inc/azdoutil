@@ -100,20 +100,18 @@ class Program
 
         var longestName = commands.Max(x => x.Name.Length);
 
+        var consoleWidth = Console.WindowWidth;
+        var separator = " - ";
+        int commandNameColumnWidth = (longestName + separator.Length);
+
         foreach (var command in commands.OrderBy(x => x.Name))
         {
-            Console.Write(GetNameWithPadding(command.Name, longestName));
-            Console.WriteLine($" - {command.Description}");
+            Console.Write(LineWrapUtilities.GetValueWithPadding(command.Name, longestName));
+            Console.Write(separator);
+
+            Console.WriteLine(
+                LineWrapUtilities.WrapValue(commandNameColumnWidth,
+                consoleWidth, command.Description));
         }
-    }
-
-    private static string GetNameWithPadding(string name, int padToLength)
-    {
-        var builder = new StringBuilder();
-
-        builder.Append(name);
-        builder.Append(' ', padToLength - name.Length);
-
-        return builder.ToString();
-    }
+    }    
 }
