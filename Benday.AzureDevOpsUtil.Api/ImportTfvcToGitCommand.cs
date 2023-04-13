@@ -42,6 +42,11 @@ public class ImportTfvcToGitCommand : AzureDevOpsCommandBase
         var repoName = Arguments.GetStringValue(Constants.ArgumentNameRepositoryName);
         var tfvcPath = Arguments.GetStringValue(Constants.ArgumentNameTfvcFolder);
         
+        if (tfvcPath.StartsWith("$/") == false)
+        {
+            throw new KnownException($"The value for /{Constants.ArgumentNameTfvcFolder} should start with '$/'.  For example: $/{projectName}/Main/HelloWorld");
+        }
+
         var project = await GetProject(projectName);
 
         var tfvcValidationResult = await ValidateImport(project, tfvcPath);
@@ -54,10 +59,9 @@ public class ImportTfvcToGitCommand : AzureDevOpsCommandBase
         }
         else
         {
-            _OutputProvider.WriteLine("Created git repository.");
-            _OutputProvider.WriteLine($"{gitRepoCreateResult.Name} ({gitRepoCreateResult.Id}): {gitRepoCreateResult.WebUrl}");
-
             await ImportTfvcToGit(project, gitRepoCreateResult, tfvcValidationResult);
+
+            WriteLine("Migration started. FYI, the migration may take a few minutes to complete.");
         }
     }
 
