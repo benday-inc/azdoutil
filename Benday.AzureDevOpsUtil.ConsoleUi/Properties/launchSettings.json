@@ -36,7 +36,26 @@
     "create-project": {
       "commandName": "Project",
       "commandLineArgs": "createproject /config:demo2 /teamproject:test20230228a /processname:Scrum"
+    },
+    "list-build-defs-xaml": {
+      "commandName": "Project",
+      "commandLineArgs": "listbuilddefs /teamproject:Test20230405 /xaml"
+    },
+    "list-build-defs-non-xaml": {
+      "commandName": "Project",
+      "commandLineArgs": "listbuilddefs /teamproject:codegenerator"
+    },
+    "export-build-def": {
+      "commandName": "Project",
+      "commandLineArgs": "exportbuilddef /teamproject:Test20230405 /xaml /name:helloworld /showlastruninfo"
+    },
+    "export-build-def-csv": {
+      "commandName": "Project",
+      "commandLineArgs": "exportbuilddef /teamproject:Test20230405 /xaml /name:helloworld /showlastruninfo /csv"
+    },
+    "export-build-def-non-xaml": {
+      "commandName": "Project",
+      "commandLineArgs": "exportbuilddef /teamproject:codegenerator /name:code-generator-web /showlastruninfo"
     }
-
   }
 }

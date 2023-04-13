@@ -140,6 +140,7 @@ public class AzureDevOpsConfigurationManager
         if (match != null)
         {
             configurations.Remove(match);
+            configurations.Add(config);
         }
         else
         {

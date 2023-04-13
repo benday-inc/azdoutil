@@ -87,17 +87,31 @@ public abstract class AzureDevOpsCommandBase : AsynchronousCommand
 
     protected HttpClient GetHttpClientInstanceForAzureDevOps()
     {
-        var client = new HttpClient();
+        if (Configuration.IsWindowsAuth == true)
+        {
+            var client = new HttpClient(
+                new HttpClientHandler() {  UseDefaultCredentials = true });
 
-        var baseUri = new Uri(Configuration.CollectionUrl);
+            var baseUri = new Uri(Configuration.CollectionUrl);
 
-        client.BaseAddress = baseUri;
+            client.BaseAddress = baseUri;
 
-        client.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("Basic",
-            Configuration.GetTokenBase64Encoded());
+            return client;
+        }
+        else
+        {
+            var client = new HttpClient();
 
-        return client;
+            var baseUri = new Uri(Configuration.CollectionUrl);
+
+            client.BaseAddress = baseUri;
+
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Basic",
+                Configuration.GetTokenBase64Encoded());
+
+            return client;
+        }        
     }
 
     protected async Task<T?> CallEndpointViaGetAndGetResult<T>(string requestUrl, bool writeStringContentToInfo = false, bool throwExceptionOnError = true)
@@ -114,6 +128,39 @@ public abstract class AzureDevOpsCommandBase : AsynchronousCommand
 
             return result;
         }
+    }
+
+    protected async Task<string?> GetStringAsync(
+        string requestUrl, bool writeStringContentToInfo = false, bool throwExceptionOnError = true)
+    {
+        using var client = GetHttpClientInstanceForAzureDevOps();
+
+        var result = await client.GetAsync(requestUrl);
+
+        if (result.IsSuccessStatusCode == false && throwExceptionOnError == true)
+        {
+            throw new InvalidOperationException($"Problem with server call to {requestUrl}. {result.StatusCode} {result.ReasonPhrase}");
+        }
+        else if (result.IsSuccessStatusCode == false && throwExceptionOnError == false)
+        {
+            return default;
+        }
+        else
+        {
+            var responseContent = await result.Content.ReadAsStringAsync();
+
+            if (writeStringContentToInfo == true)
+            {
+                WriteLine(responseContent);
+            }
+
+            return responseContent;
+        }
+    }
+
+    protected virtual void WriteLine()
+    {
+        _OutputProvider.WriteLine();
     }
 
     private async Task<T?> CallEndpointViaGetAndGetResultSingleAttempt<T>(

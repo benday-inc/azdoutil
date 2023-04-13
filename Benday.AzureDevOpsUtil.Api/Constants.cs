@@ -11,6 +11,8 @@ public static class Constants
     public const string CommandArgumentNameRemoveConfig = "removeconfig";
     public const string CommandArgumentNameListConfig = "listconfig";
     public const string CommandArgumentName_ListGitRepos = "listgitrepos";
+    public const string CommandArgumentNameListBuildDefinitions = "listbuilddefs";
+    public const string CommandArgumentNameExportBuildDefinition = "exportbuilddef";
     public const string CommandArgumentNameCreateGitRepository = "creategitrepo";
     public const string CommandArgumentNameListWorkItemQueries = "listworkitemqueries";
     public const string CommandArgumentNameGetIterations = "getiterations";
@@ -48,8 +50,16 @@ public static class Constants
     public const string ArgumentNameConfirm = "confirm";
     public const string ArgumentNameConfigurationName = "config";
     public const string ArgumentNameCollectionUrl = "url";
+    public const string ArgumentNameWindowsAuth = "windowsauth";
     public const string ArgumentNameToken = "pat";
     public const string ArgumentNameQuietMode = "quiet";
+    public const string ArgumentNameNameOnly = "nameonly";
+    public const string ArgumentNameXaml = "xaml";
+    public const string ArgumentNameOutputRaw = "raw";
+    public const string ArgumentNameBuildDefinitionName = "name";
+    public const string ArgumentNameShowLastRunInfo = "showlastruninfo";
+    public const string ArgumentNameOutputCsv = "csv";
+    public const string ArgumentNameNoCsvHeader = "csv-noheader";
 
     public const string ArgumentNameCycleTimeNumberOfDays = "numberofdays";
     public const string ArgumentNameForecastNumberOfWeeks = "forecastweeks";

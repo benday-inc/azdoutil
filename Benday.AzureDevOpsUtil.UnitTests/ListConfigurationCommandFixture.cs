@@ -73,7 +73,8 @@ public class ListConfigurationCommandFixture
         {
             Name = "config2",
             CollectionUrl = "url2",
-            Token = "token2"
+            Token = "token2",
+            IsWindowsAuth = true
         });
 
         Utilities.AssertFileExists(ConfigurationManager.PathToConfigurationFile);
@@ -97,6 +98,7 @@ public class ListConfigurationCommandFixture
         Assert.IsTrue(output.Contains("Token: token2"), "didn't find token2 in output");
         Assert.IsTrue(output.Contains("Collection Url: url2"), "didn't find url2 in output");
         Assert.IsTrue(output.Contains("Name: config2"), "didn't find config2 in output");
+        Assert.IsTrue(output.Contains($"Use Windows Auth: {true}"), "didn't find use windows auth in output");
     }
 
     [TestMethod]
