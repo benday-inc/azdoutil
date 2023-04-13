@@ -14,7 +14,7 @@ public class BuildDefinitionInfo
     public string ItemType { get; set; } = string.Empty;
 
     [JsonPropertyName("revision")]
-    public string Revision { get; set; } = string.Empty;
+    public int Revision { get; set; }
 
     [JsonPropertyName("id")]
     public int Id { get; set; }

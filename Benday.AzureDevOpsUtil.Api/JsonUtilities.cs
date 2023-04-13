@@ -11,15 +11,22 @@ public static class JsonUtilities
             throw new ArgumentNullException(nameof(json), "Argument cannot be null.");
         }
 
-        var returnValue = JsonSerializer.Deserialize<T>(json);
+        try
+        {
+            var returnValue = JsonSerializer.Deserialize<T>(json);
 
-        if (returnValue == null)
-        {
-            throw new InvalidOperationException($"Could not deserialize json to {nameof(T)}");
+            if (returnValue == null)
+            {
+                throw new InvalidOperationException($"Could not deserialize json to {nameof(T)}");
+            }
+            else
+            {
+                return returnValue;
+            }
         }
-        else
+        catch (Exception ex)
         {
-            return returnValue;
+            throw;
         }
     }
 }
