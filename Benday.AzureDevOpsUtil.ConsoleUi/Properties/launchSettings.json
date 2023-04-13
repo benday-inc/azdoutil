@@ -56,6 +56,10 @@
     "export-build-def-non-xaml": {
       "commandName": "Project",
       "commandLineArgs": "exportbuilddef /teamproject:codegenerator /name:code-generator-web /showlastruninfo"
+    },
+    "import-tfvc-to-git": {
+      "commandName": "Project",
+      "commandLineArgs": "tfvc-to-git /teamproject:build-migration-research-tfvc /tfvc-path:main /reponame:test2"
     }
   }
 }
