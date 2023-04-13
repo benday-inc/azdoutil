@@ -60,12 +60,14 @@ public class ExportBuildDefinitionCommand : AzureDevOpsCommandBase
         return arguments;
     }
 
+    private bool _isXamlMode;
+
     protected override async Task OnExecute()
     {
         // XamlBuildRunInfo
         _TeamProjectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);
         _BuildDefinitionName = Arguments.GetStringValue(Constants.ArgumentNameBuildDefinitionName);
-        var isXamlMode = Arguments.GetBooleanValue(Constants.ArgumentNameXaml);
+        _isXamlMode = Arguments.GetBooleanValue(Constants.ArgumentNameXaml);
         var outputRaw = Arguments.GetBooleanValue(Constants.ArgumentNameOutputRaw);
         var showLastRunInfo = Arguments.GetBooleanValue(Constants.ArgumentNameShowLastRunInfo);
         var outputCsv = Arguments.GetBooleanValue(Constants.ArgumentNameOutputCsv);
@@ -75,19 +77,19 @@ public class ExportBuildDefinitionCommand : AzureDevOpsCommandBase
 
         if (buildId == null)
         {
-                throw new KnownException(
-                    String.Format("Build name '{0}' was not found.", _BuildDefinitionName));         
+            throw new KnownException(
+                String.Format("Build name '{0}' was not found.", _BuildDefinitionName));
         }
         else
         {
             var apiVersion = "7.0";
 
-            if (isXamlMode == true)
+            if (_isXamlMode == true)
             {
                 apiVersion = "2.0";
             }
 
-            var requestUrl = $"{_TeamProjectName}/_apis/build/definitions/{buildId}?api-version={apiVersion}";
+            var requestUrl = $"{_TeamProjectName}/_apis/build/definitions/{buildId}?api-version={apiVersion}&includeLatestBuilds=true";
 
             var json = await GetStringAsync(requestUrl);
 
@@ -193,9 +195,13 @@ public class ExportBuildDefinitionCommand : AzureDevOpsCommandBase
         builder.AppendLabeledValue("Controller Id", data.Controller.Id);
         builder.AppendLabeledValue("Controller Name", data.Controller.Name);
 
-        if (showLastRunInfo == true)
+        if (showLastRunInfo == true && _isXamlMode == true)
         {
-            await AppendLastRunInfo(builder, data);
+            await AppendLastRunInfoForXaml(builder, data);
+        }
+        else if (showLastRunInfo == true && _isXamlMode == false)
+        {
+            AppendLastRunInfo(builder, data, false);
         }
     }
 
@@ -245,15 +251,59 @@ public class ExportBuildDefinitionCommand : AzureDevOpsCommandBase
         builder.AppendCsv("Controller Id", data.Controller.Id);
         builder.AppendCsv("Controller Name", data.Controller.Name);
 
-        if (showLastRunInfo == true)
+        if (showLastRunInfo == true && _isXamlMode == true)
         {
-            await AppendLastRunInfo(builder, data, true);
+            await AppendLastRunInfoForXaml(builder, data, true);
+        }
+        else if (showLastRunInfo == true && _isXamlMode == false)
+        {
+            AppendLastRunInfo(builder, data, true);
         }
 
         builder.AppendLine();
     }
 
-    private async Task AppendLastRunInfo(StringBuilder builder, 
+    private void AppendLastRunInfo(StringBuilder builder,
+        XamlBuildDefinitionDetail definition, bool csv = false)
+    {
+        if (definition.LatestBuild == null && csv == true)
+        {
+            builder.AppendCsv("Build Number", string.Empty);
+            builder.AppendCsv("Build Reason", string.Empty);
+            builder.AppendCsv("Queued At", string.Empty);
+            builder.AppendCsv("Started At", string.Empty);
+            builder.AppendCsv("Finished At", string.Empty);
+            builder.AppendCsv("Last Changed Date", string.Empty);
+        }
+        else if (definition.LatestBuild == null && csv == false)
+        {
+            builder.AppendLabeledValue("Latest Build Info", "not available");
+        }
+        else if (definition.LatestBuild != null && csv == false)
+        {
+            builder.AppendLabeledValue("Build Number", definition.LatestBuild.BuildNumber);
+            builder.AppendLabeledValue("Queued At", definition.LatestBuild.QueueTime);
+            builder.AppendLabeledValue("Started At", definition.LatestBuild.StartTime);
+            builder.AppendLabeledValue("Finished At", definition.LatestBuild.FinishTime);
+            builder.AppendLabeledValue("Result", definition.LatestBuild.Result);
+            builder.AppendLabeledValue("Status", definition.LatestBuild.Status);
+            builder.AppendLabeledValue("Source Branch", definition.LatestBuild.TriggerInfo.SourceBranch);
+            builder.AppendLabeledValue("Source SHA", definition.LatestBuild.TriggerInfo.SourceSha);
+            builder.AppendLabeledValue("Source Message", definition.LatestBuild.TriggerInfo.Message);
+            builder.AppendLabeledValue("Trigger Repository", definition.LatestBuild.TriggerInfo.TriggerRepository);
+        }
+        else if (definition.LatestBuild != null && csv == true)
+        {
+            builder.AppendCsv("Build Number", definition.LatestBuild.BuildNumber);
+            builder.AppendCsv("Build Reason", string.Empty);
+            builder.AppendCsv("Queued At", definition.LatestBuild.QueueTime);
+            builder.AppendCsv("Started At", definition.LatestBuild.StartTime);
+            builder.AppendCsv("Finished At", definition.LatestBuild.FinishTime);
+            builder.AppendCsv("Last Changed Date", string.Empty);
+        }
+    }
+
+    private async Task AppendLastRunInfoForXaml(StringBuilder builder,
         XamlBuildDefinitionDetail definition, bool csv = false)
     {
         string requestUrl;
@@ -264,7 +314,7 @@ public class ExportBuildDefinitionCommand : AzureDevOpsCommandBase
         }
         else
         {
-            requestUrl = $"{definition.LastBuild.Url}";
+            requestUrl = $"{definition.LastBuild.Url}?api-version=7.0";
         }
 
         var result = await CallEndpointViaGetAndGetResult<XamlBuildRunInfo>(requestUrl);
@@ -330,5 +380,5 @@ public class ExportBuildDefinitionCommand : AzureDevOpsCommandBase
         {
             return result.Values[0];
         }
-    }        
+    }
 }

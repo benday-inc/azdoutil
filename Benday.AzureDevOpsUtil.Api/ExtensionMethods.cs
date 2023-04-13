@@ -45,7 +45,7 @@ public static class ExtensionMethods
     public static void AppendLabeledValue(this StringBuilder builder, string label, DateTime value)
     {
         builder.Append(label);
-        builder.Append(",");
+        builder.Append(": ");
         builder.Append(value);
         builder.AppendLine();
     }

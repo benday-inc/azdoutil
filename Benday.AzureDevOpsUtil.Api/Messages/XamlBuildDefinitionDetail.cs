@@ -25,6 +25,9 @@ public class XamlBuildDefinitionDetail
     //[JsonPropertyName("supportedReasons")]
     //public int SupportedReasons { get; set; }
 
+    [JsonPropertyName("latestBuild")]
+    public BuildRunInfo LatestBuild { get; set; } = new();
+
     [JsonPropertyName("lastBuild")]
     public XamlBuildLastBuildInfo LastBuild { get; set; } = new();
 

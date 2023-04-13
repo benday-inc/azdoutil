@@ -13,7 +13,10 @@ public static class JsonUtilities
 
         try
         {
-            var returnValue = JsonSerializer.Deserialize<T>(json);
+            var returnValue = JsonSerializer.Deserialize<T>(json, new JsonSerializerOptions()
+            {
+                PropertyNameCaseInsensitive = true
+            });
 
             if (returnValue == null)
             {
