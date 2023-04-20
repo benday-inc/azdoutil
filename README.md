@@ -56,6 +56,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | [getfields](#getfields) | Gets a list of work item fields for a work item type in an Azure DevOps Team Project. |
 | [getworkitemstates](#getworkitemstates) | Gets the list of states for a work item type in an Azure DevOps Team Project. |
 | [getworkitemtypes](#getworkitemtypes) | Gets a list of work item types in an Azure DevOps Team Project. |
+| [tfvc-to-git](#tfvc-to-git) | Converts a Team Foundation Version Control (TFVC) folder to a Git repository. |
 | [listbuilddefs](#listbuilddefs) | List build definitions |
 | [listconfig](#listconfig) | List an Azure DevOps configuration. For example, which server or account plus auth information. |
 | [listgitrepos](#listgitrepos) | Gets list of Git repositories from an Azure DevOps Team Project. |
@@ -241,6 +242,16 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | quiet | Optional | Boolean | Quiet mode |
 | config | Optional | String | Configuration name to use |
 | teamproject | Required | String | Team project name that contains the work item types |
+## <a name="tfvc-to-git"></a> tfvc-to-git
+**Converts a Team Foundation Version Control (TFVC) folder to a Git repository.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Required | String | Team project name that contains the TFVC and Git repositories |
+| reponame | Required | String | Name of the new git repository |
+| tfvc-path | Required | String | Source TFVC folder to convert |
 ## <a name="listbuilddefs"></a> listbuilddefs
 **List build definitions**
 ### Arguments
