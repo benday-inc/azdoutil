@@ -41,8 +41,9 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | [changeprocess](#changeprocess) | Change the process for a Team Project |
 | [addrefinementprocess](#addrefinementprocess) | Creates backlog refinement process template as described at https://www.benday.com/2022/09/29/streamlining-backlog-refinement-with-azure-devops/ |
 | [creategitrepo](#creategitrepo) | Creates a Git repository in an Azure DevOps Team Project. |
-| [createproject](#createproject) | Create team project |
+| [createproject](#createproject) | Create team projects |
 | [deleteproject](#deleteproject) | Delete team project |
+| [exportbuilddef](#exportbuilddef) | Export build definition |
 | [exportworkitemquery](#exportworkitemquery) | Export work item query results |
 | [forecastdurationforitemcount](#forecastdurationforitemcount) | Use throughput data to forecast likely number of weeks to get given number of items done using Monte Carlo simulation |
 | [forecastitemsinweeks](#forecastitemsinweeks) | Use throughput data to forecast likely number of items done in given number of weeks using Monte Carlo simulation |
@@ -55,6 +56,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | [getfields](#getfields) | Gets a list of work item fields for a work item type in an Azure DevOps Team Project. |
 | [getworkitemstates](#getworkitemstates) | Gets the list of states for a work item type in an Azure DevOps Team Project. |
 | [getworkitemtypes](#getworkitemtypes) | Gets a list of work item types in an Azure DevOps Team Project. |
+| [listbuilddefs](#listbuilddefs) | List build definitions |
 | [listconfig](#listconfig) | List an Azure DevOps configuration. For example, which server or account plus auth information. |
 | [listgitrepos](#listgitrepos) | Gets list of Git repositories from an Azure DevOps Team Project. |
 | [listprocesstemplates](#listprocesstemplates) | List process templates |
@@ -73,7 +75,8 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | Argument | Is Optional | Data Type | Description |
 | --- | --- | --- | --- |
 | config | Optional | String | Name of the configuration |
-| pat | Required | String | PAT for this collection |
+| pat | Optional | String | PAT for this collection |
+| windowsauth | Optional | Boolean | Use windows authentication with the current logged in user |
 | url | Required | String | URL for this collection (example: https://dev.azure.com/accountname) |
 ## <a name="changeprocess"></a> changeprocess
 **Change the process for a Team Project**
@@ -101,7 +104,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | teamproject | Required | String | Team project name that contains the git repositories |
 | reponame | Required | String | Name of the new git repository |
 ## <a name="createproject"></a> createproject
-**List team projects**
+**Create team projects**
 ### Arguments
 | Argument | Is Optional | Data Type | Description |
 | --- | --- | --- | --- |
@@ -118,6 +121,18 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | config | Optional | String | Configuration name to use |
 | teamproject | Required | String | Team project name to delete |
 | confirm | Optional | Boolean | Confirm delete |
+## <a name="exportbuilddef"></a> exportbuilddef
+**Export build definition**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| teamproject | Required | String | Team project name |
+| name | Required | String | Build definition name |
+| xaml | Optional | Boolean | List XAML build definitions |
+| showlastruninfo | Optional | Boolean | Show last build run info |
+| csv | Optional | Boolean | Output results in CSV format |
+| csv-noheader | Optional | Boolean | Do not print the CSV column header info |
+| raw | Optional | Boolean | Output raw build definition |
 ## <a name="exportworkitemquery"></a> exportworkitemquery
 **Export work item query results**
 ### Arguments
@@ -226,6 +241,14 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | quiet | Optional | Boolean | Quiet mode |
 | config | Optional | String | Configuration name to use |
 | teamproject | Required | String | Team project name that contains the work item types |
+## <a name="listbuilddefs"></a> listbuilddefs
+**List build definitions**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| teamproject | Required | String | Team project name |
+| nameonly | Optional | Boolean | Only display the build definition name |
+| xaml | Optional | Boolean | List XAML build definitions |
 ## <a name="listconfig"></a> listconfig
 **List an Azure DevOps configuration. For example, which server or account plus auth information.**
 ### Arguments
