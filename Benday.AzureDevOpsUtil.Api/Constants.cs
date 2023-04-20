@@ -14,6 +14,7 @@ public static class Constants
     public const string CommandArgumentNameListBuildDefinitions = "listbuilddefs";
     public const string CommandArgumentNameExportBuildDefinition = "exportbuilddef";
     public const string CommandArgumentNameCreateGitRepository = "creategitrepo";
+    public const string CommandArgumentNameImportTfvcToGit = "tfvc-to-git";
     public const string CommandArgumentNameListWorkItemQueries = "listworkitemqueries";
     public const string CommandArgumentNameGetIterations = "getiterations";
     public const string CommandArgumentNameGetAreas = "getareas";
@@ -46,6 +47,7 @@ public static class Constants
     public const string ArgumentNameTeamProjectName = "teamproject";
     public const string ArgumentNameProcessName = "processname";
     public const string ArgumentNameRepositoryName = "reponame";
+    public const string ArgumentNameTfvcFolder = "tfvc-path";
     public const string ArgumentNameWorkItemQueryName = "queryname";
     public const string ArgumentNameConfirm = "confirm";
     public const string ArgumentNameConfigurationName = "config";

@@ -229,7 +229,7 @@ public abstract class AzureDevOpsCommandBase : AsynchronousCommand
             else
             {
                 throw new InvalidOperationException(
-                                $"Problem with server call to {requestUrl}. Debug info = '{optionalDebuggingMessageInfo}'.  {result.StatusCode} {result.ReasonPhrase} - {content}");
+                     $"Problem with server call to {requestUrl}. Debug info = '{optionalDebuggingMessageInfo}'.  {result.StatusCode} {result.ReasonPhrase} - {content}");
 
             }
         }
