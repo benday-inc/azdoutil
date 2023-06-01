@@ -112,6 +112,10 @@ public class AzureDevOpsConfigurationManager
         {
             throw new ArgumentException(nameof(config), "Name value not set");
         }
+        else if (string.IsNullOrEmpty(config.AccountNameOrCollectionName) == true)
+        {
+            throw new KnownException("Could not determine account name or collection name from URL.");
+        }
 
         List<AzureDevOpsConfiguration> configurations;
 

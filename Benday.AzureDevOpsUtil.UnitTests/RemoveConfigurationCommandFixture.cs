@@ -65,14 +65,14 @@ public class RemoveConfigurationCommandFixture
         ConfigurationManager.Save(new AzureDevOpsConfiguration()
         {
             Name = "config1",
-            CollectionUrl = "url1",
+            CollectionUrl = "https://dev.azure.com/benday",
             Token = "token1"
         });
 
         ConfigurationManager.Save(new AzureDevOpsConfiguration()
         {
             Name = "config2",
-            CollectionUrl = "url2",
+            CollectionUrl = "https://azdo2022.benday.com/DefaultCollection",
             Token = "token2"
         });
 

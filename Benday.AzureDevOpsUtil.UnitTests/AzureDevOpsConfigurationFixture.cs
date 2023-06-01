@@ -154,6 +154,25 @@ public class AzureDevOpsConfigurationFixture
     }
 
     [TestMethod]
+    [DataRow("url")]
+    [DataRow("/url")]
+    [DataRow("url/")]
+    [DataRow("")]
+    public void AccountNameOrCollectionName_ReturnsEmptyStringIfInvalidUri(string url)
+    {
+        // arrange
+        var expected = string.Empty;
+
+        SystemUnderTest.CollectionUrl = url;
+
+        // act
+        var actual = SystemUnderTest.AccountNameOrCollectionName;
+
+        // assert
+        Assert.AreEqual<string>(expected, actual, "AccountNameOrCollectionName is wrong.");
+    }
+
+    [TestMethod]
     public void AccountNameOrCollectionName_ReturnsEmptyStringIfNotFound_NoTrailingSlash()
     {
         // arrange

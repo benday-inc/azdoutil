@@ -37,17 +37,22 @@ public class AzureDevOpsConfiguration
     {
         get
         {
-            var uri = new Uri(CollectionUrl);
-
-            var segments = uri.Segments;
-
-            if (segments.Length < 2)
+            if (Uri.TryCreate(CollectionUrl, UriKind.Absolute, out var uri) == false)
             {
                 return string.Empty;
             }
             else
             {
-                return segments[1].Replace("/", "");
+                var segments = uri.Segments;
+
+                if (segments.Length < 2)
+                {
+                    return string.Empty;
+                }
+                else
+                {
+                    return segments[1].Replace("/", "");
+                }
             }
         }
     }

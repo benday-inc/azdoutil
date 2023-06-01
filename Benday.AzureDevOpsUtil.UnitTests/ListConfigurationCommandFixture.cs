@@ -62,20 +62,22 @@ public class ListConfigurationCommandFixture
         // arrange
         Utilities.AssertFileDoesNotExist(ConfigurationManager.PathToConfigurationFile);
 
-        ConfigurationManager.Save(new AzureDevOpsConfiguration()
+        AzureDevOpsConfiguration expected0 = new AzureDevOpsConfiguration()
         {
             Name = "config1",
-            CollectionUrl = "url1",
+            CollectionUrl = "https://dev.azure.com/benday",
             Token = "token1"
-        });
+        };
+        ConfigurationManager.Save(expected0);
 
-        ConfigurationManager.Save(new AzureDevOpsConfiguration()
+        AzureDevOpsConfiguration expected1 = new AzureDevOpsConfiguration()
         {
             Name = "config2",
-            CollectionUrl = "url2",
+            CollectionUrl = "https://azdo2022.benday.com/DefaultCollection",
             Token = "token2",
             IsWindowsAuth = true
-        });
+        };
+        ConfigurationManager.Save(expected1);
 
         Utilities.AssertFileExists(ConfigurationManager.PathToConfigurationFile);
 
@@ -96,7 +98,8 @@ public class ListConfigurationCommandFixture
         Console.WriteLine(output);
 
         Assert.IsTrue(output.Contains("Token: token2"), "didn't find token2 in output");
-        Assert.IsTrue(output.Contains("Collection Url: url2"), "didn't find url2 in output");
+        Assert.IsTrue(output.Contains($"Collection Url: {expected1.CollectionUrl}"), "didn't find url2 in output");
+        Assert.IsTrue(output.Contains($"Account Name / TPC Name: {expected1.AccountNameOrCollectionName}"), "didn't find account name or TPC name in output");
         Assert.IsTrue(output.Contains("Name: config2"), "didn't find config2 in output");
         Assert.IsTrue(output.Contains($"Use Windows Auth: {true}"), "didn't find use windows auth in output");
     }
@@ -110,16 +113,18 @@ public class ListConfigurationCommandFixture
         ConfigurationManager.Save(new AzureDevOpsConfiguration()
         {
             Name = "config1",
-            CollectionUrl = "url1",
+            CollectionUrl = "https://dev.azure.com/benday",
             Token = "token1"
         });
 
-        ConfigurationManager.Save(new AzureDevOpsConfiguration()
+        AzureDevOpsConfiguration expected1 = new AzureDevOpsConfiguration()
         {
             Name = "config2",
-            CollectionUrl = "url2",
+            CollectionUrl = "https://azdo2022.benday.com/DefaultCollection",
             Token = "token2"
-        });
+        };
+
+        ConfigurationManager.Save(expected1);
 
         Utilities.AssertFileExists(ConfigurationManager.PathToConfigurationFile);
 
@@ -139,7 +144,8 @@ public class ListConfigurationCommandFixture
         Console.WriteLine(output);
 
         Assert.IsTrue(output.Contains("Token: token2"), "didn't find token2 in output");
-        Assert.IsTrue(output.Contains("Collection Url: url2"), "didn't find url2 in output");
+        Assert.IsTrue(output.Contains($"Collection Url: {expected1.CollectionUrl}"), "didn't find url2 in output");
+        Assert.IsTrue(output.Contains($"Account Name / TPC Name: {expected1.AccountNameOrCollectionName}"), "didn't find account name or TPC name in output");
         Assert.IsTrue(output.Contains("Name: config2"), "didn't find config2 in output");
     }
 

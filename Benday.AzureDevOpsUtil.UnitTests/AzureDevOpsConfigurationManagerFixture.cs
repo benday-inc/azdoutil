@@ -45,6 +45,58 @@ public class AzureDevOpsConfigurationManagerFixture
     }
 
     [TestMethod]
+    [ExpectedException(typeof(KnownException))]
+    public void AddConfig_AzureDevOpsServerUrl_FailsIfNoTeamProjectCollection()
+    {
+        // arrange
+        _SystemUnderTest = Utilities.InitializeTestModeConfigurationManager();
+
+        var expectedConfigurationName = Constants.DefaultConfigurationName;
+        var expectedToken = "token-value";
+        var expectedUrl = "https://azdo2022.benday.com";
+
+        var config = new AzureDevOpsConfiguration()
+        {
+            CollectionUrl = expectedUrl,
+            Token = expectedToken,
+            Name = expectedConfigurationName
+        };
+
+        Utilities.AssertFileDoesNotExist(SystemUnderTest.PathToConfigurationFile);
+
+        // act
+        SystemUnderTest.Save(config);
+
+        // assert        
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(KnownException))]
+    public void AddConfig_AzureDevOpsServiceUrl_FailsIfNoAccountName()
+    {
+        // arrange
+        _SystemUnderTest = Utilities.InitializeTestModeConfigurationManager();
+
+        var expectedConfigurationName = Constants.DefaultConfigurationName;
+        var expectedToken = "token-value";
+        var expectedUrl = "https://dev.azure.com";
+
+        var config = new AzureDevOpsConfiguration()
+        {
+            CollectionUrl = expectedUrl,
+            Token = expectedToken,
+            Name = expectedConfigurationName
+        };
+
+        Utilities.AssertFileDoesNotExist(SystemUnderTest.PathToConfigurationFile);
+
+        // act
+        SystemUnderTest.Save(config);
+
+        // assert        
+    }
+
+    [TestMethod]
     public void AddConfig_Default()
     {
         // arrange
@@ -120,14 +172,14 @@ public class AzureDevOpsConfigurationManagerFixture
         SystemUnderTest.Save(new AzureDevOpsConfiguration()
         {
             Name = "config1",
-            CollectionUrl = "url1",
+            CollectionUrl = "https://dev.azure.com/benday",
             Token = "token1"
         });
 
         SystemUnderTest.Save(new AzureDevOpsConfiguration()
         {
             Name = "config2",
-            CollectionUrl = "url2",
+            CollectionUrl = "https://azdo2022.benday.com/DefaultCollection",
             Token = "token2"
         });
 
@@ -149,14 +201,14 @@ public class AzureDevOpsConfigurationManagerFixture
         SystemUnderTest.Save(new AzureDevOpsConfiguration()
         {
             Name = "config1",
-            CollectionUrl = "url1",
+            CollectionUrl = "https://dev.azure.com/benday",
             Token = "token1"
         });
 
         SystemUnderTest.Save(new AzureDevOpsConfiguration()
         {
             Name = "config2",
-            CollectionUrl = "url2",
+            CollectionUrl = "https://azdo2022.benday.com/DefaultCollection",
             Token = "token2"
         });
 
