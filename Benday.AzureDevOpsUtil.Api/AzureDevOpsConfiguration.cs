@@ -33,6 +33,25 @@ public class AzureDevOpsConfiguration
         }
     }
 
+    public string AccountNameOrCollectionName
+    {
+        get
+        {
+            var uri = new Uri(CollectionUrl);
+
+            var segments = uri.Segments;
+
+            if (segments.Length < 2)
+            {
+                return string.Empty;
+            }
+            else
+            {
+                return segments[1].Replace("/", "");
+            }
+        }
+    }
+
     public string GetTokenBase64Encoded()
     {
         var tokenBase64 = Convert.ToBase64String(

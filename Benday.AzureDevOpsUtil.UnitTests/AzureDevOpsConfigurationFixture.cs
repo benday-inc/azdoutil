@@ -88,4 +88,85 @@ public class AzureDevOpsConfigurationFixture
         // assert
         Assert.AreEqual<bool>(expected, actual, "IsAzureDevOpsService is wrong.");
     }
+
+    [TestMethod]
+    public void AccountNameOrCollectionName_ForServiceCollectionUrl()
+    {
+        // arrange
+        var url = "https://dev.azure.com/benday/";
+        var expected = "benday";
+
+        SystemUnderTest.CollectionUrl = url;
+
+        // act
+        var actual = SystemUnderTest.AccountNameOrCollectionName;
+
+        // assert
+        Assert.AreEqual<string>(expected, actual, "IsAzureDevOpsService is wrong.");
+    }
+
+    [TestMethod]
+    public void AccountNameOrCollectionName_ForServerCollectionUrl_NoTrailingSlash()
+    {
+        // arrange
+        var url = "https://azdo2022.benday.com/DefaultCollection";
+        var expected = "DefaultCollection";
+
+        SystemUnderTest.CollectionUrl = url;
+
+        // act
+        var actual = SystemUnderTest.AccountNameOrCollectionName;
+
+        // assert
+        Assert.AreEqual<string>(expected, actual, "IsAzureDevOpsService is wrong.");
+    }
+
+    [TestMethod]
+    public void AccountNameOrCollectionName_ForServiceCollectionUrl_NoTrailingSlash()
+    {
+        // arrange
+        var url = "https://dev.azure.com/benday";
+        var expected = "benday";
+
+        SystemUnderTest.CollectionUrl = url;
+
+        // act
+        var actual = SystemUnderTest.AccountNameOrCollectionName;
+
+        // assert
+        Assert.AreEqual<string>(expected, actual, "IsAzureDevOpsService is wrong.");
+    }
+
+ 
+    [TestMethod]
+    public void AccountNameOrCollectionName_ReturnsEmptyStringIfNotFound()
+    {
+        // arrange
+        var url = "https://azdo2022.benday.com/";
+        var expected = string.Empty;
+
+        SystemUnderTest.CollectionUrl = url;
+
+        // act
+        var actual = SystemUnderTest.AccountNameOrCollectionName;
+
+        // assert
+        Assert.AreEqual<string>(expected, actual, "IsAzureDevOpsService is wrong.");
+    }
+
+    [TestMethod]
+    public void AccountNameOrCollectionName_ReturnsEmptyStringIfNotFound_NoTrailingSlash()
+    {
+        // arrange
+        var url = "https://azdo2022.benday.com";
+        var expected = string.Empty;
+
+        SystemUnderTest.CollectionUrl = url;
+
+        // act
+        var actual = SystemUnderTest.AccountNameOrCollectionName;
+
+        // assert
+        Assert.AreEqual<string>(expected, actual, "IsAzureDevOpsService is wrong.");
+    }
 }
