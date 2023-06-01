@@ -6,14 +6,14 @@ using Benday.CommandsFramework;
 
 namespace Benday.AzureDevOpsUtil.Api;
 
-[Command(Name = Constants.CommandArgumentName_ListTeams,
+[Command(Name = Constants.CommandArgumentName_CreateTeam,
     IsAsync = true,
-    Description = "Gets list of teams in an Azure DevOps Team Project.")]
-public class ListTeamsForProjectCommand : AzureDevOpsCommandBase
+    Description = "Creates a new team in an Azure DevOps Team Project.")]
+public class CreateTeamCommand : AzureDevOpsCommandBase
 {
-    public TeamInfo[]? LastResult { get; private set; }
+    public TeamInfo? LastResult { get; private set; }
 
-    public ListTeamsForProjectCommand(CommandExecutionInfo info, ITextOutputProvider outputProvider) :
+    public CreateTeamCommand(CommandExecutionInfo info, ITextOutputProvider outputProvider) :
         base(info, outputProvider)
     {
 
@@ -25,7 +25,12 @@ public class ListTeamsForProjectCommand : AzureDevOpsCommandBase
 
         AddCommonArguments(args);
         args.AddString(Constants.ArgumentNameTeamProjectName).AsRequired().
-            WithDescription("Team project name that contains the teams");      
+            WithDescription("Team project name that contains the team");
+        args.AddString(Constants.ArgumentNameTeamName).AsRequired().
+            WithDescription("Name of the new team");
+
+        args.AddString(Constants.ArgumentNameTeamDescription).AsNotRequired().
+            WithDescription("Description for the new team");
 
         return args;
     }
@@ -33,39 +38,46 @@ public class ListTeamsForProjectCommand : AzureDevOpsCommandBase
     protected override async Task OnExecute()
     {
         var projectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);
+        var teamName = Arguments.GetStringValue(Constants.ArgumentNameTeamName);
+        var description = string.Empty;
+
+        if (Arguments.HasValue(Constants.ArgumentNameTeamDescription) == true)
+        {
+            description = Arguments.GetStringValue(Constants.ArgumentNameTeamDescription);
+        }
 
         var project = await GetTeamProject(projectName);
 
         var result = await GetTeams(project.Id);
 
-        LastResult = result;
+        var match = result.Where(x => string.Compare(x.Name, teamName, true) == 0).FirstOrDefault();
 
-        if (IsQuietMode)
+        if (match != null)
         {
-            return;
+            throw new KnownException($"Team '{teamName}' already exists.");
         }
-        else if (result == null)
-        {
-            WriteLine("Result is null");
-        }
-        else if (result.Length == 0)
-        {
-            WriteLine("Result length is 0.");
-        }
-        else
-        {
-            WriteLine($"Team count: {result.Length}");
 
-            foreach (var item in result)
+        var requestData = new CreateTeamRequest()
+        {
+            Name = teamName,
+            Description = description
+        };
+
+        var response = await SendPostForBodyAndGetTypedResponseSingleAttempt<TeamInfo, CreateTeamRequest>(
+                       $"_apis/projects/{project.Id}/teams?api-version=7.0",
+                       requestData);
+
+        LastResult = response;
+
+        if (IsQuietMode == false)
+        {
+            if (response.Id == project.DefaultTeam?.Id)
             {
-                if (item.Id == project.DefaultTeam?.Id)
-                {
-                    WriteLine($"{item.Name} ({item.Id}, Default Team) -- {item.Description}");
-                }
-                else
-                {
-                    WriteLine($"{item.Name} ({item.Id}) -- {item.Description}");
-                }
+                WriteLine($"{response.Name} ({response.Id}, Default Team) -- {response.Description}");
+            }
+            else
+            {
+                WriteLine($"{response.Name} ({response.Id}) -- {response.Description}");
             }
         }
     }

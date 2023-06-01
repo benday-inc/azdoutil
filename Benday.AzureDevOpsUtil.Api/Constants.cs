@@ -22,6 +22,7 @@ public static class Constants
     public const string CommandArgumentNameGetWorkItemTypes = "getworkitemtypes";
     public const string CommandArgumentNameCreateBacklogRefinementProcessTemplate = "addrefinementprocess";
     public const string CommandArgumentName_ListTeams = "listteams";
+    public const string CommandArgumentName_CreateTeam = "createteam";
 
     public const string CommandName_ListProjects = "listprojects";
     public const string CommandName_GetProject = "getproject";
@@ -60,6 +61,8 @@ public static class Constants
     public const string ArgumentNameXaml = "xaml";
     public const string ArgumentNameOutputRaw = "raw";
     public const string ArgumentNameBuildDefinitionName = "name";
+    public const string ArgumentNameTeamName = "name";
+    public const string ArgumentNameTeamDescription = "description";
     public const string ArgumentNameShowLastRunInfo = "showlastruninfo";
     public const string ArgumentNameOutputCsv = "csv";
     public const string ArgumentNameNoCsvHeader = "csv-noheader";

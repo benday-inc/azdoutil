@@ -70,5 +70,10 @@
       "commandName": "Project",
       "commandLineArgs": "listteams /teamproject:test20230601a"
     },
+
+    "create-team": {
+      "commandName": "Project",
+      "commandLineArgs": "createteam /teamproject:test20230601a /name:bingbong2 /description:\"the team for bingbong2\""
+    }
   }
 }
