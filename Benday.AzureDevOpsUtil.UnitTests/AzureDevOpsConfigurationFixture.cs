@@ -102,7 +102,7 @@ public class AzureDevOpsConfigurationFixture
         var actual = SystemUnderTest.AccountNameOrCollectionName;
 
         // assert
-        Assert.AreEqual<string>(expected, actual, "IsAzureDevOpsService is wrong.");
+        Assert.AreEqual<string>(expected, actual, "AccountNameOrCollectionName is wrong.");
     }
 
     [TestMethod]
@@ -118,7 +118,7 @@ public class AzureDevOpsConfigurationFixture
         var actual = SystemUnderTest.AccountNameOrCollectionName;
 
         // assert
-        Assert.AreEqual<string>(expected, actual, "IsAzureDevOpsService is wrong.");
+        Assert.AreEqual<string>(expected, actual, "AccountNameOrCollectionName is wrong.");
     }
 
     [TestMethod]
@@ -134,10 +134,9 @@ public class AzureDevOpsConfigurationFixture
         var actual = SystemUnderTest.AccountNameOrCollectionName;
 
         // assert
-        Assert.AreEqual<string>(expected, actual, "IsAzureDevOpsService is wrong.");
+        Assert.AreEqual<string>(expected, actual, "AccountNameOrCollectionName is wrong.");
     }
 
- 
     [TestMethod]
     public void AccountNameOrCollectionName_ReturnsEmptyStringIfNotFound()
     {
@@ -151,7 +150,7 @@ public class AzureDevOpsConfigurationFixture
         var actual = SystemUnderTest.AccountNameOrCollectionName;
 
         // assert
-        Assert.AreEqual<string>(expected, actual, "IsAzureDevOpsService is wrong.");
+        Assert.AreEqual<string>(expected, actual, "AccountNameOrCollectionName is wrong.");
     }
 
     [TestMethod]
@@ -167,6 +166,38 @@ public class AzureDevOpsConfigurationFixture
         var actual = SystemUnderTest.AccountNameOrCollectionName;
 
         // assert
-        Assert.AreEqual<string>(expected, actual, "IsAzureDevOpsService is wrong.");
+        Assert.AreEqual<string>(expected, actual, "AccountNameOrCollectionName is wrong.");
+    }
+
+    [TestMethod]
+    public void AnalyticsUrl_ForServerCollectionUrl()
+    {
+        // arrange
+        var url = "https://azdo2022.benday.com/DefaultCollection";
+        var expected = "https://azdo2022.benday.com/DefaultCollection/";
+
+        SystemUnderTest.CollectionUrl = url;
+
+        // act
+        var actual = SystemUnderTest.AnalyticsUrl;
+
+        // assert
+        Assert.AreEqual<string>(expected, actual, "AnalyticsUrl is wrong.");
+    }
+
+    [TestMethod]
+    public void AnalyticsUrl_ForServiceCollectionUrl()
+    {
+        // arrange
+        var url = "https://dev.azure.com/benday";
+        var expected = "https://analytics.dev.azure.com/benday/";
+
+        SystemUnderTest.CollectionUrl = url;
+
+        // act
+        var actual = SystemUnderTest.AnalyticsUrl;
+
+        // assert
+        Assert.AreEqual<string>(expected, actual, "AnalyticsUrl is wrong.");
     }
 }

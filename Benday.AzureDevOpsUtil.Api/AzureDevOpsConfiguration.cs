@@ -52,6 +52,21 @@ public class AzureDevOpsConfiguration
         }
     }
 
+    public string AnalyticsUrl
+    {
+        get
+        {
+            if (IsAzureDevOpsService == false)
+            {
+                return CollectionUrl;
+            }
+            else
+            {
+                return $"https://analytics.dev.azure.com/{AccountNameOrCollectionName}/";
+            }
+        }
+    }
+
     public string GetTokenBase64Encoded()
     {
         var tokenBase64 = Convert.ToBase64String(
