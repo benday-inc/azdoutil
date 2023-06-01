@@ -145,7 +145,7 @@ public class GetCycleTimeAndThroughputCommand : AzureDevOpsCommandBase
 
         var startOfRangeODataFormatted = _StartOfRange.ToString("yyyyMMdd");
 
-        var requestUrl = "https://analytics.dev.azure.com/benday/Metrics%20and%20Dashboards%20Research/_odata/v1.0/WorkItems?" +
+        var requestUrl = $"{Configuration.AnalyticsUrl}/{teamProjectNameUrlEncoded}/_odata/v1.0/WorkItems?" +
             "$select=WorkItemId,Title,CycleTimeDays,CompletedDateSK&" +
             "$filter=" +
             HttpUtility.UrlEncode($"WorkItemType eq 'Product Backlog Item' and State eq 'Done' and CompletedDateSK ge {startOfRangeODataFormatted}");
