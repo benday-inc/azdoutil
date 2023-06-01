@@ -65,6 +65,10 @@
       "commandName": "Project",
       "commandLineArgs": "tfvc-to-git /config:demo2022 /teamproject:ProjectWithTfvc1 /tfvc-path:$/ProjectWithTfvc1/main /reponame:asdf2b"
     },
-    
+
+    "list-teams": {
+      "commandName": "Project",
+      "commandLineArgs": "listteams /teamproject:test20230601a"
+    },
   }
 }
