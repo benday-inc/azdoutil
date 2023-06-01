@@ -1,4 +1,6 @@
-﻿using Benday.AzureDevOpsUtil.Api.Excel;
+﻿using System.Runtime.InteropServices;
+
+using Benday.AzureDevOpsUtil.Api.Excel;
 using Benday.AzureDevOpsUtil.Api.Messages;
 using Benday.CommandsFramework;
 
@@ -37,6 +39,11 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
             .AllowEmptyValue(false)
             .WithDescription("Creates the team project if it doesn't exist");
 
+        arguments.AddInt32(Constants.CommandArg_TeamCount)
+            .AsNotRequired()
+            .AllowEmptyValue(false)
+            .WithDescription("Creates data for multiple teams. This option is only available when creating a new project.");
+
         arguments.AddBoolean(Constants.CommandArg_AllPbisGoToDone)
             .AsNotRequired()
             .AllowEmptyValue(true)
@@ -57,7 +64,7 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
           .WithDescription($"Creates the excel export script. Requires an arg value for '{Constants.CommandArg_SaveScriptFileTo}'");
 
         return arguments;
-    }    
+    }
 
     private bool _skipFutureDates = false;
     private DateTime _startDate;
@@ -100,7 +107,7 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
                 generator.Actions);
 
             return toPath;
-        }        
+        }
         else
         {
             return null;
@@ -188,13 +195,77 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
 
             _createProjectIfNotExists = Arguments.GetBooleanValue(Constants.CommandArg_CreateProjectIfNotExists);
 
-            PopulateActions(generator);
+            WriteLine($"Team project name: '{_teamProjectName}'");
+            WriteLine($"Create project if not exists: '{_createProjectIfNotExists}'");
+
+            if (_createProjectIfNotExists == false && Arguments.HasValue(Constants.CommandArg_TeamCount) == true)
+            {
+                throw new KnownException($"When '{Constants.CommandArg_CreateProjectIfNotExists}' is false, '{Constants.CommandArg_TeamCount}' is not allowed.");
+            }
+            else if (_createProjectIfNotExists == false ||
+                Arguments.HasValue(Constants.CommandArg_TeamCount) == false ||
+                Arguments.GetInt32Value(Constants.CommandArg_TeamCount) < 2)
+            {
+                WriteLine("Populating data for a single team.");
+
+                PopulateActions(generator);
+
+                _skipFutureDates = Arguments.GetBooleanValue(Constants.CommandArg_SkipFutureDates);
+                _createProjectIfNotExists = Arguments.GetBooleanValue(Constants.CommandArg_CreateProjectIfNotExists);
+
+                await EnsureProjectExists();
+                await PopulateIterations(sprints, _startDate);
+                await RunScript();
+
+                if (outputPathAndFileName != null)
+                {
+                    WriteLine($"Script written to '{outputPathAndFileName}'");
+                }
+
+                WriteLine($"Done.");
+            }
+            else if (_createProjectIfNotExists == true && Arguments.HasValue(Constants.CommandArg_TeamCount) == true &&
+                Arguments.GetInt32Value(Constants.CommandArg_TeamCount) > 2)
+            {
+                WriteLine("Populating data for multiple teams.");
+
+                await PopulateForMultipleSprints(sprints, _startDate, outputPathAndFileName, useScrumWithBacklogRefinement, markAllPbisAsDone);
+
+            }
+            else
+            {
+                throw new KnownException("Unsupported combination of arguments.");
+            }
+
+        }
+    }
+    private async Task PopulateForMultipleSprints(List<WorkItemScriptSprint> sprints, DateTime startDate, string? outputPathAndFileName, bool useScrumWithBacklogRefinement, bool markAllPbisAsDone)
+    {
+        var teamCount = Arguments.GetInt32Value(Constants.CommandArg_TeamCount);
+
+        var projectInfo = await EnsureProjectExists();
+
+        if (projectInfo == null)
+        {
+            throw new InvalidOperationException($"Failed to create project '{_teamProjectName}'.");
+        }
+
+        await PopulateIterations(sprints, startDate);
+
+        for (var i = 0; i < teamCount; i++)
+        {
+            WriteLine($"Generating script for team {i + 1} of {teamCount}...");
+
+            _workItemIdMaps.Clear();
+
+            var generator = new WorkItemScriptGenerator(useScrumWithBacklogRefinement);
+
+            generator.GenerateScript(sprints, markAllPbisAsDone);
+
+            PopulateActions(generator, $"{projectInfo.Name}\\Team {i + 1}");
 
             _skipFutureDates = Arguments.GetBooleanValue(Constants.CommandArg_SkipFutureDates);
-            _createProjectIfNotExists = Arguments.GetBooleanValue(Constants.CommandArg_CreateProjectIfNotExists);
 
-            await EnsureProjectExists();
-            await PopulateIterations(sprints, _startDate);
             await RunScript();
 
             if (outputPathAndFileName != null)
@@ -202,8 +273,11 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
                 WriteLine($"Script written to '{outputPathAndFileName}'");
             }
 
-            WriteLine($"Done.");
+            WriteLine($"Generated script for team {i + 1} of {teamCount}...");
         }
+
+
+        WriteLine($"Done.");
     }
 
     private void PopulateActions(WorkItemScriptGenerator generator)
@@ -211,6 +285,22 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
         _actions = generator.Actions;
 
         CleanUpRowDataShortcuts(_actions);
+    }
+
+    private void PopulateActions(WorkItemScriptGenerator generator, string assignToTeamName)
+    {
+        _actions = generator.Actions;
+
+        CleanUpRowDataShortcuts(_actions);
+
+        foreach (var action in _actions)
+        {
+            if (IsEqualCaseInsensitive(action.Definition.Operation, "Create") == true)
+            {
+                WriteLine($"Assigning new PBI to team '{assignToTeamName}'.");
+                action.SetValue("System.AreaPath", assignToTeamName);
+            }
+        }
     }
 
     private static void CleanUpRowDataShortcuts(List<WorkItemScriptAction> rows)
@@ -270,7 +360,7 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
     }
 
     private async Task UpdatePbi(WorkItemScriptAction action)
-    {        
+    {
         await ModifyWorkItem(action, true);
     }
 
@@ -293,7 +383,7 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
         {
             requestUrl = $"{_teamProjectName}/_apis/wit/workitems/${workItemTypeNameHtmlEncoded}?api-version=6.0";
         }
-        
+
         WorkItemFieldOperationValueCollection body = new();
 
         PopulateBody(action, actionDate, body);
@@ -310,7 +400,7 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
                 requestUrl, body);
 
         WriteLine($"Create PBI - {action.Definition.Description} -- {action.Definition.WorkItemType} for action id {action.ActionId} as work item id '{savedWorkItemInfo.Id}'...");
-        
+
         AddActionWorkItemIdMap(action, savedWorkItemInfo);
     }
 
@@ -448,7 +538,7 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
 
         if (bypassRules == true)
         {
-            requestUrl = 
+            requestUrl =
                 $"{_teamProjectName}/_apis/wit/workitems/{realWorkItemId}?api-version=6.0&bypassRules=true&supressNotifications=true";
         }
         else
@@ -515,7 +605,7 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
             var sprintStartDate = startDate.AddDays(
                 ((item.SprintNumber - 1) * 14)
                 );
-                 
+
             var sprintEndDate = startDate.AddDays((item.SprintNumber * 14) - 1);
 
             item.StartDate = sprintStartDate;
@@ -533,7 +623,7 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
         }
     }
 
-    private async Task EnsureProjectExists()
+    private async Task<TeamProjectInfo?> EnsureProjectExists()
     {
         WriteLine($"Team project: {_teamProjectName}");
 
@@ -598,6 +688,63 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
             await client.GetStringAsync($"{_teamProjectName}/_boards/board/t/{_teamProjectName}%20Team");
 
             WriteLine($"Project ready.  Called backlog board to initialize...");
+
+            await CreateTeams(getExistingProjectCommand.LastResult!);
         }
+
+        return getExistingProjectCommand.LastResult;
+    }
+
+    private async Task CreateTeams(TeamProjectInfo lastResult)
+    {
+        if (Arguments.HasValue(Constants.CommandArg_TeamCount) == false)
+        {
+            return;
+        }
+        else
+        {
+            var teamCount = Arguments.GetInt32Value(Constants.CommandArg_TeamCount);
+            if (teamCount < 2)
+            {
+                WriteLine($"Team count is less than 2.  Skipping team creation.");
+
+                return;
+            }
+            else
+            {
+                WriteLine($"Creating {teamCount} teams...");
+
+                for (int i = 0; i < teamCount; i++)
+                {
+                    await CreateTeam(lastResult.Name, $"Team {i + 1}");
+                }
+            }
+        }
+    }
+
+    private async Task<TeamInfo> CreateTeam(string teamProjectName, string teamName)
+    {
+        var args = ExecutionInfo.GetCloneOfArguments(
+                        Constants.CommandArgumentName_CreateTeam,
+                        true);
+
+        args.AddArgumentValue(Constants.ArgumentNameTeamProjectName, teamProjectName);
+        args.AddArgumentValue(Constants.ArgumentNameTeamName, teamName);
+
+        var command = new CreateTeamCommand(
+            args, _OutputProvider);
+
+        await command.ExecuteAsync();
+
+        if (command.LastResult == null)
+        {
+            throw new KnownException($"Could not team '{teamName}' in team project.");
+        }
+        else
+        {
+            WriteLine($"Created team '{teamName}' in team project.");
+        }
+
+        return command.LastResult;
     }
 }

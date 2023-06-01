@@ -88,6 +88,7 @@ public static class Constants
     public const string CommandArg_StartDate = "startdate";
     public const string CommandArg_TeamProjectName = "teamproject";
     public const string CommandArg_CreateProjectIfNotExists = "createproject";
+    public const string CommandArg_TeamCount = "teamcount";
     public const string CommandArg_ProcessTemplateName = "processname";
     public const string CommandArg_EndDate = "enddate";
     public const string CommandArg_IterationName = "name";

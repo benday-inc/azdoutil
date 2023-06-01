@@ -79,6 +79,12 @@
     "connection-data": {
       "commandName": "Project",
       "commandLineArgs": "connectiondata"
-    }
+    },
+    "create-from-generator": {
+      "commandName": "Project",
+      "commandLineArgs": "createfromgenerator /numberofsprints:2 /createproject:true /teamcount:3 /processname:\"Scrum with Backlog Refinement\" /teamproject:20230601e"
+    },
+
+
   }
 }
