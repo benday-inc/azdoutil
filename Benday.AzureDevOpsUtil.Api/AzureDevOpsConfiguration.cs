@@ -25,6 +25,13 @@ public class AzureDevOpsConfiguration
     }
     public string Token { get; set; } = string.Empty;
     public bool IsWindowsAuth { get; set; }
+    public bool IsAzureDevOpsService
+    {
+        get
+        {
+            return CollectionUrl.Contains("dev.azure.com");
+        }
+    }
 
     public string GetTokenBase64Encoded()
     {

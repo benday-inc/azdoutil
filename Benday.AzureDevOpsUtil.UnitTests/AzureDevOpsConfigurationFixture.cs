@@ -56,4 +56,36 @@ public class AzureDevOpsConfigurationFixture
         // assert
         Assert.AreEqual<string>(expected, actual, "Collection url is wrong.");
     }
+
+    [TestMethod]
+    public void IsAzureDevOpsService_ForServiceCollectionUrl()
+    {
+        // arrange
+        var url = "https://dev.azure.com/benday/";
+        var expected = true;
+
+        SystemUnderTest.CollectionUrl = url;
+
+        // act
+        var actual = SystemUnderTest.IsAzureDevOpsService;
+
+        // assert
+        Assert.AreEqual<bool>(expected, actual, "IsAzureDevOpsService is wrong.");
+    }
+
+    [TestMethod]
+    public void IsAzureDevOpsService_ForServerCollectionUrl()
+    {
+        // arrange
+        var url = "https://azdo2022.benday.com/DefaultCollection/";
+        var expected = false;
+
+        SystemUnderTest.CollectionUrl = url;
+
+        // act
+        var actual = SystemUnderTest.IsAzureDevOpsService;
+
+        // assert
+        Assert.AreEqual<bool>(expected, actual, "IsAzureDevOpsService is wrong.");
+    }
 }
