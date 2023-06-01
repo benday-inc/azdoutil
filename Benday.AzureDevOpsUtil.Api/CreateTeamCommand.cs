@@ -47,6 +47,7 @@ public class CreateTeamCommand : AzureDevOpsCommandBase
         }
 
         var project = await GetTeamProject(projectName);
+        var groups = await GetGroups(project.Id);
         var connectionData = await GetConnectionData();
 
         var result = await GetTeams(project.Id);
@@ -58,10 +59,20 @@ public class CreateTeamCommand : AzureDevOpsCommandBase
             throw new KnownException($"Team '{teamName}' already exists.");
         }
 
+        var contributors = groups.Identities.Where(
+            x => x.FriendlyDisplayName == "Contributors" &&
+            x.IdentityType == "group").FirstOrDefault();
+
+        if (contributors == null)
+        {
+            throw new KnownException("Could not find Contributors group in project.");
+        }
+
         var requestData = new CreateTeamRequest()
         {
             Name = teamName,
-            Description = description
+            Description = description,
+            ParentGroupGuid = contributors.TeamFoundationId
         };
 
         requestData.AddUser(connectionData.AuthenticatedUser.Id);
@@ -110,6 +121,31 @@ public class CreateTeamCommand : AzureDevOpsCommandBase
         }
 
         return command.LastResult;
+    }
+
+    private async Task<GetGroupsResponse> GetGroups(string projectId)
+    {
+        using var client = GetHttpClientInstanceForAzureDevOps();
+
+        var requestUrl = $"{projectId}/_api/_identity/ReadScopedApplicationGroupsJson?__v=5";
+
+        var results = await client.GetAsync(requestUrl);
+
+        if (results.IsSuccessStatusCode == false)
+        {
+            throw new InvalidOperationException($"Request failed -- {results.StatusCode} {results.ReasonPhrase}");
+        }
+
+        var content = await results.Content.ReadAsStringAsync();
+
+        var objectResults = JsonSerializer.Deserialize<GetGroupsResponse>(content);
+
+        if (objectResults == null)
+        {
+            return new GetGroupsResponse();
+        }
+
+        return objectResults;
     }
 
     private async Task<ConnectionDataResponse> GetConnectionData()
