@@ -63,8 +63,14 @@ public class CreateTeamCommand : AzureDevOpsCommandBase
             Description = description
         };
 
+        /*
         var response = await SendPostForBodyAndGetTypedResponseSingleAttempt<TeamInfo, CreateTeamRequest>(
                        $"_apis/projects/{project.Id}/teams?api-version=7.0",
+                       requestData);
+        */
+
+        var response = await SendPostForBodyAndGetTypedResponseSingleAttempt<TeamInfo, CreateTeamRequest>(
+                       $"{project.Id}/_api/_identity/CreateTeam?__v=5",
                        requestData);
 
         LastResult = response;

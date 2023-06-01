@@ -73,7 +73,12 @@
 
     "create-team": {
       "commandName": "Project",
-      "commandLineArgs": "createteam /teamproject:test20230601a /name:bingbong2 /description:\"the team for bingbong2\""
+      "commandLineArgs": "createteam /teamproject:test20230601a /name:bingbong5 /description:\"the team for bingbong5\""
+    },
+
+    "connection-data": {
+      "commandName": "Project",
+      "commandLineArgs": "connectiondata"
     }
   }
 }

@@ -9,4 +9,7 @@ public class CreateTeamRequest
 
     [JsonPropertyName("description")]
     public string Description { get; set; } = string.Empty;
+
+    [JsonPropertyName("createArea")]
+    public bool CreateArea { get; set; } = true;
 }

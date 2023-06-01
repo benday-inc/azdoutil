@@ -23,6 +23,7 @@ public static class Constants
     public const string CommandArgumentNameCreateBacklogRefinementProcessTemplate = "addrefinementprocess";
     public const string CommandArgumentName_ListTeams = "listteams";
     public const string CommandArgumentName_CreateTeam = "createteam";
+    public const string CommandArgumentName_ConnectionData = "connectiondata";
 
     public const string CommandName_ListProjects = "listprojects";
     public const string CommandName_GetProject = "getproject";

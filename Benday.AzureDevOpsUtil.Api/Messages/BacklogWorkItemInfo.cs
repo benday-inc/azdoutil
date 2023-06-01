@@ -7,4 +7,3 @@ public partial class BacklogWorkItemInfo
     [JsonPropertyName("target")]
     public BacklogWorkItemTargetInfo Target { get; set; } = new();
 }
-
