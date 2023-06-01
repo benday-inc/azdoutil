@@ -47,6 +47,7 @@ public class CreateTeamCommand : AzureDevOpsCommandBase
         }
 
         var project = await GetTeamProject(projectName);
+        var connectionData = await GetConnectionData();
 
         var result = await GetTeams(project.Id);
 
@@ -62,6 +63,8 @@ public class CreateTeamCommand : AzureDevOpsCommandBase
             Name = teamName,
             Description = description
         };
+
+        requestData.AddUser(connectionData.AuthenticatedUser.Id);
 
         /*
         var response = await SendPostForBodyAndGetTypedResponseSingleAttempt<TeamInfo, CreateTeamRequest>(
@@ -104,6 +107,25 @@ public class CreateTeamCommand : AzureDevOpsCommandBase
         if (command.LastResult == null)
         {
             throw new KnownException($"Could not team project '{teamProjectName}' for work item.");
+        }
+
+        return command.LastResult;
+    }
+
+    private async Task<ConnectionDataResponse> GetConnectionData()
+    {
+        var args = ExecutionInfo.GetCloneOfArguments(
+                        Constants.CommandName_ConnectionData,
+                        true);
+
+        var command = new GetConnectionDataCommand(
+            args, _OutputProvider);
+
+        await command.ExecuteAsync();
+
+        if (command.LastResult == null)
+        {
+            throw new KnownException($"Could not get connection data.");
         }
 
         return command.LastResult;
