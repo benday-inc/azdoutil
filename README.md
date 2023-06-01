@@ -41,6 +41,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | [changeprocess](#changeprocess) | Change the process for a Team Project |
 | [addrefinementprocess](#addrefinementprocess) | Creates backlog refinement process template as described at https://www.benday.com/2022/09/29/streamlining-backlog-refinement-with-azure-devops/ |
 | [creategitrepo](#creategitrepo) | Creates a Git repository in an Azure DevOps Team Project. |
+| [createteam](#createteam) | Creates a new team in an Azure DevOps Team Project. |
 | [createproject](#createproject) | Create team projects |
 | [deleteproject](#deleteproject) | Delete team project |
 | [exportbuilddef](#exportbuilddef) | Export build definition |
@@ -49,6 +50,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | [forecastitemsinweeks](#forecastitemsinweeks) | Use throughput data to forecast likely number of items done in given number of weeks using Monte Carlo simulation |
 | [forecastworkitem](#forecastworkitem) | Use throughput data to forecast when a work item is likely to be done based on the current backlog priority using Monte Carlo simulation |
 | [getareas](#getareas) | Gets a list of areas in an Azure DevOps Team Project. |
+| [connectiondata](#connectiondata) | Get information about a connection to Azure DevOps. |
 | [throughputcycletime](#throughputcycletime) | Get cycle time and throughput data for a team project for a date range |
 | [getiterations](#getiterations) | Gets a list of iterations in an Azure DevOps Team Project. |
 | [getproject](#getproject) | Get team project info |
@@ -62,6 +64,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | [listgitrepos](#listgitrepos) | Gets list of Git repositories from an Azure DevOps Team Project. |
 | [listprocesstemplates](#listprocesstemplates) | List process templates |
 | [listprojects](#listprojects) | List team projects |
+| [listteams](#listteams) | Gets list of teams in an Azure DevOps Team Project. |
 | [listworkitemqueries](#listworkitemqueries) | Gets a list of all work item queries in an Azure DevOps Team Project. |
 | [removeconfig](#removeconfig) | Remove an Azure DevOps configuration. For example, which server or account plus auth information. |
 | [runworkitemquery](#runworkitemquery) | Run work item query |
@@ -104,6 +107,16 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | config | Optional | String | Configuration name to use |
 | teamproject | Required | String | Team project name that contains the git repositories |
 | reponame | Required | String | Name of the new git repository |
+## <a name="createteam"></a> createteam
+**Creates a new team in an Azure DevOps Team Project.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Required | String | Team project name that contains the team |
+| name | Required | String | Name of the new team |
+| description | Optional | String | Description for the new team |
 ## <a name="createproject"></a> createproject
 **Create team projects**
 ### Arguments
@@ -182,6 +195,13 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | config | Optional | String | Configuration name to use |
 | teamproject | Required | String | Team project name that contains the iterations |
 | verbose | Optional | Boolean | Verbose output |
+## <a name="connectiondata"></a> connectiondata
+**Get information about a connection to Azure DevOps.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
 ## <a name="throughputcycletime"></a> throughputcycletime
 **Get cycle time and throughput data for a team project for a date range**
 ### Arguments
@@ -288,6 +308,14 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | --- | --- | --- | --- |
 | quiet | Optional | Boolean | Quiet mode |
 | config | Optional | String | Configuration name to use |
+## <a name="listteams"></a> listteams
+**Gets list of teams in an Azure DevOps Team Project.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Required | String | Team project name that contains the teams |
 ## <a name="listworkitemqueries"></a> listworkitemqueries
 **Gets a list of all work item queries in an Azure DevOps Team Project.**
 ### Arguments

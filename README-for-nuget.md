@@ -41,6 +41,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | changeprocess | Change the process for a Team Project |
 | addrefinementprocess | Creates backlog refinement process template as described at https://www.benday.com/2022/09/29/streamlining-backlog-refinement-with-azure-devops/ |
 | creategitrepo | Creates a Git repository in an Azure DevOps Team Project. |
+| createteam | Creates a new team in an Azure DevOps Team Project. |
 | createproject | Create team projects |
 | deleteproject | Delete team project |
 | exportbuilddef | Export build definition |
@@ -49,6 +50,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | forecastitemsinweeks | Use throughput data to forecast likely number of items done in given number of weeks using Monte Carlo simulation |
 | forecastworkitem | Use throughput data to forecast when a work item is likely to be done based on the current backlog priority using Monte Carlo simulation |
 | getareas | Gets a list of areas in an Azure DevOps Team Project. |
+| connectiondata | Get information about a connection to Azure DevOps. |
 | throughputcycletime | Get cycle time and throughput data for a team project for a date range |
 | getiterations | Gets a list of iterations in an Azure DevOps Team Project. |
 | getproject | Get team project info |
@@ -62,6 +64,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | listgitrepos | Gets list of Git repositories from an Azure DevOps Team Project. |
 | listprocesstemplates | List process templates |
 | listprojects | List team projects |
+| listteams | Gets list of teams in an Azure DevOps Team Project. |
 | listworkitemqueries | Gets a list of all work item queries in an Azure DevOps Team Project. |
 | removeconfig | Remove an Azure DevOps configuration. For example, which server or account plus auth information. |
 | runworkitemquery | Run work item query |
@@ -104,6 +107,16 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | config | Optional | String | Configuration name to use |
 | teamproject | Required | String | Team project name that contains the git repositories |
 | reponame | Required | String | Name of the new git repository |
+## createteam
+**Creates a new team in an Azure DevOps Team Project.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Required | String | Team project name that contains the team |
+| name | Required | String | Name of the new team |
+| description | Optional | String | Description for the new team |
 ## createproject
 **Create team projects**
 ### Arguments
@@ -182,6 +195,13 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | config | Optional | String | Configuration name to use |
 | teamproject | Required | String | Team project name that contains the iterations |
 | verbose | Optional | Boolean | Verbose output |
+## connectiondata
+**Get information about a connection to Azure DevOps.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
 ## throughputcycletime
 **Get cycle time and throughput data for a team project for a date range**
 ### Arguments
@@ -288,6 +308,14 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | --- | --- | --- | --- |
 | quiet | Optional | Boolean | Quiet mode |
 | config | Optional | String | Configuration name to use |
+## listteams
+**Gets list of teams in an Azure DevOps Team Project.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Required | String | Team project name that contains the teams |
 ## listworkitemqueries
 **Gets a list of all work item queries in an Azure DevOps Team Project.**
 ### Arguments
