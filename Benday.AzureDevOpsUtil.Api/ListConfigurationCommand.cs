@@ -67,6 +67,7 @@ public class ListConfigurationCommand : SynchronousCommand
             WriteLine("***");
             WriteLine($"Name: {config.Name}");
             WriteLine($"Collection Url: {config.CollectionUrl}");
+            WriteLine($"Account Name / TPC Name: {config.AccountNameOrCollectionName}");
             WriteLine($"Token: {config.Token}");
             WriteLine($"Use Windows Auth: {config.IsWindowsAuth}");
         }

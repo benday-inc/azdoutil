@@ -25,6 +25,52 @@ public class AzureDevOpsConfiguration
     }
     public string Token { get; set; } = string.Empty;
     public bool IsWindowsAuth { get; set; }
+    public bool IsAzureDevOpsService
+    {
+        get
+        {
+            return CollectionUrl.Contains("dev.azure.com");
+        }
+    }
+
+    public string AccountNameOrCollectionName
+    {
+        get
+        {
+            if (Uri.TryCreate(CollectionUrl, UriKind.Absolute, out var uri) == false)
+            {
+                return string.Empty;
+            }
+            else
+            {
+                var segments = uri.Segments;
+
+                if (segments.Length < 2)
+                {
+                    return string.Empty;
+                }
+                else
+                {
+                    return segments[1].Replace("/", "");
+                }
+            }
+        }
+    }
+
+    public string AnalyticsUrl
+    {
+        get
+        {
+            if (IsAzureDevOpsService == false)
+            {
+                return CollectionUrl;
+            }
+            else
+            {
+                return $"https://analytics.dev.azure.com/{AccountNameOrCollectionName}/";
+            }
+        }
+    }
 
     public string GetTokenBase64Encoded()
     {

@@ -10,7 +10,7 @@
 	<ItemGroup>
 		<PackageReference Include="Benday.CommandsFramework" Version="2.1.0" />
 		<PackageReference Include="Benday.XmlUtilities" Version="4.0.1" />
-		<PackageReference Include="EPPlus" Version="6.2.1" />
+		<PackageReference Include="EPPlus" Version="6.2.4" />
 	</ItemGroup>
 
 </Project>
