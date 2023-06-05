@@ -56,21 +56,50 @@ public class ForecastDurationForItemCountCommand : AzureDevOpsCommandBase
         {
             throw new KnownException("No data");
         }
-
+        
         DataGroupedByWeek = getDataCommand.GroupedByWeek;
 
         CreateForecast();
         if (IsQuietMode == false)
         {
-            DisplayForecast();
+            DisplayForecast(getDataCommand);
         }
     }
 
-    public void DisplayForecast()
+    public void DisplayForecast(GetCycleTimeAndThroughputCommand getDataCommand)
     {
         var desc = $"How many weeks will it take us to get {_NumberOfItemsToForecast} item(s) done?";
 
+        WriteThroughputByWeek(getDataCommand);
+
         DisplayForecast(desc);
+    }
+
+    private void WriteThroughputByWeek(GetCycleTimeAndThroughputCommand getDataCommand)
+    {
+        WriteLine(string.Empty);
+        WriteLine($"Throughput for the last {getDataCommand.GroupedByWeek.Count} week(s):");
+        
+        var keysOrderedByAscending = getDataCommand.GroupedByWeek.Keys.OrderBy(x => x);
+
+        foreach (var key in keysOrderedByAscending)
+        {
+            WriteThroughputForWeek(getDataCommand.GroupedByWeek[key]);
+        }
+
+        WriteLine(string.Empty);
+    }
+
+    private void WriteThroughputForWeek(ThroughputIteration throughputIteration)
+    {
+        var longestString = "mm/dd/yyyy".Length;
+
+        string dateString = throughputIteration.StartOfWeek.ToShortDateString();
+
+        // pad string to length of longest date string
+        dateString = dateString.PadRight(longestString);
+
+        base.WriteLine($"\t{dateString}: {throughputIteration.Items.Count}");
     }
 
     public void DisplayForecast(string forecastDescription)
@@ -80,36 +109,28 @@ public class ForecastDurationForItemCountCommand : AzureDevOpsCommandBase
 
         var distribution = GetDistribution();
 
-        var throughput50PercentChance = GetIterationCount(distribution, 
+        var throughput50PercentChance = GetIterationCount(distribution,
             Constants.ForecastNumberOfSimulationsFiftyPercent);
 
         var throughput80PercentChance = GetIterationCount(distribution,
             Constants.ForecastNumberOfSimulationsEightyPercent);
+
+        var throughput90PercentChance = GetIterationCount(distribution,
+            Constants.ForecastNumberOfSimulationsNinetyPercent);
+
+        var throughput100PercentChance = GetIterationCount(distribution,
+            Constants.ForecastNumberOfSimulationsHundredPercent);
 
         var sortedKeys = distribution.Keys.OrderBy(x => x);
 
         var maxOccurrences = distribution.Values.Max();
 
         // WriteLine($"Max occurrences: {maxOccurrences}");
-        WriteLine($"50% confidence threshold: {throughput50PercentChance} week(s)");
-        WriteLine($"80% confidence threshold: {throughput80PercentChance} week(s)");
+        WriteLine($"50% sure it can be done in {throughput50PercentChance} week(s)");
+        WriteLine($"80% sure it can be done in {throughput80PercentChance} week(s)");
+        WriteLine($"90% sure it can be done in {throughput90PercentChance} week(s)");
+        WriteLine($"~99% sure it can be done in {throughput100PercentChance} week(s)");
         WriteLine(string.Empty);
-
-        foreach (var key in sortedKeys)
-        {
-            var value = distribution[key];
-
-            if (value == maxOccurrences)
-            {
-                WriteLine("***");
-                WriteLine($"Week count '{key}' --> {value} occurrence(s)");
-                WriteLine("***");
-            }
-            else
-            {
-                WriteLine($"Week count '{key}' --> {value} occurrence(s)");
-            }            
-        }
     }
 
     private int GetIterationCount(Dictionary<int, int> distribution, 
