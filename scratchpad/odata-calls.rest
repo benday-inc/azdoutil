@@ -1,8 +1,15 @@
 ### metadata
 GET https://azdo2022.benday.com/DefaultCollection/20230601e/_odata/v4.0-preview/$metadata
 
-### work items
+### all areas
 GET https://azdo2022.benday.com/DefaultCollection/20230601e/_odata/v4.0-preview/Areas?$select=AreaName,AreaPath,AreaSk,AreaLevel2
+
+
+### get area by name
+GET https://azdo2022.benday.com/DefaultCollection/20230601e/_odata/v4.0-preview/Areas?$select=AreaName,AreaPath,AreaSk,AreaLevel2&$filter=AreaLevel2 eq 'Team 1'
+
+### area by name v2
+GET https://azdo2022.benday.com/DefaultCollection//Test20230601a/_odata/v1.0/Areas?$select=AreaName,AreaPath,AreaSk,AreaLevel2&$filter=AreaLevel2 eq 'Team 1'
 
 
 ### work items
@@ -10,6 +17,14 @@ GET https://azdo2022.benday.com/DefaultCollection/20230601e/_odata/v4.0-preview/
 
 ### get work item with area path
 GET https://azdo2022.benday.com/DefaultCollection/20230601e/_odata/v4.0-preview/WorkItems?$filter=WorkItemType eq 'Product Backlog Item' and State eq 'Done' and AreaSK eq 864c7233-881b-4013-9093-51b1281afbe8&$select=Title,State,WorkItemType,AreaSK
+
+
+###
+GET https://azdo2022.benday.com/DefaultCollection/20230601e/_odata/v4.0-preview/$metadata#Areas(AreaName,AreaPath,AreaSK,AreaLevel2)
+
+### throughput and cycle time for a team
+
+
 
 
 ### 

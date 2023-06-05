@@ -85,6 +85,9 @@
       "commandLineArgs": "createfromgenerator /numberofsprints:2 /createproject:true /teamcount:3 /processname:\"Scrum with Backlog Refinement\" /teamproject:20230601e"
     },
 
-
+    "thruput-cycle-time-for-team": {
+      "commandName": "Project",
+      "commandLineArgs": "throughputcycletime /teamproject:20230601e /numberofdays:60 /teamname:\"Team 1\""
+    }
   }
 }

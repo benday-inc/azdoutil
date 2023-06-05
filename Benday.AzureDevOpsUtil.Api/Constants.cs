@@ -62,7 +62,7 @@ public static class Constants
     public const string ArgumentNameXaml = "xaml";
     public const string ArgumentNameOutputRaw = "raw";
     public const string ArgumentNameBuildDefinitionName = "name";
-    public const string ArgumentNameTeamName = "name";
+    public const string ArgumentNameTeamName = "teamname";
     public const string ArgumentNameTeamDescription = "description";
     public const string ArgumentNameShowLastRunInfo = "showlastruninfo";
     public const string ArgumentNameOutputCsv = "csv";
