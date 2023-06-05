@@ -134,6 +134,8 @@ public class ForecastWorkItemDeliveryCommand : AzureDevOpsCommandBase
         {
             var builder = new StringBuilder();
 
+            builder.AppendLine();
+
             builder.AppendLine(
                 $"How many weeks will it take us to get work item #{workItem.Id} \"{workItem.FieldsAsStrings["System.Title"]}\" done?");
 
