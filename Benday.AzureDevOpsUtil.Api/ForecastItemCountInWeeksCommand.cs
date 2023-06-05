@@ -67,6 +67,7 @@ public class ForecastItemCountInWeeksCommand : AzureDevOpsCommandBase
     {        
         var distribution = GetDistribution();
 
+        WriteLine(string.Empty);
         WriteLine($"How many items will we likely get done in {_NumberOfWeeksOfForecast} week(s)?");
         WriteLine(string.Empty);
 
@@ -76,30 +77,22 @@ public class ForecastItemCountInWeeksCommand : AzureDevOpsCommandBase
         var throughput80PercentChance = GetThroughput(distribution,
             Constants.ForecastNumberOfSimulationsEightyPercent);
 
+        var throughput90PercentChance = GetThroughput(distribution,
+            Constants.ForecastNumberOfSimulationsNinetyPercent);
+
+        var throughput100PercentChance = GetThroughput(distribution,
+            Constants.ForecastNumberOfSimulationsHundredPercent);
+
         var sortedKeys = distribution.Keys.OrderBy(x => x);
 
         var maxOccurrences = distribution.Values.Max();
 
-        // WriteLine($"Max occurrences: {maxOccurrences}");
-        WriteLine($"50% confidence threshold: {throughput50PercentChance} item(s)");
-        WriteLine($"80% confidence threshold: {throughput80PercentChance} item(s)");
+        WriteLine($"50% sure {throughput50PercentChance} item(s) can be done");
+        WriteLine($"80% sure {throughput80PercentChance} item(s) can be done");
+        WriteLine($"90% sure {throughput90PercentChance} item(s) can be done");
+        WriteLine($"~99% sure {throughput100PercentChance} item(s) can be done");
+
         WriteLine(string.Empty);
-
-        foreach (var key in sortedKeys)
-        {
-            var value = distribution[key];
-
-            if (value == maxOccurrences)
-            {
-                WriteLine("***");
-                WriteLine($"Throughput '{key}' --> {value} occurrence(s)");
-                WriteLine("***");
-            }
-            else
-            {
-                WriteLine($"Throughput '{key}' --> {value} occurrence(s)");
-            }            
-        }
     }
 
     private int GetThroughput(Dictionary<int, int> distribution, 
