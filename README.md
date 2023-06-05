@@ -115,7 +115,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | quiet | Optional | Boolean | Quiet mode |
 | config | Optional | String | Configuration name to use |
 | teamproject | Required | String | Team project name that contains the team |
-| name | Required | String | Name of the new team |
+| teamname | Required | String | Name of the new team |
 | description | Optional | String | Description for the new team |
 ## <a name="createproject"></a> createproject
 **Create team projects**
@@ -167,6 +167,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | numberofdays | Required | Int32 | Number of days of history to compute |
 | teamproject | Required | String | Team project name |
 | forecastitemcount | Required | Int32 | Number of items to forecast duration for |
+| teamname | Optional | String | Team name |
 ## <a name="forecastitemsinweeks"></a> forecastitemsinweeks
 **Use throughput data to forecast likely number of items done in given number of weeks using Monte Carlo simulation**
 ### Arguments
@@ -177,6 +178,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | numberofdays | Required | Int32 | Number of days of history to compute |
 | teamproject | Required | String | Team project name |
 | forecastweeks | Required | Int32 | Number of weeks into the future to forecast |
+| teamname | Optional | String | Team name |
 ## <a name="forecastworkitem"></a> forecastworkitem
 **Use throughput data to forecast when a work item is likely to be done based on the current backlog priority using Monte Carlo simulation**
 ### Arguments
@@ -186,6 +188,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | config | Optional | String | Configuration name to use |
 | numberofdays | Required | Int32 | Number of days of history to compute |
 | id | Required | Int32 | Id of the work item to forecast |
+| teamname | Optional | String | Team name |
 ## <a name="getareas"></a> getareas
 **Gets a list of areas in an Azure DevOps Team Project.**
 ### Arguments
@@ -211,6 +214,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | config | Optional | String | Configuration name to use |
 | numberofdays | Required | Int32 | Number of days of history to compute |
 | teamproject | Required | String | Team project name |
+| teamname | Optional | String | Team name |
 ## <a name="getiterations"></a> getiterations
 **Gets a list of iterations in an Azure DevOps Team Project.**
 ### Arguments
@@ -382,6 +386,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | teamproject | Required | String | Name of the team project |
 | processname | Required | String | Process template name |
 | createproject | Required | Boolean | Creates the team project if it doesn't exist |
+| teamcount | Optional | Int32 | Creates data for multiple teams. This option is only available when creating a new project. |
 | alldone | Optional | Boolean | All PBIs in a sprint makes it to done |
 | addsessiontag | Optional | Boolean | Add a session tag to work items |
 | output | Optional | String | Save generated script file to disk in this directory. Note the filename will be auto-generated. |
