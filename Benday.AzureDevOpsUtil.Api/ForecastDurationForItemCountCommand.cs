@@ -99,7 +99,7 @@ public class ForecastDurationForItemCountCommand : AzureDevOpsCommandBase
         // pad string to length of longest date string
         dateString = dateString.PadRight(longestString);
 
-        base.WriteLine($"\t{dateString}: {throughputIteration.Items.Count}");
+        WriteLine($"\t{dateString}: {throughputIteration.Items.Count}");
     }
 
     public void DisplayForecast(string forecastDescription)

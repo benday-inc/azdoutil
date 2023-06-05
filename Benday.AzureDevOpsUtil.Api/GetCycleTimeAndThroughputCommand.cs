@@ -94,8 +94,8 @@ public class GetCycleTimeAndThroughputCommand : AzureDevOpsCommandBase
 
     private void WriteThroughputByWeek()
     {
-
-        WriteLine($"Number of weeks: {GroupedByWeek.Count}");
+        WriteLine(string.Empty);
+        WriteLine($"Throughput for the last {GroupedByWeek.Count} week(s):");
 
         var keysOrderedByAscending = GroupedByWeek.Keys.OrderBy(x => x);
 
@@ -103,14 +103,21 @@ public class GetCycleTimeAndThroughputCommand : AzureDevOpsCommandBase
         {
             WriteThroughputForWeek(GroupedByWeek[key]);
         }
+
+        
     }
 
     private void WriteThroughputForWeek(ThroughputIteration throughputIteration)
     {
+        var longestString = "mm/dd/yyyy".Length;
+
+        string dateString = throughputIteration.StartOfWeek.ToShortDateString();
+
+        WriteLine($"Week of {dateString}:");
+        WriteLine($"\tThroughput    : {throughputIteration.Items.Count} item(s)");
+        WriteLine($"\tAvg Cycle Time: {throughputIteration.AverageCycleTime} day(s)");
+
         WriteLine(string.Empty);
-        WriteLine($"* Week Starting {throughputIteration.StartOfWeek.ToShortDateString()}:");
-        WriteLine($"Throughput    : {throughputIteration.Items.Count}");
-        WriteLine($"Avg Cycle Time: {throughputIteration.AverageCycleTime}");
     }
 
     private void AddToWeek(WorkItemCycleTimeData item)
