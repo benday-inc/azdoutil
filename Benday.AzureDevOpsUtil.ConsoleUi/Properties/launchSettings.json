@@ -79,6 +79,27 @@
     "connection-data": {
       "commandName": "Project",
       "commandLineArgs": "connectiondata"
+    },
+    "create-from-generator": {
+      "commandName": "Project",
+      "commandLineArgs": "createfromgenerator /numberofsprints:2 /createproject:true /teamcount:3 /processname:\"Scrum with Backlog Refinement\" /teamproject:20230601e"
+    },
+
+    "thruput-cycle-time-for-team": {
+      "commandName": "Project",
+      "commandLineArgs": "throughputcycletime /teamproject:20230601e /numberofdays:60 /teamname:\"Team 1\""
+    },
+    "forecast-item-count-for-team1": {
+      "commandName": "Project",
+      "commandLineArgs": "forecastdurationforitemcount /numberofdays:80 /teamname:\"team 1\" /teamproject:20230601e /forecastitemcount:10"
+    },
+    "forecast-item-count-for-team2": {
+      "commandName": "Project",
+      "commandLineArgs": "forecastdurationforitemcount /numberofdays:80 /teamname:\"team 2\" /teamproject:20230601e /forecastitemcount:10"
+    },
+    "forecast-item-count-for-team3": {
+      "commandName": "Project",
+      "commandLineArgs": "forecastdurationforitemcount /numberofdays:80 /teamname:\"team 2\" /teamproject:20230601e /forecastitemcount:10"
     }
   }
 }

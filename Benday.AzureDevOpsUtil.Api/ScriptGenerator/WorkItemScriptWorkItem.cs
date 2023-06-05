@@ -8,6 +8,7 @@ public class WorkItemScriptWorkItem
     public string State { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public string Iteration { get; set; } = string.Empty;
+    public string AreaPath { get; set; } = string.Empty;
     public int RemainingWork { get; set; } = 0;
     public WorkItemScriptWorkItem? Parent { get; set; }
 

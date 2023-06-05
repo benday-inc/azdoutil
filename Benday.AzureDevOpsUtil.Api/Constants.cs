@@ -62,7 +62,7 @@ public static class Constants
     public const string ArgumentNameXaml = "xaml";
     public const string ArgumentNameOutputRaw = "raw";
     public const string ArgumentNameBuildDefinitionName = "name";
-    public const string ArgumentNameTeamName = "name";
+    public const string ArgumentNameTeamName = "teamname";
     public const string ArgumentNameTeamDescription = "description";
     public const string ArgumentNameShowLastRunInfo = "showlastruninfo";
     public const string ArgumentNameOutputCsv = "csv";
@@ -76,6 +76,8 @@ public static class Constants
     public const int ForecastNumberOfSimulations = 1000;
     public const int ForecastNumberOfSimulationsFiftyPercent = 500;
     public const int ForecastNumberOfSimulationsEightyPercent = 800;
+    public const int ForecastNumberOfSimulationsNinetyPercent = 900;
+    public const int ForecastNumberOfSimulationsHundredPercent = 999;
     public const string ProcessTemplateName_ScrumWithBacklogRefinement = "Scrum with Backlog Refinement";
     public const string ProcessTemplateRefName_ScrumWithBacklogRefinement = "Inherited.ScrumWithBacklogRefinement";
     public const string ProcessTemplateName_Scrum = "Scrum";
@@ -88,6 +90,7 @@ public static class Constants
     public const string CommandArg_StartDate = "startdate";
     public const string CommandArg_TeamProjectName = "teamproject";
     public const string CommandArg_CreateProjectIfNotExists = "createproject";
+    public const string CommandArg_TeamCount = "teamcount";
     public const string CommandArg_ProcessTemplateName = "processname";
     public const string CommandArg_EndDate = "enddate";
     public const string CommandArg_IterationName = "name";

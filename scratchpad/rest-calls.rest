@@ -1,0 +1,6 @@
+### get backlog for team
+
+GET https://azdo2022.benday.com/DefaultCollection/20230601e/Team 2/_apis/work/backlogs/Microsoft.RequirementCategory?api-version=7.0
+
+### get all backlogs for team
+GET https://azdo2022.benday.com/DefaultCollection/20230601e/Team 2/_apis/work/backlogs?api-version=7.0

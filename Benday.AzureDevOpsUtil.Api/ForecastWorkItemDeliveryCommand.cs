@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Web;
 
 using Benday.AzureDevOpsUtil.Api.Messages;
 using Benday.CommandsFramework;
@@ -30,7 +31,44 @@ public class ForecastWorkItemDeliveryCommand : AzureDevOpsCommandBase
             .AsRequired()
             .WithDescription("Id of the work item to forecast");
 
+        arguments.AddString(Constants.ArgumentNameTeamName)
+          .AsNotRequired()
+          .WithDescription("Team name");
+
         return arguments;
+    }
+
+    private string _TeamProjectName;
+    private bool _HasTeamNameQuery;
+    private string _TeamName;
+    private AreaData? _TeamInfo = null;
+
+    private async Task ValidateTeamName()
+    {
+        var teamProjectNameUrlEncoded = HttpUtility.UrlEncode(_TeamProjectName);
+
+        // _odata/v4.0-preview/Areas?$select=AreaName,AreaPath,AreaSk,AreaLevel2&$filter=AreaLevel2 eq 'Team 1'
+
+        var requestUrl = $"{Configuration.AnalyticsUrl}/{teamProjectNameUrlEncoded}/_odata/v1.0/Areas?" +
+            "$select=AreaName,AreaPath,AreaSk,AreaLevel2&" +
+             $"$filter=AreaLevel2 eq '{_TeamName}'";
+
+        var results = await CallEndpointViaGetAndGetResult<GetAreasFromODataResponse>(requestUrl, false);
+
+        if (results == null || results.Items == null || results.Items.Length == 0)
+        {
+            throw new KnownException(
+                $"Could not find team named '{_TeamName}' in project '{_TeamProjectName}'.");
+        }
+        else if (results.Items.Length > 1)
+        {
+            throw new KnownException(
+                $"Found more than one team named '{_TeamName}' in project '{_TeamProjectName}'.");
+        }
+        else
+        {
+            _TeamInfo = results.Items[0];
+        }
     }
 
     protected override async Task OnExecute()
@@ -43,7 +81,23 @@ public class ForecastWorkItemDeliveryCommand : AzureDevOpsCommandBase
 
         var teamProject = await GetTeamProject(teamProjectName);
 
-        if (teamProject.DefaultTeam == null)
+        _TeamProjectName = teamProject.Name;
+
+        _HasTeamNameQuery = Arguments.HasValue(Constants.ArgumentNameTeamName);
+
+        if (_HasTeamNameQuery == true)
+        {
+            _TeamName = Arguments.GetStringValue(Constants.ArgumentNameTeamName);
+
+            await ValidateTeamName();
+        }
+
+        if (_HasTeamNameQuery == true && _TeamInfo == null)
+        {
+            throw new KnownException(
+                $"Could not determine team information fro the supplied team name.");
+        }
+        else if (teamProject.DefaultTeam == null)
         {
             throw new KnownException(
                 $"Could not determine default team for team project '{teamProjectName}'");
@@ -80,6 +134,8 @@ public class ForecastWorkItemDeliveryCommand : AzureDevOpsCommandBase
         {
             var builder = new StringBuilder();
 
+            builder.AppendLine();
+
             builder.AppendLine(
                 $"How many weeks will it take us to get work item #{workItem.Id} \"{workItem.FieldsAsStrings["System.Title"]}\" done?");
 
@@ -93,20 +149,38 @@ public class ForecastWorkItemDeliveryCommand : AzureDevOpsCommandBase
         GetWorkItemByIdResponse workItem, TeamProjectInfo teamProject)
     {
         // get the work items from the default team backlog
-        var requestUrl = $"{teamProject.Id}/{teamProject.DefaultTeam!.Id}/" +
-            $"_apis/work/backlogs/Microsoft.RequirementCategory/workItems";
+        string requestUrl;
+
+        if (_HasTeamNameQuery == false)
+        {
+            requestUrl = $"{teamProject.Id}/{teamProject.DefaultTeam!.Id}/" +
+                        $"_apis/work/backlogs/Microsoft.RequirementCategory/workItems";
+        }
+        else
+        {
+            requestUrl = $"{teamProject.Id}/{_TeamInfo!.AreaLevel2}/" +
+                        $"_apis/work/backlogs/Microsoft.RequirementCategory/workItems";
+        }
 
         var result =
             await CallEndpointViaGetAndGetResult<GetBacklogWorkItemIdsResponse>(
             requestUrl);
 
+
+        string teamNameMessage = "default team";
+
+        if (_HasTeamNameQuery == true)
+        {
+            teamNameMessage = $"team '{_TeamName}'";
+        }
+
         if (result == null)
         {
-            throw new KnownException("Error: couldn't get backlog work items");
+            throw new KnownException($"Error: couldn't get backlog work items on backlog for {teamNameMessage}");
         }
         else if (result.WorkItems.Length == 0)
         {
-            throw new KnownException("Default backlog has zero work items");
+            throw new KnownException($"Backlog for {teamNameMessage} has zero work items.");
         }
         else
         {
@@ -122,7 +196,8 @@ public class ForecastWorkItemDeliveryCommand : AzureDevOpsCommandBase
                 }
             }
 
-            throw new KnownException("Work item isn't part of the backlog for the default team. Can't determine position of work item in backlog.");
+            throw new KnownException(
+                $"Work item isn't part of the backlog for the {teamNameMessage}. Can't determine position of work item in backlog.");
         }
     }
 
