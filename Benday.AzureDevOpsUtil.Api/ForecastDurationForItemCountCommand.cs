@@ -31,6 +31,10 @@ public class ForecastDurationForItemCountCommand : AzureDevOpsCommandBase
             .AsRequired()
             .WithDescription("Number of items to forecast duration for");
 
+        arguments.AddString(Constants.ArgumentNameTeamName)
+            .AsNotRequired()
+            .WithDescription("Team name");
+
         return arguments;
     }
 

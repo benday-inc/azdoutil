@@ -31,6 +31,10 @@ public class ForecastItemCountInWeeksCommand : AzureDevOpsCommandBase
             .AsRequired()
             .WithDescription("Number of weeks into the future to forecast");
 
+        arguments.AddString(Constants.ArgumentNameTeamName)
+          .AsNotRequired()
+          .WithDescription("Team name");
+
         return arguments;
     }
 
