@@ -7,5 +7,3 @@ public class WorkItemCycleTimeData
     public int CompletedDateSK { get; set; }
     public string Title { get; set; } = string.Empty;
 }
-
-

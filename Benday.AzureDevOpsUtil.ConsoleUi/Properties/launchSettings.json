@@ -100,6 +100,14 @@
     "forecast-item-count-for-team3": {
       "commandName": "Project",
       "commandLineArgs": "forecastdurationforitemcount /numberofdays:80 /teamname:\"team 2\" /teamproject:20230601e /forecastitemcount:10"
+    },
+    "aging-work-for-team3": {
+      "commandName": "Project",
+      "commandLineArgs": "agingwork /teamname:\"team 1\" /teamproject:20230601e"
+    },
+    "aging-work-no-team-specified": {
+      "commandName": "Project",
+      "commandLineArgs": "agingwork /teamproject:20230601e"
     }
   }
 }
