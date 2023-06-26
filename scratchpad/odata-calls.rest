@@ -19,7 +19,7 @@ GET https://azdo2022.benday.com/DefaultCollection/20230601e/_odata/v4.0-preview/
 GET https://azdo2022.benday.com/DefaultCollection/20230601e/_odata/v4.0-preview/WorkItems?$filter=WorkItemType eq 'Product Backlog Item' and State eq 'Committed'&$select=Title,State,WorkItemType,AreaSK,CycleTimeDays,InProgressDate,WorkItemId,ClosedDate
 
 ### in progress category work items
-GET https://azdo2022.benday.com/DefaultCollection/20230601e/_odata/v4.0-preview/WorkItems?$filter=WorkItemType eq 'Product Backlog Item' and StateCategory eq 'InProgress'&$select=Title,State,WorkItemType,AreaSK,CycleTimeDays,InProgressDate,WorkItemId,ClosedDate,StateCategory
+GET https://azdo2022.benday.com/DefaultCollection/20230601e/_odata/v4.0-preview/WorkItems?$filter=WorkItemType eq 'Product Backlog Item' and StateCategory eq 'InProgress'&$select=Title,WorkItemType,AreaSK,InProgressDate,WorkItemId,ClosedDate,StateCategory&$orderby=InProgressDate desc
 
 ### get work item with area path
 GET https://azdo2022.benday.com/DefaultCollection/20230601e/_odata/v4.0-preview/WorkItems?$filter=WorkItemType eq 'Product Backlog Item' and State eq 'Done' and AreaSK eq 864c7233-881b-4013-9093-51b1281afbe8&$select=Title,State,WorkItemType,AreaSK
