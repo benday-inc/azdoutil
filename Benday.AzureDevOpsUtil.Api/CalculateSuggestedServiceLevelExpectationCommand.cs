@@ -62,6 +62,7 @@ public class CalculateSuggestedServiceLevelExpectationCommand : AzureDevOpsComma
         }
 
         _Data = getDataCommand.Data;
+        DataItemCount = _Data.Items.Length;
 
         var suggestedSleCycleTime = GetSuggestedSle();
 
@@ -74,13 +75,19 @@ public class CalculateSuggestedServiceLevelExpectationCommand : AzureDevOpsComma
     }
 
     public double CycleTimeAtPercent { get; private set; } = -1;
+    public int DataItemCount { get; private set; } = -1;
 
     private double GetSuggestedSle()
+    {
+        return GetCycleTimeAtPercent(_SlePercent);
+    }
+
+    public double GetCycleTimeAtPercent(int percent)
     {
         if (_Data == null)
         {
             throw new InvalidOperationException("Data is null.");
-        }   
+        }
 
         int dataItemCount = _Data.Items.Length;
 
@@ -91,11 +98,11 @@ public class CalculateSuggestedServiceLevelExpectationCommand : AzureDevOpsComma
         }
 
         var indexForPercentForecast =
-            Utilities.GetIndexForPercentForecast(dataItemCount, _SlePercent);
+            Utilities.GetIndexForPercentForecast(dataItemCount, percent);
 
         if (indexForPercentForecast < 0)
         {
-            throw new KnownException($"Could calculate an SLE for {dataItemCount} items and {_SlePercent}.");
+            throw new KnownException($"Could not calculate an SLE for {dataItemCount} items and {percent}.");
         }
         else
         {

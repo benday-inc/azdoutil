@@ -46,6 +46,8 @@ public static class Constants
     public const string CommandArgumentNameForecastWorkItemDelivery = "forecastworkitem";
     public const string CommandArgumentNameGetForecastItemCountInWeeks = "forecastitemsinweeks";
     public const string CommandArgumentNameSuggestServiceLevelExpectation = "suggest-sle";
+    public const string CommandArgumentNameCycleTimeConfidenceRangesCommand = "cycletimeconfidence";
+
     public const string CommandArgumentNameGetForecastDurationForItemCount = "forecastdurationforitemcount";
 
     public const string ArgumentNameVerbose = "verbose";
