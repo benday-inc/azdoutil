@@ -108,6 +108,10 @@
     "aging-work-no-team-specified": {
       "commandName": "Project",
       "commandLineArgs": "agingwork /teamproject:20230601e"
+    },
+    "suggest-sle": {
+      "commandName": "Project",
+      "commandLineArgs": "suggest-sle /teamproject:20230601e /numberofdays:80"
     }
   }
 }

@@ -46,6 +46,7 @@ public class CalculateSuggestedServiceLevelExpectationCommand : AzureDevOpsComma
         _NumberOfWeeksOfForecast = Arguments.GetInt32Value(Constants.ArgumentNameForecastNumberOfWeeks);
         _NumberOfDaysOfHistory = Arguments.GetInt32Value(Constants.ArgumentNameCycleTimeNumberOfDays);
         _TeamProjectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);
+        _SlePercent = Arguments.GetInt32Value(Constants.ArgumentNamePercent);
 
         var args = ExecutionInfo.GetCloneOfArguments(Constants.CommandArgumentNameGetCycleTimeAndThroughput, true);
 
@@ -60,124 +61,46 @@ public class CalculateSuggestedServiceLevelExpectationCommand : AzureDevOpsComma
             throw new KnownException("No data");
         }
 
-        DataGroupedByWeek = getDataCommand.GroupedByWeek;
+        _Data = getDataCommand.Data;
 
-        CreateForecast();
-        DisplayForecast();
-    }
+        var suggestedSleCycleTime = GetSuggestedSle();
 
-    private void DisplayForecast()
-    {        
-        var distribution = GetDistribution();
-
-        WriteLine(string.Empty);
-        WriteLine($"How many items will we likely get done in {_NumberOfWeeksOfForecast} week(s)?");
-        WriteLine(string.Empty);
-
-        var throughput50PercentChance = GetThroughput(distribution, 
-            Constants.ForecastNumberOfSimulationsFiftyPercent);
-
-        var throughput80PercentChance = GetThroughput(distribution,
-            Constants.ForecastNumberOfSimulationsEightyPercent);
-
-        var throughput90PercentChance = GetThroughput(distribution,
-            Constants.ForecastNumberOfSimulationsNinetyPercent);
-
-        var throughput100PercentChance = GetThroughput(distribution,
-            Constants.ForecastNumberOfSimulationsHundredPercent);
-
-        var sortedKeys = distribution.Keys.OrderBy(x => x);
-
-        var maxOccurrences = distribution.Values.Max();
-
-        WriteLine($"50% sure {throughput50PercentChance} item(s) can be done");
-        WriteLine($"80% sure {throughput80PercentChance} item(s) can be done");
-        WriteLine($"90% sure {throughput90PercentChance} item(s) can be done");
-        WriteLine($"~99% sure {throughput100PercentChance} item(s) can be done");
-
-        WriteLine(string.Empty);
-    }
-
-    private int GetThroughput(Dictionary<int, int> distribution, 
-        int getThroughputAtSimulationCount)
-    {
-        var sortedKeys = distribution.Keys.OrderByDescending(x => x);
-
-        int total = 0;
-
-        foreach (var key in sortedKeys)
+        if (IsQuietMode == false)
         {
-            var value = distribution[key];
+            WriteLine($"{_SlePercent}% of items are completed in {suggestedSleCycleTime} days or less.");
+        }
+    }    
 
-            total+= value;
+    private double GetSuggestedSle()
+    {
+        int dataItemCount = _Data.Items.Length;
 
-            if (total >= getThroughputAtSimulationCount)
-            {
-                return key;
-            }
+        if (dataItemCount < 10 && IsQuietMode == false)
+        {
+            WriteLine($"Warning: there are only {dataItemCount} items for the cycle time calculation. " +
+                $"Due to percentage rounding, the actual reported SLE may be slightly off.");
         }
 
-        throw new InvalidOperationException($"Something went wrong. Never found a simulation count >= {getThroughputAtSimulationCount}.");
-    }
+        var indexForPercentForecast =
+            Utilities.GetIndexForPercentForecast(dataItemCount, _SlePercent);
 
-    private Dictionary<int, int> GetDistribution()
-    {
-        // key = throughput
-        // value = number of times this thruput happened
-
-        var distribution = new Dictionary<int, int>();
-
-        foreach (var group in _forecasts)
+        if (indexForPercentForecast < 0)
         {
-            int throughput = group.TotalThroughput;
-
-            if (distribution.ContainsKey(throughput) == false)
-            {
-                distribution.Add(throughput, 1);
-            }
-            else
-            {
-                distribution[throughput] += 1;
-            }
+            throw new KnownException($"Could calculate an SLE for {dataItemCount} items and {_SlePercent}.");
         }
-
-        return distribution;
-    }
-
-    private void CreateForecast()
-    {
-        using var rnd = new CryptoRandomNumberGenerator();
-
-        var numberOfHistoryWeeks = DataGroupedByWeek.Count;
-
-        var iterationKeys = DataGroupedByWeek.Keys.ToArray();
-
-        int iterationIndex;
-
-        ForecastGroup forecastGroup;
-
-        for (int i = 0; i < Constants.ForecastNumberOfSimulations; i++)
+        else
         {
-            forecastGroup = new ForecastGroup();
+            var cycleTimes = _Data.Items.OrderBy(x => x.CycleTimeDays)
+                .Select(x => x.CycleTimeDays)
+                .ToArray();
 
-            for (int x = 0; x < _NumberOfWeeksOfForecast; x++)
-            {
-                iterationIndex = rnd.GetNumberInRange(0, numberOfHistoryWeeks - 1);
-
-                var iteration = DataGroupedByWeek[iterationKeys[iterationIndex]];
-
-                forecastGroup.Add(new IterationForecast(
-                    iteration.Items.Count));                
-            }
-
-            _forecasts.Add(forecastGroup);
+            return Math.Round(cycleTimes[indexForPercentForecast], 2);
         }
     }
 
     private int _NumberOfWeeksOfForecast;
     private int _NumberOfDaysOfHistory;
-    private string _TeamProjectName;
-
-    public Dictionary<DateTime, ThroughputIteration> DataGroupedByWeek { get; private set; } = new();
-    private readonly List<ForecastGroup> _forecasts = new();
+    private string _TeamProjectName = string.Empty;
+    private int _SlePercent;
+    private CycleTimeDataResponse? _Data;    
 }
