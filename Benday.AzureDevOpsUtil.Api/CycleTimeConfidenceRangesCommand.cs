@@ -7,7 +7,7 @@ using Benday.CommandsFramework;
 namespace Benday.AzureDevOpsUtil.Api;
 
 [Command(Name = Constants.CommandArgumentNameCycleTimeConfidenceRangesCommand,
-        Description = "Get item cycle time for 50% and 85% levels.",
+        Description = "Get item cycle time for 50% and 85% levels. This helps you understand how items typically are delivered.",
         IsAsync = true)]
 public class CycleTimeConfidenceRangesCommand : AzureDevOpsCommandBase
 {
