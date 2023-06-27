@@ -65,14 +65,23 @@ public class CalculateSuggestedServiceLevelExpectationCommand : AzureDevOpsComma
 
         var suggestedSleCycleTime = GetSuggestedSle();
 
+        CycleTimeAtPercent = suggestedSleCycleTime;
+
         if (IsQuietMode == false)
         {
             WriteLine($"{_SlePercent}% of items are completed in {suggestedSleCycleTime} days or less.");
         }
-    }    
+    }
+
+    public double CycleTimeAtPercent { get; private set; } = -1;
 
     private double GetSuggestedSle()
     {
+        if (_Data == null)
+        {
+            throw new InvalidOperationException("Data is null.");
+        }   
+
         int dataItemCount = _Data.Items.Length;
 
         if (dataItemCount < 10 && IsQuietMode == false)
