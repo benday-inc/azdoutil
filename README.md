@@ -38,17 +38,20 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | Command Name | Description |
 | --- | --- |
 | [addconfig](#addconfig) | Add or update an Azure DevOps configuration. For example, which server or account plus auth information. |
+| [suggest-sle](#suggest-sle) | Calculate a suggested service level expectation (SLE) based on cycle time |
 | [changeprocess](#changeprocess) | Change the process for a Team Project |
 | [addrefinementprocess](#addrefinementprocess) | Creates backlog refinement process template as described at https://www.benday.com/2022/09/29/streamlining-backlog-refinement-with-azure-devops/ |
 | [creategitrepo](#creategitrepo) | Creates a Git repository in an Azure DevOps Team Project. |
 | [createteam](#createteam) | Creates a new team in an Azure DevOps Team Project. |
 | [createproject](#createproject) | Create team projects |
+| [cycletimeconfidence](#cycletimeconfidence) | Get item cycle time for 50% and 85% levels. This helps you understand how items typically are delivered. |
 | [deleteproject](#deleteproject) | Delete team project |
 | [exportbuilddef](#exportbuilddef) | Export build definition |
 | [exportworkitemquery](#exportworkitemquery) | Export work item query results |
 | [forecastdurationforitemcount](#forecastdurationforitemcount) | Use throughput data to forecast likely number of weeks to get given number of items done using Monte Carlo simulation |
 | [forecastitemsinweeks](#forecastitemsinweeks) | Use throughput data to forecast likely number of items done in given number of weeks using Monte Carlo simulation |
 | [forecastworkitem](#forecastworkitem) | Use throughput data to forecast when a work item is likely to be done based on the current backlog priority using Monte Carlo simulation |
+| [agingwork](#agingwork) | Get aging in-progress work items |
 | [getareas](#getareas) | Gets a list of areas in an Azure DevOps Team Project. |
 | [connectiondata](#connectiondata) | Get information about a connection to Azure DevOps. |
 | [throughputcycletime](#throughputcycletime) | Get cycle time and throughput data for a team project for a date range |
@@ -82,6 +85,17 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | pat | Optional | String | PAT for this collection |
 | windowsauth | Optional | Boolean | Use windows authentication with the current logged in user |
 | url | Required | String | URL for this collection (example: https://dev.azure.com/accountname) |
+## <a name="suggest-sle"></a> suggest-sle
+**Calculate a suggested service level expectation (SLE) based on cycle time**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| numberofdays | Required | Int32 | Number of days of history to compute |
+| teamproject | Required | String | Team project name |
+| teamname | Optional | String | Team name |
+| percent | Optional | Int32 | Percentage level to calculate. (For example, 85% of our items complete in X days) |
 ## <a name="changeprocess"></a> changeprocess
 **Change the process for a Team Project**
 ### Arguments
@@ -126,6 +140,16 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | config | Optional | String | Configuration name to use |
 | teamproject | Required | String | Team project name |
 | processname | Required | String | Process template name |
+## <a name="cycletimeconfidence"></a> cycletimeconfidence
+**Get item cycle time for 50% and 85% levels. This helps you understand how items typically are delivered.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| numberofdays | Required | Int32 | Number of days of history to compute |
+| teamproject | Required | String | Team project name |
+| teamname | Optional | String | Team name |
 ## <a name="deleteproject"></a> deleteproject
 **Delete team project**
 ### Arguments
@@ -188,6 +212,15 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | config | Optional | String | Configuration name to use |
 | numberofdays | Required | Int32 | Number of days of history to compute |
 | id | Required | Int32 | Id of the work item to forecast |
+| teamname | Optional | String | Team name |
+## <a name="agingwork"></a> agingwork
+**Get aging in-progress work items**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Required | String | Team project name |
 | teamname | Optional | String | Team name |
 ## <a name="getareas"></a> getareas
 **Gets a list of areas in an Azure DevOps Team Project.**

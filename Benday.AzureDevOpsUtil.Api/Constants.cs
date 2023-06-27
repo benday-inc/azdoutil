@@ -45,6 +45,9 @@ public static class Constants
     public const string CommandArgumentNameGetAgingWorkItemsCommand = "agingwork";
     public const string CommandArgumentNameForecastWorkItemDelivery = "forecastworkitem";
     public const string CommandArgumentNameGetForecastItemCountInWeeks = "forecastitemsinweeks";
+    public const string CommandArgumentNameSuggestServiceLevelExpectation = "suggest-sle";
+    public const string CommandArgumentNameCycleTimeConfidenceRangesCommand = "cycletimeconfidence";
+
     public const string CommandArgumentNameGetForecastDurationForItemCount = "forecastdurationforitemcount";
 
     public const string ArgumentNameVerbose = "verbose";
@@ -64,6 +67,7 @@ public static class Constants
     public const string ArgumentNameOutputRaw = "raw";
     public const string ArgumentNameBuildDefinitionName = "name";
     public const string ArgumentNameTeamName = "teamname";
+    public const string ArgumentNamePercent = "percent";
     public const string ArgumentNameTeamDescription = "description";
     public const string ArgumentNameShowLastRunInfo = "showlastruninfo";
     public const string ArgumentNameOutputCsv = "csv";
