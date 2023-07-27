@@ -8,7 +8,9 @@ using Benday.CommandsFramework;
 
 namespace Benday.AzureDevOpsUtil.Api;
 
-[Command(Name = Constants.CommandArgumentNameListWorkItemQueries, 
+[Command(
+    Category = Constants.Category_WorkItems,
+    Name = Constants.CommandArgumentNameListWorkItemQueries, 
     Description = "Gets a list of all work item queries in an Azure DevOps Team Project.", 
     IsAsync = true)]
 public class ListWorkItemQueriesCommand : AzureDevOpsCommandBase

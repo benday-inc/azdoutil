@@ -8,7 +8,9 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Benday.AzureDevOpsUtil.Api;
 
-[Command(Name = Constants.CommandArgumentNameGetCycleTimeAndThroughput,
+[Command(
+    Category = Constants.Category_FlowMetrics,
+    Name = Constants.CommandArgumentNameGetCycleTimeAndThroughput,
         Description = "Get cycle time and throughput data for a team project for a date range",
         IsAsync = true)]
 public class GetCycleTimeAndThroughputCommand : AzureDevOpsCommandBase

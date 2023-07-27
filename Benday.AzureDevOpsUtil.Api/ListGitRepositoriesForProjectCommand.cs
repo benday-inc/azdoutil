@@ -6,7 +6,9 @@ using Benday.CommandsFramework;
 
 namespace Benday.AzureDevOpsUtil.Api;
 
-[Command(Name = Constants.CommandArgumentName_ListGitRepos,
+[Command(
+    Category = Constants.Category_VersionControl,
+    Name = Constants.CommandArgumentName_ListGitRepos,
     IsAsync = true,
     Description = "Gets list of Git repositories from an Azure DevOps Team Project.")]
 public class ListGitRepositoriesForProjectCommand : AzureDevOpsCommandBase

@@ -8,7 +8,9 @@ using Benday.CommandsFramework;
 
 namespace Benday.AzureDevOpsUtil.Api;
 
-[Command(Name = Constants.CommandArgumentNameImportTfvcToGit, 
+[Command(
+    Category = Constants.Category_VersionControl,
+    Name = Constants.CommandArgumentNameImportTfvcToGit, 
     Description = "Converts a Team Foundation Version Control (TFVC) folder to a Git repository.", 
     IsAsync = true)]
 public class ImportTfvcToGitCommand : AzureDevOpsCommandBase

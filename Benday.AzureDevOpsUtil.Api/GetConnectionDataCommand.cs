@@ -6,7 +6,9 @@ using Benday.CommandsFramework;
 
 namespace Benday.AzureDevOpsUtil.Api;
 
-[Command(Name = Constants.CommandName_ConnectionData,
+[Command(
+    Category = Constants.Category_Misc,
+    Name = Constants.CommandName_ConnectionData,
     IsAsync = true,
     Description = "Get information about a connection to Azure DevOps.")]
 public class GetConnectionDataCommand : AzureDevOpsCommandBase

@@ -5,7 +5,9 @@ using Benday.CommandsFramework;
 
 namespace Benday.AzureDevOpsUtil.Api;
 
-[Command(Name = Constants.CommandName_ChangeProjectProcess,
+[Command(
+    Category = Constants.Category_ProcessTemplates,
+    Name = Constants.CommandName_ChangeProjectProcess,
         Description = "Change the process for a Team Project",
         IsAsync = true)]
 public class ChangeProjectProcessCommand : AzureDevOpsCommandBase

@@ -6,9 +6,11 @@ using OfficeOpenXml.Utils;
 
 namespace Benday.AzureDevOpsUtil.Api;
 
-[Command(Name = Constants.CommandArgumentNameAddUpdateConfig,
-        Description = "Add or update an Azure DevOps configuration. For example, which server or account plus auth information.",
-        IsAsync = false)]
+[Command(
+    Category = Constants.Category_AzdoUtilConfig,
+    Name = Constants.CommandArgumentNameAddUpdateConfig,
+    Description = "Add or update an Azure DevOps configuration. For example, which server or account plus auth information.",
+    IsAsync = false)]
 public class AddUpdateConfigurationCommand : SynchronousCommand
 {
     public AddUpdateConfigurationCommand(

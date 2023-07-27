@@ -6,7 +6,9 @@ using Benday.CommandsFramework;
 
 namespace Benday.AzureDevOpsUtil.Api;
 
-[Command(Name = Constants.CommandArgumentName_CreateTeam,
+[Command(
+    Category = Constants.Category_ProjectAdmin,
+    Name = Constants.CommandArgumentName_CreateTeam,
     IsAsync = true,
     Description = "Creates a new team in an Azure DevOps Team Project.")]
 public class CreateTeamCommand : AzureDevOpsCommandBase

@@ -3,7 +3,9 @@ using Benday.CommandsFramework;
 
 namespace Benday.AzureDevOpsUtil.Api;
 
-[Command(Name = Constants.CommandName_ListProjects,
+[Command(
+    Category = Constants.Category_ProjectAdmin,
+    Name = Constants.CommandName_ListProjects,
         Description = "List team projects",
         IsAsync = true)]
 public class ListTeamProjectsCommand : AzureDevOpsCommandBase

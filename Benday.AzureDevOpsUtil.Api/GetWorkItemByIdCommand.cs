@@ -6,7 +6,9 @@ using System.Xml.Linq;
 namespace Benday.AzureDevOpsUtil.Api;
 
 
-[Command(Name = Constants.CommandName_GetWorkItemById,
+[Command(
+    Category = Constants.Category_WorkItems,
+    Name = Constants.CommandName_GetWorkItemById,
         Description = "Get work item by id",
         IsAsync = true)]
 public class GetWorkItemByIdCommand : AzureDevOpsCommandBase

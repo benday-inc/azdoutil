@@ -6,7 +6,9 @@ using Benday.CommandsFramework;
 
 namespace Benday.AzureDevOpsUtil.Api;
 
-[Command(Name = Constants.CommandArgumentNameListBuildDefinitions,
+[Command(
+    Category = Constants.Category_Builds,
+    Name = Constants.CommandArgumentNameListBuildDefinitions,
         Description = "List build definitions",
         IsAsync = true)]
 public class ListBuildDefinitionsCommand : AzureDevOpsCommandBase

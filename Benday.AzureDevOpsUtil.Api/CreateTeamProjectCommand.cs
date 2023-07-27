@@ -4,7 +4,9 @@ using Benday.CommandsFramework;
 namespace Benday.AzureDevOpsUtil.Api;
 
 
-[Command(Name = Constants.CommandName_CreateProject,
+[Command(
+    Category = Constants.Category_ProjectAdmin,
+    Name = Constants.CommandName_CreateProject,
         Description = "Create team projects",
         IsAsync = true)]
 public class CreateTeamProjectCommand : AzureDevOpsCommandBase

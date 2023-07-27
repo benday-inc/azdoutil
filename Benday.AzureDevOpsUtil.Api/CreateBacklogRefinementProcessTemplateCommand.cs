@@ -3,7 +3,9 @@ using Benday.CommandsFramework;
 
 namespace Benday.AzureDevOpsUtil.Api;
 
-[Command(Name = Constants.CommandArgumentNameCreateBacklogRefinementProcessTemplate,
+[Command(
+    Category = Constants.Category_ProcessTemplates,
+    Name = Constants.CommandArgumentNameCreateBacklogRefinementProcessTemplate,
         Description = "Creates backlog refinement process template as described at https://www.benday.com/2022/09/29/streamlining-backlog-refinement-with-azure-devops/",
         IsAsync = true)]
 public class CreateBacklogRefinementProcessTemplateCommand : AzureDevOpsCommandBase

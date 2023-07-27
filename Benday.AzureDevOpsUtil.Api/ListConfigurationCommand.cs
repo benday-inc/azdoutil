@@ -2,7 +2,9 @@
 
 namespace Benday.AzureDevOpsUtil.Api;
 
-[Command(Name = Constants.CommandArgumentNameListConfig,
+[Command(
+    Category = Constants.Category_AzdoUtilConfig,
+    Name = Constants.CommandArgumentNameListConfig,
         Description = "List an Azure DevOps configuration. For example, which server or account plus auth information.",
         IsAsync = false)]
 public class ListConfigurationCommand : SynchronousCommand
