@@ -8,6 +8,39 @@ info@benday.com
 
 *Got ideas for Azure DevOps utilities you'd like to see? Found a bug? Let us know by submitting an issue https://github.com/benday-inc/azdoutil/issues*. *Want to contribute? Submit a pull request.*
 
+## Command Categories
+
+<dl>
+
+<dt>Azure DevOps Utility Configuration</dt>
+<dd>Commands for setting up this tool and connecting to Azure DevOps</dd>
+
+<dt>Automated Builds</dt>
+<dd>Commands that help with automated builds and automated releases</dd>
+
+<dt>Flow Metrics</dt>
+<dd>Tools for forecasting project management details using Flow Metrics such as throughput and cycle time. <p /><p><i>Want to learn more about how to use Flow Metrics to run your projects? Check out this course: <br />
+    <b><a href="https://courses.benday.com/c/flow-metrics-2023">Predicting the Future, Estimating, and Running Your Projects with Flow Metrics</a></b>.</i></p></dd>
+
+<dt>Process Templates</dt>
+<dd>Process template customization and administration utilities</dd>
+
+<dt>Team Project Administration</dt>
+<dd>Tools for creating, editing, and managing Team Projects in Azure DevOps</dd>
+
+<dt>Test Data</dt>
+<dd>Utilities for populating Azure DevOps Team Projects with test data</dd>
+
+<dt>Version Control</dt>
+<dd>Tools for creating, converting, managing version control repositories</dd>
+
+<dt>Work Items</dt>
+<dd>Utilities for editing work items and working with work item queries (WIQL)</dd>
+
+<dt>Miscellaneous</dt>
+<dd>Miscellaneous commands</dd>
+</dl>
+
 ## Installing
 The azdoutil is distributed as a .NET Core Tool via NuGet. To install it go to the command prompt and type  
 `dotnet tool install azdoutil -g`
@@ -76,6 +109,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | Work Items | setiteration | Create iteration including start and end date |
 | Work Items | setworkitemstate | Set the state value on an existing work item |
 | Work Items | showworkitemquery | Show work item query |
+# AzdoUtil Configuration
 ## addconfig
 **Add or update an Azure DevOps configuration. For example, which server or account plus auth information.**
 ### Arguments
@@ -85,80 +119,19 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | pat | Optional | String | PAT for this collection |
 | windowsauth | Optional | Boolean | Use windows authentication with the current logged in user |
 | url | Required | String | URL for this collection (example: https://dev.azure.com/accountname) |
-## suggest-sle
-**Calculate a suggested service level expectation (SLE) based on cycle time**
+## listconfig
+**List an Azure DevOps configuration. For example, which server or account plus auth information.**
 ### Arguments
 | Argument | Is Optional | Data Type | Description |
 | --- | --- | --- | --- |
-| quiet | Optional | Boolean | Quiet mode |
-| config | Optional | String | Configuration name to use |
-| numberofdays | Required | Int32 | Number of days of history to compute |
-| teamproject | Required | String | Team project name |
-| teamname | Optional | String | Team name |
-| percent | Optional | Int32 | Percentage level to calculate. (For example, 85% of our items complete in X days) |
-## changeprocess
-**Change the process for a Team Project**
+| config | Optional | String | Name of the configuration |
+## removeconfig
+**Remove an Azure DevOps configuration. For example, which server or account plus auth information.**
 ### Arguments
 | Argument | Is Optional | Data Type | Description |
 | --- | --- | --- | --- |
-| quiet | Optional | Boolean | Quiet mode |
-| config | Optional | String | Configuration name to use |
-| teamproject | Required | String | Team project name |
-| processname | Required | String | New process name |
-## addrefinementprocess
-**Creates backlog refinement process template as described at https://www.benday.com/2022/09/29/streamlining-backlog-refinement-with-azure-devops/**
-### Arguments
-| Argument | Is Optional | Data Type | Description |
-| --- | --- | --- | --- |
-| quiet | Optional | Boolean | Quiet mode |
-| config | Optional | String | Configuration name to use |
-## creategitrepo
-**Creates a Git repository in an Azure DevOps Team Project.**
-### Arguments
-| Argument | Is Optional | Data Type | Description |
-| --- | --- | --- | --- |
-| quiet | Optional | Boolean | Quiet mode |
-| config | Optional | String | Configuration name to use |
-| teamproject | Required | String | Team project name that contains the git repositories |
-| reponame | Required | String | Name of the new git repository |
-## createteam
-**Creates a new team in an Azure DevOps Team Project.**
-### Arguments
-| Argument | Is Optional | Data Type | Description |
-| --- | --- | --- | --- |
-| quiet | Optional | Boolean | Quiet mode |
-| config | Optional | String | Configuration name to use |
-| teamproject | Required | String | Team project name that contains the team |
-| teamname | Required | String | Name of the new team |
-| description | Optional | String | Description for the new team |
-## createproject
-**Create team projects**
-### Arguments
-| Argument | Is Optional | Data Type | Description |
-| --- | --- | --- | --- |
-| quiet | Optional | Boolean | Quiet mode |
-| config | Optional | String | Configuration name to use |
-| teamproject | Required | String | Team project name |
-| processname | Required | String | Process template name |
-## cycletimeconfidence
-**Get item cycle time for 50% and 85% levels. This helps you understand how items typically are delivered.**
-### Arguments
-| Argument | Is Optional | Data Type | Description |
-| --- | --- | --- | --- |
-| quiet | Optional | Boolean | Quiet mode |
-| config | Optional | String | Configuration name to use |
-| numberofdays | Required | Int32 | Number of days of history to compute |
-| teamproject | Required | String | Team project name |
-| teamname | Optional | String | Team name |
-## deleteproject
-**Delete team project**
-### Arguments
-| Argument | Is Optional | Data Type | Description |
-| --- | --- | --- | --- |
-| quiet | Optional | Boolean | Quiet mode |
-| config | Optional | String | Configuration name to use |
-| teamproject | Required | String | Team project name to delete |
-| confirm | Optional | Boolean | Confirm delete |
+| config | Required | String | Name of the configuration |
+# Builds
 ## exportbuilddef
 **Export build definition**
 ### Arguments
@@ -171,16 +144,34 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | csv | Optional | Boolean | Output results in CSV format |
 | csv-noheader | Optional | Boolean | Do not print the CSV column header info |
 | raw | Optional | Boolean | Output raw build definition |
-## exportworkitemquery
-**Export work item query results**
+## listbuilddefs
+**List build definitions**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| teamproject | Required | String | Team project name |
+| nameonly | Optional | Boolean | Only display the build definition name |
+| xaml | Optional | Boolean | List XAML build definitions |
+# Flow Metrics
+## agingwork
+**Get aging in-progress work items**
 ### Arguments
 | Argument | Is Optional | Data Type | Description |
 | --- | --- | --- | --- |
 | quiet | Optional | Boolean | Quiet mode |
 | config | Optional | String | Configuration name to use |
-| teamproject | Required | String | Team project name to delete |
-| queryname | Required | String | Work item query name |
-| exporttopath | Required | String | Export to path |
+| teamproject | Required | String | Team project name |
+| teamname | Optional | String | Team name |
+## cycletimeconfidence
+**Get item cycle time for 50% and 85% levels. This helps you understand how items typically are delivered.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| numberofdays | Required | Int32 | Number of days of history to compute |
+| teamproject | Required | String | Team project name |
+| teamname | Optional | String | Team name |
 ## forecastdurationforitemcount
 **Use throughput data to forecast likely number of weeks to get given number of items done using Monte Carlo simulation**
 ### Arguments
@@ -213,31 +204,17 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | numberofdays | Required | Int32 | Number of days of history to compute |
 | id | Required | Int32 | Id of the work item to forecast |
 | teamname | Optional | String | Team name |
-## agingwork
-**Get aging in-progress work items**
+## suggest-sle
+**Calculate a suggested service level expectation (SLE) based on cycle time**
 ### Arguments
 | Argument | Is Optional | Data Type | Description |
 | --- | --- | --- | --- |
 | quiet | Optional | Boolean | Quiet mode |
 | config | Optional | String | Configuration name to use |
+| numberofdays | Required | Int32 | Number of days of history to compute |
 | teamproject | Required | String | Team project name |
 | teamname | Optional | String | Team name |
-## getareas
-**Gets a list of areas in an Azure DevOps Team Project.**
-### Arguments
-| Argument | Is Optional | Data Type | Description |
-| --- | --- | --- | --- |
-| quiet | Optional | Boolean | Quiet mode |
-| config | Optional | String | Configuration name to use |
-| teamproject | Required | String | Team project name that contains the iterations |
-| verbose | Optional | Boolean | Verbose output |
-## connectiondata
-**Get information about a connection to Azure DevOps.**
-### Arguments
-| Argument | Is Optional | Data Type | Description |
-| --- | --- | --- | --- |
-| quiet | Optional | Boolean | Quiet mode |
-| config | Optional | String | Configuration name to use |
+| percent | Optional | Int32 | Percentage level to calculate. (For example, 85% of our items complete in X days) |
 ## throughputcycletime
 **Get cycle time and throughput data for a team project for a date range**
 ### Arguments
@@ -248,15 +225,60 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | numberofdays | Required | Int32 | Number of days of history to compute |
 | teamproject | Required | String | Team project name |
 | teamname | Optional | String | Team name |
-## getiterations
-**Gets a list of iterations in an Azure DevOps Team Project.**
+# Miscellaneous
+## connectiondata
+**Get information about a connection to Azure DevOps.**
 ### Arguments
 | Argument | Is Optional | Data Type | Description |
 | --- | --- | --- | --- |
 | quiet | Optional | Boolean | Quiet mode |
 | config | Optional | String | Configuration name to use |
-| teamproject | Required | String | Team project name that contains the iterations |
-| verbose | Optional | Boolean | Verbose output |
+# Process Templates
+## addrefinementprocess
+**Creates backlog refinement process template as described at https://www.benday.com/2022/09/29/streamlining-backlog-refinement-with-azure-devops/**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+## changeprocess
+**Change the process for a Team Project**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Required | String | Team project name |
+| processname | Required | String | New process name |
+# Project Administration
+## createproject
+**Create team projects**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Required | String | Team project name |
+| processname | Required | String | Process template name |
+## createteam
+**Creates a new team in an Azure DevOps Team Project.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Required | String | Team project name that contains the team |
+| teamname | Required | String | Name of the new team |
+| description | Optional | String | Description for the new team |
+## deleteproject
+**Delete team project**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Required | String | Team project name to delete |
+| confirm | Optional | Boolean | Confirm delete |
 ## getproject
 **Get team project info**
 ### Arguments
@@ -265,72 +287,6 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | quiet | Optional | Boolean | Quiet mode |
 | config | Optional | String | Configuration name to use |
 | teamproject | Required | String | Team project name |
-## getworkitem
-**Get work item by id**
-### Arguments
-| Argument | Is Optional | Data Type | Description |
-| --- | --- | --- | --- |
-| quiet | Optional | Boolean | Quiet mode |
-| config | Optional | String | Configuration name to use |
-| id | Required | Int32 | Work item id |
-## getfields
-**Gets a list of work item fields for a work item type in an Azure DevOps Team Project.**
-### Arguments
-| Argument | Is Optional | Data Type | Description |
-| --- | --- | --- | --- |
-| quiet | Optional | Boolean | Quiet mode |
-| config | Optional | String | Configuration name to use |
-| teamproject | Required | String | Team project name that contains the work item type |
-| workitemtypename | Required | String | Name of the work item type |
-## getworkitemstates
-**Gets the list of states for a work item type in an Azure DevOps Team Project.**
-### Arguments
-| Argument | Is Optional | Data Type | Description |
-| --- | --- | --- | --- |
-| quiet | Optional | Boolean | Quiet mode |
-| config | Optional | String | Configuration name to use |
-| teamproject | Required | String | Team project name that contains the work item type |
-| workitemtypename | Required | String | Name of the work item type |
-## getworkitemtypes
-**Gets a list of work item types in an Azure DevOps Team Project.**
-### Arguments
-| Argument | Is Optional | Data Type | Description |
-| --- | --- | --- | --- |
-| quiet | Optional | Boolean | Quiet mode |
-| config | Optional | String | Configuration name to use |
-| teamproject | Required | String | Team project name that contains the work item types |
-## tfvc-to-git
-**Converts a Team Foundation Version Control (TFVC) folder to a Git repository.**
-### Arguments
-| Argument | Is Optional | Data Type | Description |
-| --- | --- | --- | --- |
-| quiet | Optional | Boolean | Quiet mode |
-| config | Optional | String | Configuration name to use |
-| teamproject | Required | String | Team project name that contains the TFVC and Git repositories |
-| reponame | Required | String | Name of the new git repository |
-| tfvc-path | Required | String | Source TFVC folder to convert |
-## listbuilddefs
-**List build definitions**
-### Arguments
-| Argument | Is Optional | Data Type | Description |
-| --- | --- | --- | --- |
-| teamproject | Required | String | Team project name |
-| nameonly | Optional | Boolean | Only display the build definition name |
-| xaml | Optional | Boolean | List XAML build definitions |
-## listconfig
-**List an Azure DevOps configuration. For example, which server or account plus auth information.**
-### Arguments
-| Argument | Is Optional | Data Type | Description |
-| --- | --- | --- | --- |
-| config | Optional | String | Name of the configuration |
-## listgitrepos
-**Gets list of Git repositories from an Azure DevOps Team Project.**
-### Arguments
-| Argument | Is Optional | Data Type | Description |
-| --- | --- | --- | --- |
-| quiet | Optional | Boolean | Quiet mode |
-| config | Optional | String | Configuration name to use |
-| teamproject | Required | String | Team project name that contains the git repositories |
 ## listprocesstemplates
 **List process templates**
 ### Arguments
@@ -353,6 +309,128 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | quiet | Optional | Boolean | Quiet mode |
 | config | Optional | String | Configuration name to use |
 | teamproject | Required | String | Team project name that contains the teams |
+# Test Data
+## createfromexcel
+**Create work items using Excel script**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| skipfuturedates | Optional | Boolean | Skip script steps that occur in the future |
+| pathtoexcel | Required | String | Path to the Excel script |
+| startdate | Required | DateTime | Date for the start of the Excel script |
+| teamproject | Required | String | Name of the team project |
+| processname | Required | String | Process template name |
+| createproject | Required | Boolean | Creates the team project if it doesn't exist |
+## createfromgenerator
+**Create work items using random data generator**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| skipfuturedates | Optional | Boolean | Skip script steps that occur in the future |
+| numberofsprints | Required | Int32 | Number of sprints to generate |
+| teamproject | Required | String | Name of the team project |
+| processname | Required | String | Process template name |
+| createproject | Required | Boolean | Creates the team project if it doesn't exist |
+| teamcount | Optional | Int32 | Creates data for multiple teams. This option is only available when creating a new project. |
+| alldone | Optional | Boolean | All PBIs in a sprint makes it to done |
+| addsessiontag | Optional | Boolean | Add a session tag to work items |
+| output | Optional | String | Save generated script file to disk in this directory. Note the filename will be auto-generated. |
+| scriptonly | Optional | Boolean | Creates the excel export script. Requires an arg value for 'output' |
+# Version Control
+## creategitrepo
+**Creates a Git repository in an Azure DevOps Team Project.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Required | String | Team project name that contains the git repositories |
+| reponame | Required | String | Name of the new git repository |
+## listgitrepos
+**Gets list of Git repositories from an Azure DevOps Team Project.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Required | String | Team project name that contains the git repositories |
+## tfvc-to-git
+**Converts a Team Foundation Version Control (TFVC) folder to a Git repository.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Required | String | Team project name that contains the TFVC and Git repositories |
+| reponame | Required | String | Name of the new git repository |
+| tfvc-path | Required | String | Source TFVC folder to convert |
+# Work Items
+## exportworkitemquery
+**Export work item query results**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Required | String | Team project name to delete |
+| queryname | Required | String | Work item query name |
+| exporttopath | Required | String | Export to path |
+## getareas
+**Gets a list of areas in an Azure DevOps Team Project.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Required | String | Team project name that contains the iterations |
+| verbose | Optional | Boolean | Verbose output |
+## getfields
+**Gets a list of work item fields for a work item type in an Azure DevOps Team Project.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Required | String | Team project name that contains the work item type |
+| workitemtypename | Required | String | Name of the work item type |
+## getiterations
+**Gets a list of iterations in an Azure DevOps Team Project.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Required | String | Team project name that contains the iterations |
+| verbose | Optional | Boolean | Verbose output |
+## getworkitem
+**Get work item by id**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| id | Required | Int32 | Work item id |
+## getworkitemstates
+**Gets the list of states for a work item type in an Azure DevOps Team Project.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Required | String | Team project name that contains the work item type |
+| workitemtypename | Required | String | Name of the work item type |
+## getworkitemtypes
+**Gets a list of work item types in an Azure DevOps Team Project.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Required | String | Team project name that contains the work item types |
 ## listworkitemqueries
 **Gets a list of all work item queries in an Azure DevOps Team Project.**
 ### Arguments
@@ -361,12 +439,6 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | quiet | Optional | Boolean | Quiet mode |
 | config | Optional | String | Configuration name to use |
 | teamproject | Required | String | Team project name that contains the work item queries |
-## removeconfig
-**Remove an Azure DevOps configuration. For example, which server or account plus auth information.**
-### Arguments
-| Argument | Is Optional | Data Type | Description |
-| --- | --- | --- | --- |
-| config | Required | String | Name of the configuration |
 ## runworkitemquery
 **Run work item query**
 ### Arguments
@@ -407,33 +479,3 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | config | Optional | String | Configuration name to use |
 | teamproject | Required | String | Team project that contains the work item query |
 | queryname | Required | String | Work item query name |
-## createfromgenerator
-**Create work items using random data generator**
-### Arguments
-| Argument | Is Optional | Data Type | Description |
-| --- | --- | --- | --- |
-| quiet | Optional | Boolean | Quiet mode |
-| config | Optional | String | Configuration name to use |
-| skipfuturedates | Optional | Boolean | Skip script steps that occur in the future |
-| numberofsprints | Required | Int32 | Number of sprints to generate |
-| teamproject | Required | String | Name of the team project |
-| processname | Required | String | Process template name |
-| createproject | Required | Boolean | Creates the team project if it doesn't exist |
-| teamcount | Optional | Int32 | Creates data for multiple teams. This option is only available when creating a new project. |
-| alldone | Optional | Boolean | All PBIs in a sprint makes it to done |
-| addsessiontag | Optional | Boolean | Add a session tag to work items |
-| output | Optional | String | Save generated script file to disk in this directory. Note the filename will be auto-generated. |
-| scriptonly | Optional | Boolean | Creates the excel export script. Requires an arg value for 'output' |
-## createfromexcel
-**Create work items using Excel script**
-### Arguments
-| Argument | Is Optional | Data Type | Description |
-| --- | --- | --- | --- |
-| quiet | Optional | Boolean | Quiet mode |
-| config | Optional | String | Configuration name to use |
-| skipfuturedates | Optional | Boolean | Skip script steps that occur in the future |
-| pathtoexcel | Required | String | Path to the Excel script |
-| startdate | Required | DateTime | Date for the start of the Excel script |
-| teamproject | Required | String | Name of the team project |
-| processname | Required | String | Process template name |
-| createproject | Required | Boolean | Creates the team project if it doesn't exist |

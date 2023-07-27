@@ -13,15 +13,22 @@ public class MarkdownUsageFormatter
     {
         var builder = new StringBuilder();
 
+        var categories = usages.Select(x => x.Category).Distinct().Order();
+
         AppendCommandList(usages.OrderBy(x => x.Category).ThenBy(x => x.Name).ToList(), builder, skipCommandAnchors);
 
-        foreach (var usage in usages)
+        foreach (var category in categories)
         {
-            AppendUsage(builder, usage, skipCommandAnchors);
+            builder.AppendLine($"# {category}");
+
+            foreach (var usage in usages.Where(x => x.Category == category).OrderBy(x => x.Name))
+            {
+                AppendUsage(builder, usage, skipCommandAnchors);
+            }
         }
 
         return builder.ToString();
-    }    
+    }
 
     private void AppendCommandList(List<CommandInfo> usages, StringBuilder builder, bool skipCommandAnchors)
     {
@@ -39,7 +46,7 @@ public class MarkdownUsageFormatter
             else
             {
                 builder.AppendLine($"| {usage.Category} | [{usage.Name}](#{usage.Name}) | {usage.Description} |");
-            }            
+            }
         }
     }
 
@@ -55,7 +62,7 @@ public class MarkdownUsageFormatter
         }
 
         builder.AppendLine($"**{usage.Description}**");
-        
+
         builder.AppendLine("### Arguments");
 
         builder.AppendLine("| Argument | Is Optional | Data Type | Description |");
