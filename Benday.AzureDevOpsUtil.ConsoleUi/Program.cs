@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Text;
 
+using Benday.AzureDevOpsUtil.Api;
 using Benday.CommandsFramework;
 
 class Program
@@ -10,7 +11,9 @@ class Program
     {
         var util = new CommandAttributeUtility();
 
-        if (args.Length == 0)
+        if (args.Length == 0 ||
+            (args.Length == 1 ||
+            args.Contains(Benday.CommandsFramework.ArgumentFrameworkConstants.ArgumentHelpString)))
         {
             DisplayUsage(util);
         }
@@ -79,7 +82,6 @@ class Program
             {
                 Console.WriteLine(ex.Message);
             }
-
         }
     }
 
