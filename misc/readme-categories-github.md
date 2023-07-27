@@ -1,4 +1,4 @@
-## Command Categories GITHUB
+## Command Categories
 
 <dl>
 

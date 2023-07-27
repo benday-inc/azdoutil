@@ -8,38 +8,37 @@ info@benday.com
 
 *Got ideas for Azure DevOps utilities you'd like to see? Found a bug? Let us know by submitting an issue https://github.com/benday-inc/azdoutil/issues*. *Want to contribute? Submit a pull request.*
 
-## Command Categories NUGET
+## Command Categories
 
-<dl>
+* **Azure DevOps Utility Configuration** - 
+Commands for setting up this tool and connecting to Azure DevOps
 
-<dt>Azure DevOps Utility Configuration</dt>
-<dd>Commands for setting up this tool and connecting to Azure DevOps</dd>
+* **Automated Builds** - 
+Commands that help with automated builds and automated releases
 
-<dt>Automated Builds</dt>
-<dd>Commands that help with automated builds and automated releases</dd>
+* **Flow Metrics** - 
+Tools for forecasting project management details using Flow Metrics such as throughput and cycle time. 
 
-<dt>Flow Metrics</dt>
-<dd>Tools for forecasting project management details using Flow Metrics such as throughput and cycle time. <p /><p><i>Want to learn more about how to use Flow Metrics to run your projects? Check out this course: <br />
-    <b><a href="https://courses.benday.com/c/flow-metrics-2023">Predicting the Future, Estimating, and Running Your Projects with Flow Metrics</a></b>.</i></p></dd>
+_Want to learn more about how to use Flow Metrics to run your projects? Check out this course:   
+**[Predicting the Future, Estimating, and Running Your Projects with Flow Metrics](https://courses.benday.com/c/flow-metrics-2023)**._
 
-<dt>Process Templates</dt>
-<dd>Process template customization and administration utilities</dd>
+* **Process Templates** - 
+Process template customization and administration utilities
 
-<dt>Team Project Administration</dt>
-<dd>Tools for creating, editing, and managing Team Projects in Azure DevOps</dd>
+* **Team Project Administration** - 
+Tools for creating, editing, and managing Team Projects in Azure DevOps
 
-<dt>Test Data</dt>
-<dd>Utilities for populating Azure DevOps Team Projects with test data</dd>
+* **Test Data** - 
+Utilities for populating Azure DevOps Team Projects with test data
 
-<dt>Version Control</dt>
-<dd>Tools for creating, converting, managing version control repositories</dd>
+* **Version Control** - 
+Tools for creating, converting, managing version control repositories
 
-<dt>Work Items</dt>
-<dd>Utilities for editing work items and working with work item queries (WIQL)</dd>
+* **Work Items** - 
+Utilities for editing work items and working with work item queries (WIQL)
 
-<dt>Miscellaneous</dt>
-<dd>Miscellaneous commands</dd>
-</dl>
+* **Miscellaneous** - 
+Miscellaneous commands
 
 ## Installing
 The azdoutil is distributed as a .NET Core Tool via NuGet. To install it go to the command prompt and type  
