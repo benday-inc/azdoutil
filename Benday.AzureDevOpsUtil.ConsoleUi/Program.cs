@@ -88,7 +88,7 @@ class Program
     private static void DisplayUsage(CommandAttributeUtility util)
     {
         var versionInfo = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location);
-        
+
         Console.WriteLine($"Azure DevOps Utilities");
         Console.WriteLine($"https://www.benday.com");
         Console.WriteLine();
@@ -100,20 +100,30 @@ class Program
 
         var commands = util.GetAvailableCommandAttributes(assembly);
 
+        var categories = commands.Select(x => x.Category).Distinct().Order();
+
         var longestName = commands.Max(x => x.Name.Length);
 
         var consoleWidth = Console.WindowWidth;
         var separator = " - ";
         int commandNameColumnWidth = (longestName + separator.Length);
 
-        foreach (var command in commands.OrderBy(x => x.Name))
+        foreach (var category in categories)
         {
-            Console.Write(LineWrapUtilities.GetValueWithPadding(command.Name, longestName));
-            Console.Write(separator);
+            Console.WriteLine($"* {category} *");
+            Console.WriteLine();
 
-            Console.WriteLine(
-                LineWrapUtilities.WrapValue(commandNameColumnWidth,
-                consoleWidth, command.Description));
+            foreach (var command in commands.Where(x => x.Category == category).OrderBy(x => x.Name))
+            {
+                Console.Write(LineWrapUtilities.GetValueWithPadding(command.Name, longestName));
+                Console.Write(separator);
+
+                Console.WriteLine(
+                    LineWrapUtilities.WrapValue(commandNameColumnWidth,
+                    consoleWidth, command.Description));
+            }
+
+            Console.WriteLine();
         }
-    }    
+    }
 }

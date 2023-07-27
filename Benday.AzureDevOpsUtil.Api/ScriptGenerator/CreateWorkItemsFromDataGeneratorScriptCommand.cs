@@ -6,7 +6,9 @@ using Benday.CommandsFramework;
 
 namespace Benday.AzureDevOpsUtil.Api.ScriptGenerator;
 
-[Command(Name = Constants.CommandName_CreateWorkItemsFromDataGenerator,
+[Command(
+    Category = Constants.Category_TestData,
+    Name = Constants.CommandName_CreateWorkItemsFromDataGenerator,
         Description = "Create work items using random data generator",
         IsAsync = true)]
 public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandBase
