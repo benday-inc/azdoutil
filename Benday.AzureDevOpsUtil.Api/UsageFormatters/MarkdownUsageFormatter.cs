@@ -13,7 +13,7 @@ public class MarkdownUsageFormatter
     {
         var builder = new StringBuilder();
 
-        AppendCommandList(usages, builder, skipCommandAnchors);
+        AppendCommandList(usages.OrderBy(x => x.Category).ThenBy(x => x.Name).ToList(), builder, skipCommandAnchors);
 
         foreach (var usage in usages)
         {
@@ -27,18 +27,18 @@ public class MarkdownUsageFormatter
     {
         builder.AppendLine($"## Commands");
 
-        builder.AppendLine("| Command Name | Description |");
-        builder.AppendLine("| --- | --- |");
+        builder.AppendLine("| Category | Command Name | Description |");
+        builder.AppendLine("| --- | --- | --- |");
 
         foreach (var usage in usages)
         {
             if (skipCommandAnchors)
             {
-                builder.AppendLine($"| {usage.Name} | {usage.Description} |");
+                builder.AppendLine($"| {usage.Category} | {usage.Name} | {usage.Description} |");
             }
             else
             {
-                builder.AppendLine($"| [{usage.Name}](#{usage.Name}) | {usage.Description} |");
+                builder.AppendLine($"| {usage.Category} | [{usage.Name}](#{usage.Name}) | {usage.Description} |");
             }            
         }
     }

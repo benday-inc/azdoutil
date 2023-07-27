@@ -35,47 +35,47 @@ If you want to run a command against an Azure DevOps instance that is NOT your d
 To add new configuration or modify an existing configuration, use the `azdoutil addconfig` command. You can list your configurations using the `azdoutil listconfig` command. To delete a configuration, use the `azdoutil removeconfig` command.
 
 ## Commands
-| Command Name | Description |
-| --- | --- |
-| [addconfig](#addconfig) | Add or update an Azure DevOps configuration. For example, which server or account plus auth information. |
-| [suggest-sle](#suggest-sle) | Calculate a suggested service level expectation (SLE) based on cycle time |
-| [changeprocess](#changeprocess) | Change the process for a Team Project |
-| [addrefinementprocess](#addrefinementprocess) | Creates backlog refinement process template as described at https://www.benday.com/2022/09/29/streamlining-backlog-refinement-with-azure-devops/ |
-| [creategitrepo](#creategitrepo) | Creates a Git repository in an Azure DevOps Team Project. |
-| [createteam](#createteam) | Creates a new team in an Azure DevOps Team Project. |
-| [createproject](#createproject) | Create team projects |
-| [cycletimeconfidence](#cycletimeconfidence) | Get item cycle time for 50% and 85% levels. This helps you understand how items typically are delivered. |
-| [deleteproject](#deleteproject) | Delete team project |
-| [exportbuilddef](#exportbuilddef) | Export build definition |
-| [exportworkitemquery](#exportworkitemquery) | Export work item query results |
-| [forecastdurationforitemcount](#forecastdurationforitemcount) | Use throughput data to forecast likely number of weeks to get given number of items done using Monte Carlo simulation |
-| [forecastitemsinweeks](#forecastitemsinweeks) | Use throughput data to forecast likely number of items done in given number of weeks using Monte Carlo simulation |
-| [forecastworkitem](#forecastworkitem) | Use throughput data to forecast when a work item is likely to be done based on the current backlog priority using Monte Carlo simulation |
-| [agingwork](#agingwork) | Get aging in-progress work items |
-| [getareas](#getareas) | Gets a list of areas in an Azure DevOps Team Project. |
-| [connectiondata](#connectiondata) | Get information about a connection to Azure DevOps. |
-| [throughputcycletime](#throughputcycletime) | Get cycle time and throughput data for a team project for a date range |
-| [getiterations](#getiterations) | Gets a list of iterations in an Azure DevOps Team Project. |
-| [getproject](#getproject) | Get team project info |
-| [getworkitem](#getworkitem) | Get work item by id |
-| [getfields](#getfields) | Gets a list of work item fields for a work item type in an Azure DevOps Team Project. |
-| [getworkitemstates](#getworkitemstates) | Gets the list of states for a work item type in an Azure DevOps Team Project. |
-| [getworkitemtypes](#getworkitemtypes) | Gets a list of work item types in an Azure DevOps Team Project. |
-| [tfvc-to-git](#tfvc-to-git) | Converts a Team Foundation Version Control (TFVC) folder to a Git repository. |
-| [listbuilddefs](#listbuilddefs) | List build definitions |
-| [listconfig](#listconfig) | List an Azure DevOps configuration. For example, which server or account plus auth information. |
-| [listgitrepos](#listgitrepos) | Gets list of Git repositories from an Azure DevOps Team Project. |
-| [listprocesstemplates](#listprocesstemplates) | List process templates |
-| [listprojects](#listprojects) | List team projects |
-| [listteams](#listteams) | Gets list of teams in an Azure DevOps Team Project. |
-| [listworkitemqueries](#listworkitemqueries) | Gets a list of all work item queries in an Azure DevOps Team Project. |
-| [removeconfig](#removeconfig) | Remove an Azure DevOps configuration. For example, which server or account plus auth information. |
-| [runworkitemquery](#runworkitemquery) | Run work item query |
-| [setiteration](#setiteration) | Create iteration including start and end date |
-| [setworkitemstate](#setworkitemstate) | Set the state value on an existing work item |
-| [showworkitemquery](#showworkitemquery) | Show work item query |
-| [createfromgenerator](#createfromgenerator) | Create work items using random data generator |
-| [createfromexcel](#createfromexcel) | Create work items using Excel script |
+| Category | Command Name | Description |
+| --- | --- | --- |
+| AzdoUtil Configuration | [addconfig](#addconfig) | Add or update an Azure DevOps configuration. For example, which server or account plus auth information. |
+| AzdoUtil Configuration | [listconfig](#listconfig) | List an Azure DevOps configuration. For example, which server or account plus auth information. |
+| AzdoUtil Configuration | [removeconfig](#removeconfig) | Remove an Azure DevOps configuration. For example, which server or account plus auth information. |
+| Builds | [exportbuilddef](#exportbuilddef) | Export build definition |
+| Builds | [listbuilddefs](#listbuilddefs) | List build definitions |
+| Flow Metrics | [agingwork](#agingwork) | Get aging in-progress work items |
+| Flow Metrics | [cycletimeconfidence](#cycletimeconfidence) | Get item cycle time for 50% and 85% levels. This helps you understand how items typically are delivered. |
+| Flow Metrics | [forecastdurationforitemcount](#forecastdurationforitemcount) | Use throughput data to forecast likely number of weeks to get given number of items done using Monte Carlo simulation |
+| Flow Metrics | [forecastitemsinweeks](#forecastitemsinweeks) | Use throughput data to forecast likely number of items done in given number of weeks using Monte Carlo simulation |
+| Flow Metrics | [forecastworkitem](#forecastworkitem) | Use throughput data to forecast when a work item is likely to be done based on the current backlog priority using Monte Carlo simulation |
+| Flow Metrics | [suggest-sle](#suggest-sle) | Calculate a suggested service level expectation (SLE) based on cycle time |
+| Flow Metrics | [throughputcycletime](#throughputcycletime) | Get cycle time and throughput data for a team project for a date range |
+| Miscellaneous | [connectiondata](#connectiondata) | Get information about a connection to Azure DevOps. |
+| Process Templates | [addrefinementprocess](#addrefinementprocess) | Creates backlog refinement process template as described at https://www.benday.com/2022/09/29/streamlining-backlog-refinement-with-azure-devops/ |
+| Process Templates | [changeprocess](#changeprocess) | Change the process for a Team Project |
+| Project Administration | [createproject](#createproject) | Create team projects |
+| Project Administration | [createteam](#createteam) | Creates a new team in an Azure DevOps Team Project. |
+| Project Administration | [deleteproject](#deleteproject) | Delete team project |
+| Project Administration | [getproject](#getproject) | Get team project info |
+| Project Administration | [listprocesstemplates](#listprocesstemplates) | List process templates |
+| Project Administration | [listprojects](#listprojects) | List team projects |
+| Project Administration | [listteams](#listteams) | Gets list of teams in an Azure DevOps Team Project. |
+| Test Data | [createfromexcel](#createfromexcel) | Create work items using Excel script |
+| Test Data | [createfromgenerator](#createfromgenerator) | Create work items using random data generator |
+| Version Control | [creategitrepo](#creategitrepo) | Creates a Git repository in an Azure DevOps Team Project. |
+| Version Control | [listgitrepos](#listgitrepos) | Gets list of Git repositories from an Azure DevOps Team Project. |
+| Version Control | [tfvc-to-git](#tfvc-to-git) | Converts a Team Foundation Version Control (TFVC) folder to a Git repository. |
+| Work Items | [exportworkitemquery](#exportworkitemquery) | Export work item query results |
+| Work Items | [getareas](#getareas) | Gets a list of areas in an Azure DevOps Team Project. |
+| Work Items | [getfields](#getfields) | Gets a list of work item fields for a work item type in an Azure DevOps Team Project. |
+| Work Items | [getiterations](#getiterations) | Gets a list of iterations in an Azure DevOps Team Project. |
+| Work Items | [getworkitem](#getworkitem) | Get work item by id |
+| Work Items | [getworkitemstates](#getworkitemstates) | Gets the list of states for a work item type in an Azure DevOps Team Project. |
+| Work Items | [getworkitemtypes](#getworkitemtypes) | Gets a list of work item types in an Azure DevOps Team Project. |
+| Work Items | [listworkitemqueries](#listworkitemqueries) | Gets a list of all work item queries in an Azure DevOps Team Project. |
+| Work Items | [runworkitemquery](#runworkitemquery) | Run work item query |
+| Work Items | [setiteration](#setiteration) | Create iteration including start and end date |
+| Work Items | [setworkitemstate](#setworkitemstate) | Set the state value on an existing work item |
+| Work Items | [showworkitemquery](#showworkitemquery) | Show work item query |
 ## <a name="addconfig"></a> addconfig
 **Add or update an Azure DevOps configuration. For example, which server or account plus auth information.**
 ### Arguments
