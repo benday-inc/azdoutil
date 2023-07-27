@@ -95,7 +95,13 @@ public class MarkdownUsageFormatterFixture
             Directory.CreateDirectory(pathToGeneratedReadmeFiles);
         }
 
-        var readmeHeader = File.ReadAllText(Path.Combine(miscDir, "readme-header.md"));
+        var readmeHeaderGitHub = File.ReadAllText(Path.Combine(miscDir, "readme-header.md"));
+        var readmeHeaderCategoriesGithub = File.ReadAllText(Path.Combine(miscDir, "readme-categories-github.md"));
+        readmeHeaderGitHub = readmeHeaderGitHub.Replace("%%CATEGORIES%%", readmeHeaderCategoriesGithub);
+
+        var readmeHeaderNuGet = File.ReadAllText(Path.Combine(miscDir, "readme-header.md"));
+        var readmeHeaderCategoriesNuget = File.ReadAllText(Path.Combine(miscDir, "readme-categories-nuget.md"));
+        readmeHeaderNuGet = readmeHeaderNuGet.Replace("%%CATEGORIES%%", readmeHeaderCategoriesNuget);
 
         var readmeCommandsForNuget = SystemUnderTest.Format(usages, true);
         var readmeCommandsForGitHub = SystemUnderTest.Format(usages, false);
@@ -108,13 +114,11 @@ public class MarkdownUsageFormatterFixture
         Console.WriteLine($"pathToGitHubReadme: {pathToGitHubReadme}");
 
         File.WriteAllText(pathToNugetReadme,
-            readmeHeader + Environment.NewLine + readmeCommandsForNuget
-            );
-
-        
+            readmeHeaderNuGet + Environment.NewLine + readmeCommandsForNuget
+            );        
 
         File.WriteAllText(pathToGitHubReadme,
-            readmeHeader + Environment.NewLine + readmeCommandsForGitHub
+            readmeHeaderGitHub + Environment.NewLine + readmeCommandsForGitHub
             );
     }
 

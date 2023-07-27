@@ -8,7 +8,7 @@ info@benday.com
 
 *Got ideas for Azure DevOps utilities you'd like to see? Found a bug? Let us know by submitting an issue https://github.com/benday-inc/azdoutil/issues*. *Want to contribute? Submit a pull request.*
 
-## Command Categories
+## Command Categories NUGET
 
 <dl>
 
