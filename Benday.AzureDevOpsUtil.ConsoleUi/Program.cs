@@ -12,7 +12,7 @@ class Program
         var util = new CommandAttributeUtility();
 
         if (args.Length == 0 ||
-            (args.Length == 1 ||
+            (args.Length == 1 &&
             args.Contains(Benday.CommandsFramework.ArgumentFrameworkConstants.ArgumentHelpString)))
         {
             DisplayUsage(util);
