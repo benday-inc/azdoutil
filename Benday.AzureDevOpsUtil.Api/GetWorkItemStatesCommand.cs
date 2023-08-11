@@ -7,7 +7,9 @@ using OfficeOpenXml.Utils;
 
 namespace Benday.AzureDevOpsUtil.Api;
 
-[Command(Name = Constants.CommandArgumentNameGetWorkItemStates, 
+[Command(
+    Category = Constants.Category_WorkItems,
+    Name = Constants.CommandArgumentNameGetWorkItemStates, 
     Description = "Gets the list of states for a work item type in an Azure DevOps Team Project.", 
     IsAsync = true)]
 public class GetWorkItemStatesCommand : AzureDevOpsCommandBase

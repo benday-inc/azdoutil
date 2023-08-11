@@ -6,6 +6,17 @@ public static class Constants
     public const string ConfigFileName = "azdoutil-config.json";
     public const string DefaultConfigurationName = "(default)";
 
+    public const string Category_AzdoUtilConfig = "AzdoUtil Configuration";
+    public const string Category_Builds = "Builds";
+    public const string Category_FlowMetrics = "Flow Metrics";
+    public const string Category_Misc = "Miscellaneous";
+    public const string Category_ProcessTemplates = "Process Templates";
+    public const string Category_ProjectAdmin = "Project Administration";
+    public const string Category_TestData = "Test Data";
+    public const string Category_VersionControl = "Version Control";
+    public const string Category_WorkItems = "Work Items";
+
+
     public const string CommandArgumentNameShowConfig = "showconfig";
     public const string CommandArgumentNameAddUpdateConfig = "addconfig";
     public const string CommandArgumentNameRemoveConfig = "removeconfig";

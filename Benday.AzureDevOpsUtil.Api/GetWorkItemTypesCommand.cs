@@ -3,7 +3,9 @@ using Benday.CommandsFramework;
 
 namespace Benday.AzureDevOpsUtil.Api;
 
-[Command(Name = Constants.CommandArgumentNameGetWorkItemTypes,
+[Command(
+    Category = Constants.Category_WorkItems,
+    Name = Constants.CommandArgumentNameGetWorkItemTypes,
     Description = "Gets a list of work item types in an Azure DevOps Team Project.",
     IsAsync = true)]
 public class GetWorkItemTypesCommand : AzureDevOpsCommandBase

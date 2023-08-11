@@ -3,7 +3,9 @@
 using Benday.CommandsFramework;
 namespace Benday.AzureDevOpsUtil.Api;
 
-[Command(Name = Constants.CommandArgumentNameGetIterations,
+[Command(
+    Category = Constants.Category_WorkItems,
+    Name = Constants.CommandArgumentNameGetIterations,
     Description = "Gets a list of iterations in an Azure DevOps Team Project.",
     IsAsync = true)]
 public class GetIterationsCommand : GetClassificationNodesCommandBase

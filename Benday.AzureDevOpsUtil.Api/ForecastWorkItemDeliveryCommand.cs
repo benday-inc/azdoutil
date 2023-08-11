@@ -6,7 +6,9 @@ using Benday.CommandsFramework;
 
 namespace Benday.AzureDevOpsUtil.Api;
 
-[Command(Name = Constants.CommandArgumentNameForecastWorkItemDelivery,
+[Command(
+    Category = Constants.Category_FlowMetrics,
+    Name = Constants.CommandArgumentNameForecastWorkItemDelivery,
         Description = "Use throughput data to forecast when a work item is likely to be done based on the current backlog priority using Monte Carlo simulation",
         IsAsync = true)]
 public class ForecastWorkItemDeliveryCommand : AzureDevOpsCommandBase

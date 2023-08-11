@@ -9,7 +9,9 @@ using OfficeOpenXml.Utils;
 
 namespace Benday.AzureDevOpsUtil.Api;
 
-[Command(Name = Constants.CommandName_ExportWorkItemQuery,
+[Command(
+    Category = Constants.Category_WorkItems,
+    Name = Constants.CommandName_ExportWorkItemQuery,
         Description = "Export work item query results",
         IsAsync = true)]
 public class ExportWorkItemQueryCommand : AzureDevOpsCommandBase

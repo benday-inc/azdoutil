@@ -8,7 +8,9 @@ using Benday.CommandsFramework;
 
 namespace Benday.AzureDevOpsUtil.Api;
 
-[Command(Name = Constants.CommandArgumentNameCreateGitRepository, Description = "Creates a Git repository in an Azure DevOps Team Project.", IsAsync = true)]
+[Command(
+    Category = Constants.Category_VersionControl,
+    Name = Constants.CommandArgumentNameCreateGitRepository, Description = "Creates a Git repository in an Azure DevOps Team Project.", IsAsync = true)]
 public class CreateGitRepositoryCommand : AzureDevOpsCommandBase
 {
 

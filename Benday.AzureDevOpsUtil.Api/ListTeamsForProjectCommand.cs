@@ -6,7 +6,9 @@ using Benday.CommandsFramework;
 
 namespace Benday.AzureDevOpsUtil.Api;
 
-[Command(Name = Constants.CommandArgumentName_ListTeams,
+[Command(
+    Category = Constants.Category_ProjectAdmin,
+    Name = Constants.CommandArgumentName_ListTeams,
     IsAsync = true,
     Description = "Gets list of teams in an Azure DevOps Team Project.")]
 public class ListTeamsForProjectCommand : AzureDevOpsCommandBase

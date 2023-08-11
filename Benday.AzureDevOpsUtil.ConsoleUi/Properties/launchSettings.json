@@ -113,6 +113,10 @@
       "commandName": "Project",
       "commandLineArgs": "suggest-sle /teamproject:20230601e /numberofdays:80"
     },
+    "suggest-sle-no-args": {
+      "commandName": "Project",
+      "commandLineArgs": "suggest-sle --help"
+    },
     "cycle-time-confidence": {
       "commandName": "Project",
       "commandLineArgs": "cycletimeconfidence /teamproject:20230601e /numberofdays:80"

@@ -5,7 +5,9 @@ using Benday.CommandsFramework;
 namespace Benday.AzureDevOpsUtil.Api.ScriptGenerator;
 
 
-[Command(Name = Constants.CommandName_CreateWorkItemsFromExcelScript,
+[Command(
+    Category = Constants.Category_TestData,
+    Name = Constants.CommandName_CreateWorkItemsFromExcelScript,
         Description = "Create work items using Excel script",
         IsAsync = true)]
 public class CreateWorkItemsFromExcelScriptCommand : AzureDevOpsCommandBase

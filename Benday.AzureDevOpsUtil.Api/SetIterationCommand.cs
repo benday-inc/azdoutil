@@ -3,7 +3,9 @@ using Benday.CommandsFramework;
 
 namespace Benday.AzureDevOpsUtil.Api;
 
-[Command(Name = Constants.CommandName_SetIteration,
+[Command(
+    Category = Constants.Category_WorkItems,
+    Name = Constants.CommandName_SetIteration,
         Description = "Create iteration including start and end date",
         IsAsync = true)]
 public class SetIterationCommand : AzureDevOpsCommandBase

@@ -3,7 +3,9 @@ using Benday.CommandsFramework;
 
 namespace Benday.AzureDevOpsUtil.Api;
 
-[Command(Name = Constants.CommandName_GetProject,
+[Command(
+    Category = Constants.Category_ProjectAdmin,
+    Name = Constants.CommandName_GetProject,
         Description = "Get team project info",
         IsAsync = true)]
 public class GetTeamProjectCommand : AzureDevOpsCommandBase

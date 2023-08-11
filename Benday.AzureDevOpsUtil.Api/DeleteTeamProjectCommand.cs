@@ -3,7 +3,9 @@ using Benday.CommandsFramework;
 
 namespace Benday.AzureDevOpsUtil.Api;
 
-[Command(Name = Constants.CommandName_DeleteProject,
+[Command(
+    Category = Constants.Category_ProjectAdmin,
+    Name = Constants.CommandName_DeleteProject,
         Description = "Delete team project",
         IsAsync = true)]
 public class DeleteTeamProjectCommand : AzureDevOpsCommandBase

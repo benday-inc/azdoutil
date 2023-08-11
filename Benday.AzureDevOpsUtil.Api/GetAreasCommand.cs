@@ -1,7 +1,9 @@
 ﻿using Benday.CommandsFramework;
 namespace Benday.AzureDevOpsUtil.Api;
 
-[Command(Name = Constants.CommandArgumentNameGetAreas,
+[Command(
+    Category = Constants.Category_WorkItems,
+    Name = Constants.CommandArgumentNameGetAreas,
     Description = "Gets a list of areas in an Azure DevOps Team Project.",
     IsAsync = true)]
 public class GetAreasCommand : GetClassificationNodesCommandBase

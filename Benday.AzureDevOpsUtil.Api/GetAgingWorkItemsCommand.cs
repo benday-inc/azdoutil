@@ -8,7 +8,9 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Benday.AzureDevOpsUtil.Api;
 
-[Command(Name = Constants.CommandArgumentNameGetAgingWorkItemsCommand,
+[Command(
+    Category = Constants.Category_FlowMetrics,
+    Name = Constants.CommandArgumentNameGetAgingWorkItemsCommand,
         Description = "Get aging in-progress work items",
         IsAsync = true)]
 public class GetAgingWorkItemsCommand : AzureDevOpsCommandBase

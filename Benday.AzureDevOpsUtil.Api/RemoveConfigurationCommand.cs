@@ -2,7 +2,9 @@
 
 namespace Benday.AzureDevOpsUtil.Api;
 
-[Command(Name = Constants.CommandArgumentNameRemoveConfig,
+[Command(
+    Category = Constants.Category_AzdoUtilConfig,
+    Name = Constants.CommandArgumentNameRemoveConfig,
         Description = "Remove an Azure DevOps configuration. For example, which server or account plus auth information.",
         IsAsync = false)]
 public class RemoveConfigurationCommand : SynchronousCommand

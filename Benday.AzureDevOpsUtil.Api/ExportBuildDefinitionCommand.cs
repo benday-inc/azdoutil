@@ -6,7 +6,9 @@ using Benday.CommandsFramework;
 
 namespace Benday.AzureDevOpsUtil.Api;
 
-[Command(Name = Constants.CommandArgumentNameExportBuildDefinition,
+[Command(
+    Category = Constants.Category_Builds,
+    Name = Constants.CommandArgumentNameExportBuildDefinition,
         Description = "Export build definition",
         IsAsync = true)]
 public class ExportBuildDefinitionCommand : AzureDevOpsCommandBase

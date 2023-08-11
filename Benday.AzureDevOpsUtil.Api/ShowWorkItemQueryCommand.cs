@@ -5,7 +5,9 @@ using Benday.CommandsFramework;
 
 namespace Benday.AzureDevOpsUtil.Api;
 
-[Command(Name = Constants.CommandName_ShowWorkItemQuery,
+[Command(
+    Category = Constants.Category_WorkItems,
+    Name = Constants.CommandName_ShowWorkItemQuery,
         Description = "Show work item query",
         IsAsync = true)]
 public class ShowWorkItemQueryCommand : AzureDevOpsCommandBase

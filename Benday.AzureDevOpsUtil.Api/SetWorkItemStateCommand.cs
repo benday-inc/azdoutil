@@ -6,7 +6,9 @@ using Benday.CommandsFramework;
 
 namespace Benday.AzureDevOpsUtil.Api;
 
-[Command(Name = Constants.CommandName_SetWorkItemState,
+[Command(
+    Category = Constants.Category_WorkItems,
+    Name = Constants.CommandName_SetWorkItemState,
         Description = "Set the state value on an existing work item",
         IsAsync = true)]
 public class SetWorkItemStateCommand : AzureDevOpsCommandBase

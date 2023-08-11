@@ -2,7 +2,9 @@
 using Benday.CommandsFramework;
 
 namespace Benday.AzureDevOpsUtil.Api;
-[Command(Name = Constants.CommandName_ListProcessTemplates,
+[Command(
+    Category = Constants.Category_ProjectAdmin,
+    Name = Constants.CommandName_ListProcessTemplates,
         Description = "List process templates",
         IsAsync = true)]
 public class ListProcessTemplatesCommand : AzureDevOpsCommandBase

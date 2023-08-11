@@ -8,6 +8,8 @@ info@benday.com
 
 *Got ideas for Azure DevOps utilities you'd like to see? Found a bug? Let us know by submitting an issue https://github.com/benday-inc/azdoutil/issues*. *Want to contribute? Submit a pull request.*
 
+%%CATEGORIES%%
+
 ## Installing
 The azdoutil is distributed as a .NET Core Tool via NuGet. To install it go to the command prompt and type  
 `dotnet tool install azdoutil -g`

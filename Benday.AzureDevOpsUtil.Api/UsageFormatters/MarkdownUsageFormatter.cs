@@ -13,33 +13,40 @@ public class MarkdownUsageFormatter
     {
         var builder = new StringBuilder();
 
-        AppendCommandList(usages, builder, skipCommandAnchors);
+        var categories = usages.Select(x => x.Category).Distinct().Order();
 
-        foreach (var usage in usages)
+        AppendCommandList(usages.OrderBy(x => x.Category).ThenBy(x => x.Name).ToList(), builder, skipCommandAnchors);
+
+        foreach (var category in categories)
         {
-            AppendUsage(builder, usage, skipCommandAnchors);
+            builder.AppendLine($"# {category}");
+
+            foreach (var usage in usages.Where(x => x.Category == category).OrderBy(x => x.Name))
+            {
+                AppendUsage(builder, usage, skipCommandAnchors);
+            }
         }
 
         return builder.ToString();
-    }    
+    }
 
     private void AppendCommandList(List<CommandInfo> usages, StringBuilder builder, bool skipCommandAnchors)
     {
         builder.AppendLine($"## Commands");
 
-        builder.AppendLine("| Command Name | Description |");
-        builder.AppendLine("| --- | --- |");
+        builder.AppendLine("| Category | Command Name | Description |");
+        builder.AppendLine("| --- | --- | --- |");
 
         foreach (var usage in usages)
         {
             if (skipCommandAnchors)
             {
-                builder.AppendLine($"| {usage.Name} | {usage.Description} |");
+                builder.AppendLine($"| {usage.Category} | {usage.Name} | {usage.Description} |");
             }
             else
             {
-                builder.AppendLine($"| [{usage.Name}](#{usage.Name}) | {usage.Description} |");
-            }            
+                builder.AppendLine($"| {usage.Category} | [{usage.Name}](#{usage.Name}) | {usage.Description} |");
+            }
         }
     }
 
@@ -55,7 +62,7 @@ public class MarkdownUsageFormatter
         }
 
         builder.AppendLine($"**{usage.Description}**");
-        
+
         builder.AppendLine("### Arguments");
 
         builder.AppendLine("| Argument | Is Optional | Data Type | Description |");

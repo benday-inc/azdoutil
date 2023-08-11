@@ -6,7 +6,9 @@ using Benday.CommandsFramework;
 
 namespace Benday.AzureDevOpsUtil.Api;
 
-[Command(Name = Constants.CommandArgumentNameSuggestServiceLevelExpectation,
+[Command(
+    Category = Constants.Category_FlowMetrics,
+    Name = Constants.CommandArgumentNameSuggestServiceLevelExpectation,
         Description = "Calculate a suggested service level expectation (SLE) based on cycle time",
         IsAsync = true)]
 public class CalculateSuggestedServiceLevelExpectationCommand : AzureDevOpsCommandBase
