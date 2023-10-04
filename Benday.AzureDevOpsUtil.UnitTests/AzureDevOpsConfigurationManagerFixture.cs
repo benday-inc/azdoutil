@@ -1,4 +1,5 @@
 ﻿using Benday.AzureDevOpsUtil.Api;
+using Benday.CommandsFramework;
 namespace Benday.AzureDevOpsUtil.UnitTests;
 
 [TestClass]
