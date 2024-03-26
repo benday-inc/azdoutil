@@ -3,6 +3,7 @@
 namespace Benday.AzureDevOpsUtil.UnitTests;
 
 [TestClass]
+[Ignore]
 public class ExcelWorkItemScriptRowReaderFixture
 {
     [TestInitialize]

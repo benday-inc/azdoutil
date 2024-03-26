@@ -23,7 +23,7 @@ public class ExcelWorkItemScriptWriter
             AddIterations(excel, worksheetIterations);
             AddActions(excel, worksheetScript, actions);
 
-            var dir = Path.GetDirectoryName(filename);
+            var dir = Path.GetDirectoryName(filename) ?? throw new InvalidOperationException();
 
             if (!Directory.Exists(dir))
             {
