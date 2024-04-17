@@ -22,6 +22,25 @@ public class BuildDefinitionInfo
     [JsonPropertyName("name")] 
     public string Name { get; set; } = string.Empty;
 
+    [JsonPropertyName("type")]
+    public string Type { get; set; } = string.Empty;
+
+    [JsonIgnore]
+    public bool IsXaml
+    {
+        get
+        {
+            if (Type == "xaml")
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+
     [JsonPropertyName("url")] 
     public string Url { get; set; } = string.Empty;
 

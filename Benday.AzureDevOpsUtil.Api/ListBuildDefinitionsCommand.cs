@@ -94,6 +94,11 @@ public class ListBuildDefinitionsCommand : AzureDevOpsCommandBase
             builder.Append(" (");
             builder.Append(definition.Id);
             builder.Append(")");
+
+            if (definition.IsXaml == true)
+            {
+                builder.Append(" [XAML]");
+            }
         }
 
         return builder.ToString();

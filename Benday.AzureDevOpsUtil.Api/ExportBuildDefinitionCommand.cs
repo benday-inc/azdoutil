@@ -156,29 +156,17 @@ public class ExportBuildDefinitionCommand : AzureDevOpsCommandBase
         {
             try
             {
-                var mappings = JsonUtilities.GetJsonValueAsType<XamlBuildTfvcMappings>(
-                    data.Repository.Properties.TfvcMapping);
+                var count = 0;
 
-                if (mappings == null)
+                foreach (var mapping in data.Repository.Properties.TfvcMappings.Mappings)
                 {
-                    builder.AppendLabeledValue("Repository Properties", "(n/a)");
-                }
-                else
-                {
-                    builder.AppendLabeledValue("Repository Properties", string.Empty);
+                    count++;
 
-                    var count = 0;
-
-                    foreach (var mapping in mappings.Mappings)
-                    {
-                        count++;
-
-                        builder.AppendLabeledValue($"\tMapping #{count}", string.Empty);
-                        builder.AppendLabeledValue("\tMapping Type", mapping.MappingType);
-                        builder.AppendLabeledValue("\tServer Path", mapping.ServerPath);
-                        builder.AppendLabeledValue("\tLocal Path", mapping.LocalPath ?? string.Empty);
-                        builder.AppendLine();
-                    }
+                    builder.AppendLabeledValue($"\tMapping #{count}", string.Empty);
+                    builder.AppendLabeledValue("\tMapping Type", mapping.MappingType);
+                    builder.AppendLabeledValue("\tServer Path", mapping.ServerPath);
+                    builder.AppendLabeledValue("\tLocal Path", mapping.LocalPath ?? string.Empty);
+                    builder.AppendLine();
                 }
             }
             catch
