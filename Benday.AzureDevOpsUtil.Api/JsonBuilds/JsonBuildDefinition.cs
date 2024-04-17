@@ -107,8 +107,13 @@ public class Definition
 
 }
 
+public class Inputs : Dictionary<string, string>
+{
 
-public class Inputs
+}
+
+
+public class Inputs1234
 {
     [JsonPropertyName("branchFilters")]
     public string BranchFilters { get; set; } = string.Empty;
@@ -538,7 +543,12 @@ public class SystemDebug
 }
 
 
-public class JsonBuildProperties
+public class JsonBuildProperties : Dictionary<string, string>
+{
+
+}
+
+public class JsonBuildProperties1234
 {
     [JsonPropertyName("cleanOptions")]
     public string CleanOptions { get; set; } = string.Empty;

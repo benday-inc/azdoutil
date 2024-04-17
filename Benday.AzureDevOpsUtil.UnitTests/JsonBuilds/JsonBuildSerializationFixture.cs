@@ -92,6 +92,6 @@ public class JsonBuildSerializationFixture
         Console.WriteLine($"Expected path: {expectedPath}");
         Console.WriteLine($"Actual path: {actualPath}");
 
-        // Assert.AreEqual<string>(expected, actual, $"Json didn't match");
+        Assert.AreEqual<string>(expected, actual, $"Json didn't match");
     }
 }
