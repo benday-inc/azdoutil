@@ -6,6 +6,14 @@
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="StarterBuilds\json-build-single-solution-tfvc-2024.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="StarterBuilds\json-build-single-solution-tfvc-2024.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Benday.CommandsFramework" Version="3.2.0" />
     <PackageReference Include="Benday.XmlUtilities" Version="4.0.1" />
     <PackageReference Include="EPPlus" Version="7.1.1" />

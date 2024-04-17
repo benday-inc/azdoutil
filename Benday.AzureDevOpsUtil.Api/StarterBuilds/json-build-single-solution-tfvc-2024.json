@@ -1,0 +1,414 @@
+{
+  "options": [
+    {
+      "enabled": true,
+      "definition": {
+        "id": "5d58cc01-7c75-450c-be18-a388ddb129ec"
+      },
+      "inputs": {
+        "branchFilters": "[\"+refs/heads/*\"]",
+        "additionalFields": "{}"
+      }
+    },
+    {
+      "enabled": false,
+      "definition": {
+        "id": "a9db38f9-9fdc-478c-b0f9-464221e58316"
+      },
+      "inputs": {
+        "workItemType": "Task",
+        "assignToRequestor": "true",
+        "additionalFields": "{}"
+      }
+    }
+  ],
+  "variables": {
+    "BuildConfiguration": {
+      "value": "release",
+      "allowOverride": true
+    },
+    "BuildPlatform": {
+      "value": "any cpu",
+      "allowOverride": true
+    },
+    "system.debug": {
+      "value": "false",
+      "allowOverride": true
+    }
+  },
+  "properties": {
+  },
+  "tags": [
+  ],
+  "_links": {
+    "self": {
+      "href": "https://pudding.benday.com/MovedTpc/a6e45659-0bad-4712-b564-e553495ac619/_apis/build/Definitions/2?revision=4"
+    },
+    "web": {
+      "href": "https://pudding.benday.com/MovedTpc/a6e45659-0bad-4712-b564-e553495ac619/_build/definition?definitionId=2"
+    },
+    "editor": {
+      "href": "https://pudding.benday.com/MovedTpc/a6e45659-0bad-4712-b564-e553495ac619/_build/designer?id=2&_a=edit-build-definition"
+    },
+    "badge": {
+      "href": "https://pudding.benday.com/MovedTpc/a6e45659-0bad-4712-b564-e553495ac619/_apis/build/status/2"
+    }
+  },
+  "buildNumberFormat": "$(date:yyyyMMdd)$(rev:.r)",
+  "jobAuthorizationScope": 1,
+  "jobTimeoutInMinutes": 60,
+  "jobCancelTimeoutInMinutes": 5,
+  "process": {
+    "phases": [
+      {
+        "steps": [
+          {
+            "environment": {
+            },
+            "enabled": true,
+            "continueOnError": false,
+            "alwaysRun": false,
+            "displayName": "Use NuGet 6.*",
+            "timeoutInMinutes": 0,
+            "retryCountOnTaskFailure": 0,
+            "condition": "succeeded()",
+            "task": {
+              "id": "2c65196a-54fd-4a02-9be8-d9d1837b7c5d",
+              "versionSpec": "1.*",
+              "definitionType": "task"
+            },
+            "inputs": {
+              "versionSpec": "6.x",
+              "checkLatest": "true"
+            }
+          },
+          {
+            "environment": {
+            },
+            "enabled": true,
+            "continueOnError": false,
+            "alwaysRun": false,
+            "displayName": "NuGet restore",
+            "timeoutInMinutes": 0,
+            "retryCountOnTaskFailure": 0,
+            "condition": "succeeded()",
+            "task": {
+              "id": "333b11bd-d341-40d9-afcf-b32d5ce6f23b",
+              "versionSpec": "2.*",
+              "definitionType": "task"
+            },
+            "inputs": {
+              "command": "restore",
+              "solution": "$(Parameters.solution)",
+              "selectOrConfig": "select",
+              "feedRestore": "",
+              "includeNuGetOrg": "true",
+              "nugetConfigPath": "",
+              "externalEndpoints": "",
+              "noCache": "false",
+              "disableParallelProcessing": "false",
+              "packagesDirectory": "",
+              "verbosityRestore": "Detailed",
+              "searchPatternPush": "$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg",
+              "nuGetFeedType": "internal",
+              "feedPublish": "",
+              "publishPackageMetadata": "true",
+              "allowPackageConflicts": "false",
+              "externalEndpoint": "",
+              "verbosityPush": "Detailed",
+              "searchPatternPack": "**/*.csproj",
+              "configurationToPack": "$(BuildConfiguration)",
+              "outputDir": "$(Build.ArtifactStagingDirectory)",
+              "versioningScheme": "off",
+              "includeReferencedProjects": "false",
+              "versionEnvVar": "",
+              "requestedMajorVersion": "1",
+              "requestedMinorVersion": "0",
+              "requestedPatchVersion": "0",
+              "packTimezone": "utc",
+              "includeSymbols": "false",
+              "toolPackage": "false",
+              "buildProperties": "",
+              "basePath": "",
+              "verbosityPack": "Detailed",
+              "arguments": ""
+            }
+          },
+          {
+            "environment": {
+            },
+            "enabled": true,
+            "continueOnError": false,
+            "alwaysRun": false,
+            "displayName": "Build solution $/test20240410/Main/Benday.HelloWorld/Benday.HelloWorld.sln",
+            "timeoutInMinutes": 0,
+            "retryCountOnTaskFailure": 0,
+            "condition": "succeeded()",
+            "task": {
+              "id": "71a9a2d3-a98a-4caa-96ab-affca411ecda",
+              "versionSpec": "1.*",
+              "definitionType": "task"
+            },
+            "inputs": {
+              "solution": "$(Parameters.solution)",
+              "vsVersion": "latest",
+              "msbuildArgs": "",
+              "platform": "$(BuildPlatform)",
+              "configuration": "$(BuildConfiguration)",
+              "clean": "false",
+              "maximumCpuCount": "false",
+              "restoreNugetPackages": "false",
+              "msbuildArchitecture": "x86",
+              "logProjectEvents": "true",
+              "createLogFile": "false",
+              "logFileVerbosity": "normal",
+              "enableDefaultLogger": "true",
+              "customVersion": ""
+            }
+          },
+          {
+            "environment": {
+            },
+            "enabled": true,
+            "continueOnError": false,
+            "alwaysRun": false,
+            "displayName": "VsTest - testAssemblies",
+            "timeoutInMinutes": 0,
+            "retryCountOnTaskFailure": 0,
+            "condition": "succeeded()",
+            "task": {
+              "id": "ef087383-ee5e-42c7-9a53-ab56c98420f9",
+              "versionSpec": "2.*",
+              "definitionType": "task"
+            },
+            "inputs": {
+              "testSelector": "testAssemblies",
+              "testAssemblyVer2": "**\\$(BuildConfiguration)\\*.tests.dll\n!**\\obj\\**",
+              "testPlan": "",
+              "testSuite": "",
+              "testConfiguration": "",
+              "tcmTestRun": "$(test.RunId)",
+              "searchFolder": "$(System.DefaultWorkingDirectory)",
+              "resultsFolder": "$(Agent.TempDirectory)\\TestResults",
+              "testFiltercriteria": "",
+              "runOnlyImpactedTests": "False",
+              "runAllTestsAfterXBuilds": "50",
+              "uiTests": "false",
+              "vstestLocationMethod": "version",
+              "vsTestVersion": "latest",
+              "vstestLocation": "",
+              "runSettingsFile": "",
+              "overrideTestrunParameters": "",
+              "pathtoCustomTestAdapters": "",
+              "runInParallel": "False",
+              "runTestsInIsolation": "False",
+              "codeCoverageEnabled": "False",
+              "otherConsoleOptions": "",
+              "distributionBatchType": "basedOnTestCases",
+              "batchingBasedOnAgentsOption": "autoBatchSize",
+              "customBatchSizeValue": "10",
+              "batchingBasedOnExecutionTimeOption": "autoBatchSize",
+              "customRunTimePerBatchValue": "60",
+              "dontDistribute": "False",
+              "testRunTitle": "",
+              "platform": "$(BuildPlatform)",
+              "configuration": "$(BuildConfiguration)",
+              "publishRunAttachments": "true",
+              "failOnMinTestsNotRun": "False",
+              "minimumExpectedTests": "1",
+              "diagnosticsEnabled": "false",
+              "collectDumpOn": "onAbortOnly",
+              "rerunFailedTests": "False",
+              "rerunType": "basedOnTestFailurePercentage",
+              "rerunFailedThreshold": "30",
+              "rerunFailedTestCasesMaxLimit": "5",
+              "rerunMaxAttempts": "3"
+            }
+          },
+          {
+            "environment": {
+            },
+            "enabled": true,
+            "continueOnError": true,
+            "alwaysRun": false,
+            "displayName": "Publish symbols path",
+            "timeoutInMinutes": 0,
+            "retryCountOnTaskFailure": 0,
+            "condition": "succeeded()",
+            "task": {
+              "id": "0675668a-7bba-4ccb-901d-5ad6554ca653",
+              "versionSpec": "2.*",
+              "definitionType": "task"
+            },
+            "inputs": {
+              "SymbolsFolder": "$(Build.SourcesDirectory)",
+              "SearchPattern": "**\\bin\\**\\*.pdb",
+              "IndexSources": "true",
+              "PublishSymbols": "false",
+              "SymbolServerType": "TeamServices",
+              "SymbolsPath": "",
+              "CompressSymbols": "false",
+              "SymbolExpirationInDays": "36530",
+              "IndexableFileFormats": "Default",
+              "DetailedLog": "true",
+              "TreatNotIndexedAsWarning": "false",
+              "UseNetCoreClientTool": "false",
+              "SymbolsMaximumWaitTime": "",
+              "SymbolsProduct": "",
+              "SymbolsVersion": "",
+              "SymbolsArtifactName": "Symbols_$(BuildConfiguration)"
+            }
+          },
+          {
+            "environment": {
+            },
+            "enabled": true,
+            "continueOnError": false,
+            "alwaysRun": true,
+            "displayName": "Copy Files to: $(build.artifactstagingdirectory)",
+            "timeoutInMinutes": 0,
+            "retryCountOnTaskFailure": 0,
+            "condition": "succeededOrFailed()",
+            "task": {
+              "id": "5bfb729a-a7c8-4a78-a7c3-8d717bb7c13c",
+              "versionSpec": "2.*",
+              "definitionType": "task"
+            },
+            "inputs": {
+              "SourceFolder": "$(system.defaultworkingdirectory)",
+              "Contents": "**\\bin\\$(BuildConfiguration)\\**",
+              "TargetFolder": "$(build.artifactstagingdirectory)",
+              "CleanTargetFolder": "false",
+              "OverWrite": "false",
+              "flattenFolders": "false",
+              "preserveTimestamp": "false",
+              "retryCount": "0",
+              "delayBetweenRetries": "1000",
+              "ignoreMakeDirErrors": "false"
+            }
+          },
+          {
+            "environment": {
+            },
+            "enabled": true,
+            "continueOnError": false,
+            "alwaysRun": true,
+            "displayName": "Publish Artifact: drop",
+            "timeoutInMinutes": 0,
+            "retryCountOnTaskFailure": 0,
+            "condition": "succeededOrFailed()",
+            "task": {
+              "id": "2ff763a7-ce83-4e1f-bc89-0ae63477cebe",
+              "versionSpec": "1.*",
+              "definitionType": "task"
+            },
+            "inputs": {
+              "PathtoPublish": "$(build.artifactstagingdirectory)",
+              "ArtifactName": "drop",
+              "ArtifactType": "Container",
+              "TargetPath": "\\\\my\\share\\$(Build.DefinitionName)\\$(Build.BuildNumber)",
+              "Parallel": "false",
+              "ParallelCount": "8",
+              "FileCopyOptions": "",
+              "StoreAsTar": "false"
+            }
+          }
+        ],
+        "name": "Agent job 1",
+        "refName": "Job_1",
+        "condition": "succeeded()",
+        "target": {
+          "executionOptions": {
+            "type": 0
+          },
+          "allowScriptsAuthAccessOption": false,
+          "type": 1
+        },
+        "jobAuthorizationScope": 1
+      }
+    ],
+    "type": 1
+  },
+  "repository": {
+    "properties": {
+      "cleanOptions": "3",
+      "tfvcMapping": "{\"mappings\":[{\"serverPath\":\"$/test20240410/Main/Benday.HelloWorld\",\"mappingType\":\"map\",\"localPath\":\"\\\\\"}]}",
+      "labelSources": "0",
+      "labelSourcesFormat": "$(build.buildNumber)"
+    },
+    "id": "$/",
+    "type": "TfsVersionControl",
+    "name": "test20240410",
+    "url": "https://pudding.benday.com/MovedTpc/",
+    "defaultBranch": "$/test20240410/Main/Benday.HelloWorld",
+    "rootFolder": "$/test20240410",
+    "clean": "true",
+    "checkoutSubmodules": false
+  },
+  "processParameters": {
+    "inputs": [
+      {
+        "aliases": [
+        ],
+        "options": {
+        },
+        "properties": {
+        },
+        "name": "solution",
+        "label": "Solution",
+        "defaultValue": "$/test20240410/Main/Benday.HelloWorld/Benday.HelloWorld.sln",
+        "required": true,
+        "type": "filePath",
+        "helpMarkDown": "The path to the Visual Studio solution file or NuGet packages.config. Wildcards can be used.  For example, `**\\\\*.sln` for all sln files in all sub folders."
+      }
+    ]
+  },
+  "quality": 1,
+  "authoredBy": {
+    "displayName": "Ben Day",
+    "url": "https://pudding.benday.com/MovedTpc/_apis/Identities/48bda790-0c8c-46c7-ba11-e0eebb0b8d59",
+    "_links": {
+      "avatar": {
+        "href": "https://pudding.benday.com/MovedTpc/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMzUxMjY2Njk5OC0yMjMzODc3OTY4LTU5MTI3NjE4MS0xMTA5"
+      }
+    },
+    "id": "48bda790-0c8c-46c7-ba11-e0eebb0b8d59",
+    "uniqueName": "BENDAY\\benday",
+    "imageUrl": "https://pudding.benday.com/MovedTpc/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMzUxMjY2Njk5OC0yMjMzODc3OTY4LTU5MTI3NjE4MS0xMTA5",
+    "descriptor": "win.Uy0xLTUtMjEtMzUxMjY2Njk5OC0yMjMzODc3OTY4LTU5MTI3NjE4MS0xMTA5"
+  },
+  "drafts": [
+  ],
+  "queue": {
+    "_links": {
+      "self": {
+        "href": "https://pudding.benday.com/MovedTpc/_apis/build/Queues/1"
+      }
+    },
+    "id": 1,
+    "name": "Default",
+    "url": "https://pudding.benday.com/MovedTpc/_apis/build/Queues/1",
+    "pool": {
+      "id": 1,
+      "name": "Default"
+    }
+  },
+  "id": 2,
+  "name": "test20240410-.NET Desktop-CI",
+  "url": "https://pudding.benday.com/MovedTpc/a6e45659-0bad-4712-b564-e553495ac619/_apis/build/Definitions/2?revision=4",
+  "uri": "vstfs:///Build/Definition/2",
+  "path": "\\",
+  "type": 2,
+  "queueStatus": 0,
+  "revision": 4,
+  "createdDate": "2024-04-10T18:44:34.020Z",
+  "project": {
+    "id": "a6e45659-0bad-4712-b564-e553495ac619",
+    "name": "test20240410",
+    "url": "https://pudding.benday.com/MovedTpc/_apis/projects/a6e45659-0bad-4712-b564-e553495ac619",
+    "state": 1,
+    "revision": 14,
+    "visibility": 0,
+    "lastUpdateTime": "2024-04-10T15:24:39.307Z"
+  }
+}
