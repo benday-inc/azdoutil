@@ -20,6 +20,9 @@ public class JsonBuildDefinition
     [JsonPropertyName("properties")]
     public JsonBuildProperties Properties { get; set; } = new();
 
+    [JsonPropertyName("tags")]
+    public object[] Tags { get; set; } = new object[0];
+
     [JsonPropertyName("_links")]
     public Links Links { get; set; } = new();
 
