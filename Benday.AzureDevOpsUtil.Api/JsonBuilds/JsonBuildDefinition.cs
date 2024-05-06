@@ -681,7 +681,7 @@ public class Step
     public string Condition { get; set; } = string.Empty;
 
     [JsonPropertyName("task")]
-    public Task Task { get; set; } = new();
+    public JsonBuildTask Task { get; set; } = new();
 
     [JsonPropertyName("inputs")]
     public Inputs Inputs { get; set; } = new();
@@ -694,7 +694,7 @@ public class JsonBuildEnvironment
 }
 
 
-public class Task
+public class JsonBuildTask
 {
     [JsonPropertyName("id")]
     public string Id { get; set; } = string.Empty;

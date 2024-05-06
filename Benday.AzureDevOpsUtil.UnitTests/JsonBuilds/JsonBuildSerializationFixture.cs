@@ -95,4 +95,23 @@ public class JsonBuildSerializationFixture
         // TODO: Write some kind of file comparison code that checks for close enough equality
         // Assert.AreEqual<string>(expected, actual, $"Json didn't match");
     }
+
+    [TestMethod]
+    public void UpdateBuildTemplateForCreateNew()
+    {
+        // arrange
+        var pathToSampleBuild = GetPathToBuildFile("json-build-single-solution-tfvc-2024.json");
+
+        var sourceJson = File.ReadAllText(pathToSampleBuild);
+
+        Console.WriteLine(sourceJson);
+
+        // act
+
+
+        // assert        
+
+        Assert.IsFalse(sourceJson.Contains("pudding"), "json should not contain string 'pudding'");
+        Assert.IsFalse(sourceJson.Contains("benday.com"), "json should not contain string 'benday.com'");
+    }
 }

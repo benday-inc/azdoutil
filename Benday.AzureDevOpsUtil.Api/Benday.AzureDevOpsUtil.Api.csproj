@@ -15,7 +15,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Benday.CommandsFramework" Version="3.2.0" />
-    <PackageReference Include="Benday.XmlUtilities" Version="4.0.1" />
-    <PackageReference Include="EPPlus" Version="7.1.1" />
+    <PackageReference Include="Benday.XmlUtilities" Version="5.2.0" />
+    <PackageReference Include="EPPlus" Version="7.1.2" />
   </ItemGroup>
 </Project>

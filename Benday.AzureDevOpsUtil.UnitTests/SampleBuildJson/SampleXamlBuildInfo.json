@@ -1,0 +1,47 @@
+{
+  "_links": {
+    "self": { "href": "https://pudding.benday.com/MovedTpc/a6e45659-0bad-4712-b564-e553495ac619/_apis/build/Definitions/1" },
+    "web": { "href": "https://pudding.benday.com/MovedTpc/a6e45659-0bad-4712-b564-e553495ac619/_build/definition?definitionId=1" }
+  },
+  "controller": {
+    "uri": "vstfs:///Build/Controller/1",
+    "status": "offline",
+    "enabled": true,
+    "createdDate": "2023-07-11T15:23:43.053Z",
+    "updatedDate": "2024-04-10T15:24:34.19Z",
+    "id": 1,
+    "name": "WIN-N2B4ADDC1KL - Controller",
+    "url": "https://pudding.benday.com/MovedTpc/_apis/build/Queues/1"
+  },
+  "batchSize": 1,
+  "triggerType": "continuousIntegration",
+  "defaultDropLocation": "#/",
+  "buildArgs": "/p:DingDong123=definitely /p:SuperDuper=false",
+  "createdOn": "2024-04-10T12:45:34.867Z",
+  "supportedReasons": 239,
+  "lastBuild": {
+    "id": 12,
+    "url": "https://pudding.benday.com/MovedTpc/a6e45659-0bad-4712-b564-e553495ac619/_apis/build/Builds/12"
+  },
+  "repository": {
+    "properties": { "tfvcMapping": "{\"mappings\":[{\"serverPath\":\"$/test20240410/Main/Benday.HelloWorld\",\"mappingType\":\"map\",\"localPath\":null},{\"serverPath\":\"$/AnotherProject123/BuildScripts\",\"mappingType\":\"map\",\"localPath\":null},{\"serverPath\":\"$/AnotherProject123/Main\",\"mappingType\":\"map\",\"localPath\":null}]}" },
+    "type": "TfsVersionControl",
+    "clean": null,
+    "checkoutSubmodules": false
+  },
+  "id": 1,
+  "name": "helloworld-build",
+  "url": "https://pudding.benday.com/MovedTpc/a6e45659-0bad-4712-b564-e553495ac619/_apis/build/Definitions/1",
+  "uri": "vstfs:///Build/Definition/1",
+  "type": "xaml",
+  "queueStatus": "enabled",
+  "project": {
+    "id": "a6e45659-0bad-4712-b564-e553495ac619",
+    "name": "test20240410",
+    "url": "https://pudding.benday.com/MovedTpc/_apis/projects/a6e45659-0bad-4712-b564-e553495ac619",
+    "state": "wellFormed",
+    "revision": 14,
+    "visibility": "private",
+    "lastUpdateTime": "2024-04-10T15:24:39.307Z"
+  }
+}
