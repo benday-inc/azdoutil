@@ -24,6 +24,7 @@ public static class Constants
     public const string CommandArgumentName_ListGitRepos = "listgitrepos";
     public const string CommandArgumentNameListBuildDefinitions = "listbuilddefs";
     public const string CommandArgumentNameExportBuildDefinition = "exportbuilddef";
+    public const string CommandArgumentNameImportBuildDefinition = "importbuilddef";
     public const string CommandArgumentNameCreateGitRepository = "creategitrepo";
     public const string CommandArgumentNameImportTfvcToGit = "tfvc-to-git";
     public const string CommandArgumentNameListWorkItemQueries = "listworkitemqueries";
