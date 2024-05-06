@@ -26,13 +26,26 @@ public class MarkdownUsageFormatterFixture
         }
     }
 
+    private DefaultProgramOptions CreateDefaultProgramOptions()
+    {
+        return new DefaultProgramOptions()
+        {
+            ApplicationName = "MyApp",
+            ConfigurationFolderName = "MyConfig",
+            OutputProvider = new ConsoleTextOutputProvider(),
+            UsesConfiguration = false,
+            Version = "1.0.0",
+            Website = "http://www.benday.com"
+        };
+    }
+
     [TestMethod]
     public void FormatUsagesAsMarkdown()
     {
         // arrange
         var assembly = typeof(StringUtility).Assembly;
 
-        var usages = new CommandAttributeUtility().GetAllCommandUsages(assembly);
+        var usages = new CommandAttributeUtility(CreateDefaultProgramOptions()).GetAllCommandUsages(assembly);
 
         // act
         var actual = SystemUnderTest.Format(usages, false);
@@ -56,7 +69,7 @@ public class MarkdownUsageFormatterFixture
         // arrange
         var assembly = typeof(StringUtility).Assembly;
 
-        var usages = new CommandAttributeUtility().GetAllCommandUsages(assembly);
+        var usages = new CommandAttributeUtility(CreateDefaultProgramOptions()).GetAllCommandUsages(assembly);
 
         // act
         var actual = SystemUnderTest.Format(usages, true);
@@ -80,7 +93,7 @@ public class MarkdownUsageFormatterFixture
         // arrange
         var assembly = typeof(CreateBacklogRefinementProcessTemplateCommand).Assembly;
 
-        var usages = new CommandAttributeUtility().GetAllCommandUsages(assembly);
+        var usages = new CommandAttributeUtility(CreateDefaultProgramOptions()).GetAllCommandUsages(assembly);
 
         var solutionDir = GetPathToSolutionRootDirectory();
 

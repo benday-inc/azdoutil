@@ -158,11 +158,6 @@ public abstract class AzureDevOpsCommandBase : AsynchronousCommand
         }
     }
 
-    protected virtual void WriteLine()
-    {
-        _OutputProvider.WriteLine();
-    }
-
     private async Task<T?> CallEndpointViaGetAndGetResultSingleAttempt<T>(
         string requestUrl, bool writeStringContentToInfo = false, bool throwExceptionOnError = true)
     {
