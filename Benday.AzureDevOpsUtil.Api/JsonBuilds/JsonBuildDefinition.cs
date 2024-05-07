@@ -30,7 +30,7 @@ public class JsonBuildDefinition
     public string BuildNumberFormat { get; set; } = string.Empty;
 
     [JsonPropertyName("jobAuthorizationScope")]
-    public int JobAuthorizationScope { get; set; }
+    public string JobAuthorizationScope { get; set; } = string.Empty;
 
     [JsonPropertyName("jobTimeoutInMinutes")]
     public int JobTimeoutInMinutes { get; set; }
@@ -48,7 +48,7 @@ public class JsonBuildDefinition
     public ProcessParameters ProcessParameters { get; set; } = new();
 
     [JsonPropertyName("quality")]
-    public int Quality { get; set; }
+    public string Quality { get; set; } = string.Empty;
 
     [JsonPropertyName("authoredBy")]
     public AuthoredBy AuthoredBy { get; set; } = new();
@@ -72,10 +72,10 @@ public class JsonBuildDefinition
     public string Path { get; set; } = string.Empty;
 
     [JsonPropertyName("type")]
-    public int Type { get; set; }
+    public string Type { get; set; } = string.Empty;
 
     [JsonPropertyName("queueStatus")]
-    public int QueueStatus { get; set; }
+    public string QueueStatus { get; set; } = string.Empty;
 
     [JsonPropertyName("revision")]
     public int Revision { get; set; }
@@ -649,7 +649,7 @@ public class Phase
     public Target Target { get; set; } = new();
 
     [JsonPropertyName("jobAuthorizationScope")]
-    public int JobAuthorizationScope { get; set; }
+    public string JobAuthorizationScope { get; set; } = string.Empty;
 
 }
 
@@ -881,13 +881,13 @@ public class Project
     public string Url { get; set; } = string.Empty;
 
     [JsonPropertyName("state")]
-    public int State { get; set; }
+    public string State { get; set; } = string.Empty;
 
     [JsonPropertyName("revision")]
     public int Revision { get; set; }
 
     [JsonPropertyName("visibility")]
-    public int Visibility { get; set; }
+    public string Visibility { get; set; } = string.Empty;
 
     [JsonPropertyName("lastUpdateTime")]
     public string LastUpdateTime { get; set; } = string.Empty;

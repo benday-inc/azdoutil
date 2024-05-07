@@ -1,4 +1,5 @@
 ﻿
+using Benday.AzureDevOpsUtil.Api.JsonBuilds;
 using Benday.AzureDevOpsUtil.Api.Messages;
 
 using Benday.CommandsFramework;
@@ -11,12 +12,13 @@ namespace Benday.AzureDevOpsUtil.Api;
 [Command(
     Category = Constants.Category_Builds,
     Name = Constants.CommandArgumentNameImportBuildDefinition,
-        Description = "Import build definition",
+        Description = "Import a json-based build definition",
         IsAsync = true)]
 public class ImportBuildDefinitionCommand : AzureDevOpsCommandBase
 {
     private string _TeamProjectName = string.Empty;
     private string _BuildDefinitionName = string.Empty;
+    private string _Filename = string.Empty;
 
     public BuildDefinitionInfoResponse? LastResult { get; private set; }
 
@@ -35,307 +37,85 @@ public class ImportBuildDefinitionCommand : AzureDevOpsCommandBase
         arguments.AddString(Constants.ArgumentNameBuildDefinitionName)
             .WithDescription("Build definition name");
 
-        arguments.AddBoolean(Constants.ArgumentNameXaml)
-            .AllowEmptyValue()
-            .WithDescription("List XAML build definitions")
-            .AsNotRequired();
-
-        arguments.AddBoolean(Constants.ArgumentNameShowLastRunInfo)
-            .AllowEmptyValue()
-            .WithDescription("Show last build run info")
-            .AsNotRequired();
-
-        arguments.AddBoolean(Constants.ArgumentNameOutputCsv)
-            .AllowEmptyValue()
-            .WithDescription("Output results in CSV format")
-            .AsNotRequired();
-
-        arguments.AddBoolean(Constants.ArgumentNameNoCsvHeader)
-            .AllowEmptyValue()
-            .WithDescription("Do not print the CSV column header info")
-            .AsNotRequired();
-
-        arguments.AddBoolean(Constants.ArgumentNameOutputRaw)
-            .AllowEmptyValue()
-            .AsNotRequired()
-            .WithDescription("Output raw build definition")
-            .AsNotRequired();
+        arguments.AddString(Constants.ArgumentNameFilename)
+            .WithDescription("Path to json build file");
 
         return arguments;
     }
 
-    private bool _isXamlMode;
-
     protected override async Task OnExecute()
     {
-        throw new KnownException("Not implemented.");
-
         // XamlBuildRunInfo
         _TeamProjectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);
         _BuildDefinitionName = Arguments.GetStringValue(Constants.ArgumentNameBuildDefinitionName);
-        _isXamlMode = Arguments.GetBooleanValue(Constants.ArgumentNameXaml);
-        var outputRaw = Arguments.GetBooleanValue(Constants.ArgumentNameOutputRaw);
-        var showLastRunInfo = Arguments.GetBooleanValue(Constants.ArgumentNameShowLastRunInfo);
-        var outputCsv = Arguments.GetBooleanValue(Constants.ArgumentNameOutputCsv);
-        var noCsvHeader = Arguments.GetBooleanValue(Constants.ArgumentNameNoCsvHeader);
+
+        var originalValue = Arguments.GetStringValue(Constants.ArgumentNameFilename);
+
+        WriteLine(originalValue);
+
+        _Filename =
+            CommandFrameworkUtilities.GetPathToSourceFile(originalValue, true);
+
+
+        string json = File.ReadAllText(_Filename);
+
+        // read lines from string
+        string[] lines = json.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+
+        JsonBuildDefinition buildDef =
+            System.Text.Json.JsonSerializer.Deserialize<JsonBuildDefinition>(json) ?? 
+                throw new KnownException($"Problem reading json file '{_Filename}'");
 
         var buildId = await GetBuildIdByBuildName(_BuildDefinitionName);
 
-        if (buildId == null)
+        if (buildId != null)
         {
-            throw new KnownException(
-                string.Format("Build name '{0}' was not found.", _BuildDefinitionName));
-        }
-        else
-        {
-            var apiVersion = "7.0";
+            buildDef.Name = _BuildDefinitionName;
+            buildDef.Id = int.Parse(buildId);
 
-            if (_isXamlMode == true)
-            {
-                apiVersion = "2.0";
-            }
+            WriteLine($"Build definition '{_BuildDefinitionName}' already exists as build definition id '{buildId}'.");
 
-            var requestUrl = $"{_TeamProjectName}/_apis/build/definitions/{buildId}?api-version={apiVersion}&includeLatestBuilds=true";
+            // PUT https://dev.azure.com/{organization}/{project}/_apis/build/definitions/{definitionId}?api-version=7.0
 
-            var json = await GetStringAsync(requestUrl);
+            var requestUrl = $"{_TeamProjectName}/_apis/build/definitions/{buildId}?api-version=7.0";
 
+            var result = await SendPutForBodyAndGetTypedResponseSingleAttempt(requestUrl, buildDef);
+            
             WriteLine();
 
-            if (json == null)
+            if (result == null)
             {
                 WriteLine("** Result was null **");
             }
-            else if (outputRaw == true)
-            {
-                WriteLine(json);
-            }
-            else if (outputCsv == true)
-            {
-                var data = JsonUtilities.GetJsonValueAsType<XamlBuildDefinitionDetail>(json);
-
-                var builder = new StringBuilder();
-
-                await WriteToCsv(showLastRunInfo, data, builder, noCsvHeader);
-
-                using var reader = new StringReader(builder.ToString());
-
-                var line = reader.ReadLine();
-
-                while (line != null)
-                {
-                    if (string.IsNullOrWhiteSpace(line) == false)
-                    {
-                        WriteLine(line.Trim());
-                    }
-
-                    line = reader.ReadLine();
-                }
-            }
             else
             {
-                var data = JsonUtilities.GetJsonValueAsType<XamlBuildDefinitionDetail>(json);
-
-                var builder = new StringBuilder();
-
-                await WriteToConsoleOutput(showLastRunInfo, data, builder);
-
-                WriteLine(builder.ToString());
-            }
-        }
-    }
-
-    private async Task WriteToConsoleOutput(bool showLastRunInfo, XamlBuildDefinitionDetail data, StringBuilder builder)
-    {
-        builder.AppendLabeledValue("Id", data.Id);
-        builder.AppendLabeledValue("Name", data.Name);
-        builder.AppendLabeledValue("BuildType", data.BuildType);
-        builder.AppendLabeledValue("DefaultDropLocation", data.DefaultDropLocation);
-        builder.AppendLabeledValue("BuildArgs", data.BuildArgs);
-        builder.AppendLabeledValue("CreatedOn", data.CreatedOn);
-        builder.AppendLabeledValue("LastBuild Id", data.LastBuild.Id);
-        builder.AppendLabeledValue("LastBuild Url", data.LastBuild.Url);
-        builder.AppendLabeledValue("Repository Type", data.Repository.RepositoryType);
-
-        if (string.IsNullOrWhiteSpace(data.Repository.Properties.TfvcMapping) == false)
-        {
-            try
-            {
-                var count = 0;
-
-                foreach (var mapping in data.Repository.Properties.TfvcMappings.Mappings)
-                {
-                    count++;
-
-                    builder.AppendLabeledValue($"\tMapping #{count}", string.Empty);
-                    builder.AppendLabeledValue("\tMapping Type", mapping.MappingType);
-                    builder.AppendLabeledValue("\tServer Path", mapping.ServerPath);
-                    builder.AppendLabeledValue("\tLocal Path", mapping.LocalPath ?? string.Empty);
-                    builder.AppendLine();
-                }
-            }
-            catch
-            {
-                builder.AppendLabeledValue("Repository Properties",
-                    data.Repository.Properties.TfvcMapping);
+                WriteLine($"Build definition '{_BuildDefinitionName}' id '{result.Id}' updated.");
             }
         }
         else
         {
-            builder.AppendLabeledValue("Repository Properties", "(n/a)");
-        }
 
-        builder.AppendLabeledValue("Project Name", data.Project.Name);
-        builder.AppendLabeledValue("Project Id", data.Project.Id);
-        builder.AppendLabeledValue("Controller Id", data.Controller.Id);
-        builder.AppendLabeledValue("Controller Name", data.Controller.Name);
+            buildDef.Name = _BuildDefinitionName;
+            buildDef.Id = 0;
 
-        if (showLastRunInfo == true && _isXamlMode == true)
-        {
-            await AppendLastRunInfoForXaml(builder, data);
-        }
-        else if (showLastRunInfo == true && _isXamlMode == false)
-        {
-            AppendLastRunInfo(builder, data, false);
-        }
-    }
+            var requestUrl = $"{_TeamProjectName}/_apis/build/definitions?api-version=7.0";            
 
-    private async Task WriteToCsv(bool showLastRunInfo, XamlBuildDefinitionDetail data, StringBuilder builder,
-        bool noCsvHeader)
-    {
-        if (noCsvHeader == false)
-        {
-            builder.AppendCsvHeader("Id");
-            builder.AppendCsvHeader("Name");
-            builder.AppendCsvHeader("BuildType");
-            builder.AppendCsvHeader("DefaultDropLocation");
-            builder.AppendCsvHeader("BuildArgs");
-            builder.AppendCsvHeader("CreatedOn");
-            builder.AppendCsvHeader("LastBuild Id");
-            builder.AppendCsvHeader("LastBuild Url");
-            builder.AppendCsvHeader("Repository Type");
-            builder.AppendCsvHeader("Project Name");
-            builder.AppendCsvHeader("Project Id");
-            builder.AppendCsvHeader("Controller Id");
-            builder.AppendCsvHeader("Controller Name");
+            var result = await SendPostForBodyAndGetTypedResponseSingleAttempt<JsonBuildDefinition, JsonBuildDefinition>(
+                               requestUrl, buildDef);            
 
-            if (showLastRunInfo == true)
+            WriteLine();
+
+            if (result == null)
             {
-                builder.AppendCsvHeader("Build Number");
-                builder.AppendCsvHeader("Build Reason");
-                builder.AppendCsvHeader("Queued At");
-                builder.AppendCsvHeader("Started At");
-                builder.AppendCsvHeader("Finished At");
-                builder.AppendCsvHeader("Last Changed Date");
+                WriteLine("** Result was null **");
+            }            
+            else
+            {
+                WriteLine($"Build definition '{_BuildDefinitionName}' created as build definition id '{result.Id}'.");
             }
-
-            builder.AppendLine();
-        }
-
-        builder.AppendCsv("Id", data.Id);
-        builder.AppendCsv("Name", data.Name);
-        builder.AppendCsv("BuildType", data.BuildType);
-        builder.AppendCsv("DefaultDropLocation", data.DefaultDropLocation);
-        builder.AppendCsv("BuildArgs", data.BuildArgs);
-        builder.AppendCsv("CreatedOn", data.CreatedOn);
-        builder.AppendCsv("LastBuild Id", data.LastBuild.Id);
-        builder.AppendCsv("LastBuild Url", data.LastBuild.Url);
-        builder.AppendCsv("Repository Type", data.Repository.RepositoryType);
-        builder.AppendCsv("Project Name", data.Project.Name);
-        builder.AppendCsv("Project Id", data.Project.Id);
-        builder.AppendCsv("Controller Id", data.Controller.Id);
-        builder.AppendCsv("Controller Name", data.Controller.Name);
-
-        if (showLastRunInfo == true && _isXamlMode == true)
-        {
-            await AppendLastRunInfoForXaml(builder, data, true);
-        }
-        else if (showLastRunInfo == true && _isXamlMode == false)
-        {
-            AppendLastRunInfo(builder, data, true);
-        }
-
-        builder.AppendLine();
-    }
-
-    private void AppendLastRunInfo(StringBuilder builder,
-        XamlBuildDefinitionDetail definition, bool csv = false)
-    {
-        if (definition.LatestBuild == null && csv == true)
-        {
-            builder.AppendCsv("Build Number", string.Empty);
-            builder.AppendCsv("Build Reason", string.Empty);
-            builder.AppendCsv("Queued At", string.Empty);
-            builder.AppendCsv("Started At", string.Empty);
-            builder.AppendCsv("Finished At", string.Empty);
-            builder.AppendCsv("Last Changed Date", string.Empty);
-        }
-        else if (definition.LatestBuild == null && csv == false)
-        {
-            builder.AppendLabeledValue("Latest Build Info", "not available");
-        }
-        else if (definition.LatestBuild != null && csv == false)
-        {
-            builder.AppendLabeledValue("Build Number", definition.LatestBuild.BuildNumber);
-            builder.AppendLabeledValue("Queued At", definition.LatestBuild.QueueTime);
-            builder.AppendLabeledValue("Started At", definition.LatestBuild.StartTime);
-            builder.AppendLabeledValue("Finished At", definition.LatestBuild.FinishTime);
-            builder.AppendLabeledValue("Result", definition.LatestBuild.Result);
-            builder.AppendLabeledValue("Status", definition.LatestBuild.Status);
-            builder.AppendLabeledValue("Source Branch", definition.LatestBuild.TriggerInfo.SourceBranch);
-            builder.AppendLabeledValue("Source SHA", definition.LatestBuild.TriggerInfo.SourceSha);
-            builder.AppendLabeledValue("Source Message", definition.LatestBuild.TriggerInfo.Message);
-            builder.AppendLabeledValue("Trigger Repository", definition.LatestBuild.TriggerInfo.TriggerRepository);
-        }
-        else if (definition.LatestBuild != null && csv == true)
-        {
-            builder.AppendCsv("Build Number", definition.LatestBuild.BuildNumber);
-            builder.AppendCsv("Build Reason", string.Empty);
-            builder.AppendCsv("Queued At", definition.LatestBuild.QueueTime);
-            builder.AppendCsv("Started At", definition.LatestBuild.StartTime);
-            builder.AppendCsv("Finished At", definition.LatestBuild.FinishTime);
-            builder.AppendCsv("Last Changed Date", string.Empty);
         }
     }
 
-    private async Task AppendLastRunInfoForXaml(StringBuilder builder,
-        XamlBuildDefinitionDetail definition, bool csv = false)
-    {
-        string requestUrl;
-
-        if (Arguments.GetBooleanValue(Constants.ArgumentNameXaml) == true)
-        {
-            requestUrl = $"{definition.LastBuild.Url}?api-version=2.2";
-        }
-        else
-        {
-            requestUrl = $"{definition.LastBuild.Url}?api-version=7.0";
-        }
-
-        var result = await CallEndpointViaGetAndGetResult<XamlBuildRunInfo>(requestUrl);
-
-        if (result == null)
-        {
-            return;
-        }
-        else if (csv)
-        {
-            builder.AppendCsv("Build Number", result.BuildNumber);
-            builder.AppendCsv("Build Reason", result.BuildReason);
-            builder.AppendCsv("Queued At", result.QueueTime);
-            builder.AppendCsv("Started At", result.StartTime);
-            builder.AppendCsv("Finished At", result.FinishTime);
-            builder.AppendCsv("Last Changed Date", result.LastChangedDate);
-        }
-        else
-        {
-            builder.AppendLabeledValue("Build Number", result.BuildNumber);
-            builder.AppendLabeledValue("Build Reason", result.BuildReason);
-            builder.AppendLabeledValue("Queued At", result.QueueTime);
-            builder.AppendLabeledValue("Started At", result.StartTime);
-            builder.AppendLabeledValue("Finished At", result.FinishTime);
-            builder.AppendLabeledValue("Last Changed Date", result.LastChangedDate);
-        }
-    }
 
     private async Task<string?> GetBuildIdByBuildName(string buildDefinitionName)
     {

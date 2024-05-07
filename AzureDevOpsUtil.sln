@@ -19,6 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README-for-nuget.md = README-for-nuget.md
 		misc\readme-header.md = misc\readme-header.md
 		README.md = README.md
+		reinstall.ps1 = reinstall.ps1
 		uninstall.ps1 = uninstall.ps1
 		uninstall.sh = uninstall.sh
 	EndProjectSection

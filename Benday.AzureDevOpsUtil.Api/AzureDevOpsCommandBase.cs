@@ -409,6 +409,55 @@ public abstract class AzureDevOpsCommandBase : AsynchronousCommand
         return typedResponse;
     }
 
+    protected async Task<T> SendPutForBodyAndGetTypedResponseSingleAttempt<T>(
+        string requestUrl,
+        T body, bool writeStringContentToInfo = false,
+        string? optionalDebuggingMessageInfo = null
+    )
+    {
+        if (string.IsNullOrEmpty(requestUrl))
+        {
+            throw new ArgumentException($"{nameof(requestUrl)} is null or empty.", nameof(requestUrl));
+        }
+
+        using var client = GetHttpClientInstanceForAzureDevOps();
+
+        string requestAsJson;
+
+        requestAsJson = JsonSerializer.Serialize(body);
+
+        var result = await client.PutAsync(requestUrl, 
+            new StringContent(requestAsJson, Encoding.UTF8, "application/json"));
+
+        if (result.IsSuccessStatusCode == false)
+        {
+            var content = await result.Content.ReadAsStringAsync();
+
+            if (optionalDebuggingMessageInfo == null)
+            {
+                throw new InvalidOperationException(
+                        $"Problem with server call to {requestUrl}. {result.StatusCode} {result.ReasonPhrase} - {content}");
+            }
+            else
+            {
+                throw new InvalidOperationException(
+                                $"Problem with server call to {requestUrl}. Debug info = '{optionalDebuggingMessageInfo}'.  {result.StatusCode} {result.ReasonPhrase} - {content}");
+
+            }
+        }
+
+        var responseContent = await result.Content.ReadAsStringAsync();
+
+        if (writeStringContentToInfo == true)
+        {
+            WriteLine(responseContent);
+        }
+
+        var typedResponse = JsonUtilities.GetJsonValueAsType<T>(responseContent);
+
+        return typedResponse;
+    }
+
     protected static void AssertFileExists(string path, string argumentName)
     {
         if (File.Exists(path) == false)
