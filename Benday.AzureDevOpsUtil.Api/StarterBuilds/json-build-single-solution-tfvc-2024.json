@@ -2,9 +2,7 @@
   "options": [
     {
       "enabled": true,
-      "definition": {
-        "id": "5d58cc01-7c75-450c-be18-a388ddb129ec"
-      },
+      "definition": { "id": "5d58cc01-7c75-450c-be18-a388ddb129ec" },
       "inputs": {
         "branchFilters": "[\"+refs/heads/*\"]",
         "additionalFields": "{}"
@@ -12,9 +10,7 @@
     },
     {
       "enabled": false,
-      "definition": {
-        "id": "a9db38f9-9fdc-478c-b0f9-464221e58316"
-      },
+      "definition": { "id": "a9db38f9-9fdc-478c-b0f9-464221e58316" },
       "inputs": {
         "workItemType": "Task",
         "assignToRequestor": "true",
@@ -36,13 +32,11 @@
       "allowOverride": true
     }
   },
-  "properties": {
-  },
-  "tags": [
-  ],
+  "properties": {},
+  "tags": [],
   "_links": {
     "self": {
-      "href": "https://pudding.benday.com/MovedTpc/a6e45659-0bad-4712-b564-e553495ac619/_apis/build/Definitions/2?revision=4"
+      "href": "https://pudding.benday.com/MovedTpc/a6e45659-0bad-4712-b564-e553495ac619/_apis/build/Definitions/2?revision=5"
     },
     "web": {
       "href": "https://pudding.benday.com/MovedTpc/a6e45659-0bad-4712-b564-e553495ac619/_build/definition?definitionId=2"
@@ -54,8 +48,266 @@
       "href": "https://pudding.benday.com/MovedTpc/a6e45659-0bad-4712-b564-e553495ac619/_apis/build/status/2"
     }
   },
+  "latestBuild": {
+    "_links": {
+      "self": {
+        "href": "https://pudding.benday.com/MovedTpc/a6e45659-0bad-4712-b564-e553495ac619/_apis/build/Builds/25"
+      },
+      "web": {
+        "href": "https://pudding.benday.com/MovedTpc/a6e45659-0bad-4712-b564-e553495ac619/_build/results?buildId=25"
+      },
+      "timeline": {
+        "href": "https://pudding.benday.com/MovedTpc/a6e45659-0bad-4712-b564-e553495ac619/_apis/build/builds/25/Timeline"
+      },
+      "badge": {
+        "href": "https://pudding.benday.com/MovedTpc/a6e45659-0bad-4712-b564-e553495ac619/_apis/build/status/2"
+      }
+    },
+    "properties": {},
+    "tags": [],
+    "validationResults": [],
+    "plans": [ { "planId": "5cc559cf-1eff-4af8-90a8-6d6b8a4396ff" } ],
+    "triggerInfo": {},
+    "id": 25,
+    "buildNumber": "20240415.1",
+    "status": "completed",
+    "result": "succeeded",
+    "queueTime": "2024-04-15T19:04:45.660982Z",
+    "startTime": "2024-04-15T19:06:00.9387752Z",
+    "finishTime": "2024-04-15T19:06:48.1991663Z",
+    "url": "https://pudding.benday.com/MovedTpc/a6e45659-0bad-4712-b564-e553495ac619/_apis/build/Builds/25",
+    "definition": {
+      "drafts": [],
+      "id": 2,
+      "name": "test20240410-.NET Desktop-CI",
+      "url": "https://pudding.benday.com/MovedTpc/a6e45659-0bad-4712-b564-e553495ac619/_apis/build/Definitions/2?revision=5",
+      "uri": "vstfs:///Build/Definition/2",
+      "path": "\\",
+      "type": "build",
+      "queueStatus": "enabled",
+      "revision": 5,
+      "project": {
+        "id": "a6e45659-0bad-4712-b564-e553495ac619",
+        "name": "test20240410",
+        "url": "https://pudding.benday.com/MovedTpc/_apis/projects/a6e45659-0bad-4712-b564-e553495ac619",
+        "state": "wellFormed",
+        "revision": 14,
+        "visibility": "private",
+        "lastUpdateTime": "2024-04-10T15:24:39.307Z"
+      }
+    },
+    "buildNumberRevision": 1,
+    "project": {
+      "id": "a6e45659-0bad-4712-b564-e553495ac619",
+      "name": "test20240410",
+      "url": "https://pudding.benday.com/MovedTpc/_apis/projects/a6e45659-0bad-4712-b564-e553495ac619",
+      "state": "wellFormed",
+      "revision": 14,
+      "visibility": "private",
+      "lastUpdateTime": "2024-04-10T15:24:39.307Z"
+    },
+    "uri": "vstfs:///Build/Build/25",
+    "sourceBranch": "$/",
+    "sourceVersion": "14",
+    "queue": {
+      "id": 1,
+      "name": "Default",
+      "pool": {
+        "id": 1,
+        "name": "Default"
+      }
+    },
+    "priority": "normal",
+    "reason": "manual",
+    "requestedFor": {
+      "displayName": "Ben Day",
+      "url": "https://pudding.benday.com/MovedTpc/_apis/Identities/48bda790-0c8c-46c7-ba11-e0eebb0b8d59",
+      "_links": {
+        "avatar": {
+          "href": "https://pudding.benday.com/MovedTpc/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMzUxMjY2Njk5OC0yMjMzODc3OTY4LTU5MTI3NjE4MS0xMTA5"
+        }
+      },
+      "id": "48bda790-0c8c-46c7-ba11-e0eebb0b8d59",
+      "uniqueName": "BENDAY\\benday",
+      "imageUrl": "https://pudding.benday.com/MovedTpc/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMzUxMjY2Njk5OC0yMjMzODc3OTY4LTU5MTI3NjE4MS0xMTA5",
+      "descriptor": "win.Uy0xLTUtMjEtMzUxMjY2Njk5OC0yMjMzODc3OTY4LTU5MTI3NjE4MS0xMTA5"
+    },
+    "requestedBy": {
+      "displayName": "Ben Day",
+      "url": "https://pudding.benday.com/MovedTpc/_apis/Identities/48bda790-0c8c-46c7-ba11-e0eebb0b8d59",
+      "_links": {
+        "avatar": {
+          "href": "https://pudding.benday.com/MovedTpc/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMzUxMjY2Njk5OC0yMjMzODc3OTY4LTU5MTI3NjE4MS0xMTA5"
+        }
+      },
+      "id": "48bda790-0c8c-46c7-ba11-e0eebb0b8d59",
+      "uniqueName": "BENDAY\\benday",
+      "imageUrl": "https://pudding.benday.com/MovedTpc/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMzUxMjY2Njk5OC0yMjMzODc3OTY4LTU5MTI3NjE4MS0xMTA5",
+      "descriptor": "win.Uy0xLTUtMjEtMzUxMjY2Njk5OC0yMjMzODc3OTY4LTU5MTI3NjE4MS0xMTA5"
+    },
+    "lastChangedDate": "2024-04-15T19:06:48.74Z",
+    "lastChangedBy": {
+      "displayName": "Microsoft.TeamFoundation.System",
+      "url": "https://pudding.benday.com/MovedTpc/_apis/Identities/000007f5-0000-8888-8000-000000000000",
+      "_links": {
+        "avatar": {
+          "href": "https://pudding.benday.com/MovedTpc/_apis/GraphProfile/MemberAvatars/s2s.MDAwMDA3RjUtMDAwMC04ODg4LTgwMDAtMDAwMDAwMDAwMDAwQDAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDAwMA"
+        }
+      },
+      "id": "000007f5-0000-8888-8000-000000000000",
+      "uniqueName": "000007F5-0000-8888-8000-000000000000@00000000-0000-0000-0000-000000000000",
+      "imageUrl": "https://pudding.benday.com/MovedTpc/_apis/GraphProfile/MemberAvatars/s2s.MDAwMDA3RjUtMDAwMC04ODg4LTgwMDAtMDAwMDAwMDAwMDAwQDAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDAwMA",
+      "descriptor": "s2s.MDAwMDA3RjUtMDAwMC04ODg4LTgwMDAtMDAwMDAwMDAwMDAwQDAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDAwMA"
+    },
+    "parameters": "{\"BuildConfiguration\":\"release\",\"BuildPlatform\":\"any cpu\",\"system.debug\":\"False\"}",
+    "orchestrationPlan": { "planId": "5cc559cf-1eff-4af8-90a8-6d6b8a4396ff" },
+    "logs": {
+      "id": 0,
+      "type": "Container",
+      "url": "https://pudding.benday.com/MovedTpc/a6e45659-0bad-4712-b564-e553495ac619/_apis/build/builds/25/logs"
+    },
+    "repository": {
+      "id": "$/",
+      "type": "TfsVersionControl",
+      "name": "test20240410",
+      "url": "https://pudding.benday.com/MovedTpc/",
+      "clean": null,
+      "checkoutSubmodules": false
+    },
+    "retainedByRelease": false,
+    "triggeredByBuild": null
+  },
+  "latestCompletedBuild": {
+    "_links": {
+      "self": {
+        "href": "https://pudding.benday.com/MovedTpc/a6e45659-0bad-4712-b564-e553495ac619/_apis/build/Builds/25"
+      },
+      "web": {
+        "href": "https://pudding.benday.com/MovedTpc/a6e45659-0bad-4712-b564-e553495ac619/_build/results?buildId=25"
+      },
+      "timeline": {
+        "href": "https://pudding.benday.com/MovedTpc/a6e45659-0bad-4712-b564-e553495ac619/_apis/build/builds/25/Timeline"
+      },
+      "badge": {
+        "href": "https://pudding.benday.com/MovedTpc/a6e45659-0bad-4712-b564-e553495ac619/_apis/build/status/2"
+      }
+    },
+    "properties": {},
+    "tags": [],
+    "validationResults": [],
+    "plans": [ { "planId": "5cc559cf-1eff-4af8-90a8-6d6b8a4396ff" } ],
+    "triggerInfo": {},
+    "id": 25,
+    "buildNumber": "20240415.1",
+    "status": "completed",
+    "result": "succeeded",
+    "queueTime": "2024-04-15T19:04:45.660982Z",
+    "startTime": "2024-04-15T19:06:00.9387752Z",
+    "finishTime": "2024-04-15T19:06:48.1991663Z",
+    "url": "https://pudding.benday.com/MovedTpc/a6e45659-0bad-4712-b564-e553495ac619/_apis/build/Builds/25",
+    "definition": {
+      "drafts": [],
+      "id": 2,
+      "name": "test20240410-.NET Desktop-CI",
+      "url": "https://pudding.benday.com/MovedTpc/a6e45659-0bad-4712-b564-e553495ac619/_apis/build/Definitions/2?revision=5",
+      "uri": "vstfs:///Build/Definition/2",
+      "path": "\\",
+      "type": "build",
+      "queueStatus": "enabled",
+      "revision": 5,
+      "project": {
+        "id": "a6e45659-0bad-4712-b564-e553495ac619",
+        "name": "test20240410",
+        "url": "https://pudding.benday.com/MovedTpc/_apis/projects/a6e45659-0bad-4712-b564-e553495ac619",
+        "state": "wellFormed",
+        "revision": 14,
+        "visibility": "private",
+        "lastUpdateTime": "2024-04-10T15:24:39.307Z"
+      }
+    },
+    "buildNumberRevision": 1,
+    "project": {
+      "id": "a6e45659-0bad-4712-b564-e553495ac619",
+      "name": "test20240410",
+      "url": "https://pudding.benday.com/MovedTpc/_apis/projects/a6e45659-0bad-4712-b564-e553495ac619",
+      "state": "wellFormed",
+      "revision": 14,
+      "visibility": "private",
+      "lastUpdateTime": "2024-04-10T15:24:39.307Z"
+    },
+    "uri": "vstfs:///Build/Build/25",
+    "sourceBranch": "$/",
+    "sourceVersion": "14",
+    "queue": {
+      "id": 1,
+      "name": "Default",
+      "pool": {
+        "id": 1,
+        "name": "Default"
+      }
+    },
+    "priority": "normal",
+    "reason": "manual",
+    "requestedFor": {
+      "displayName": "Ben Day",
+      "url": "https://pudding.benday.com/MovedTpc/_apis/Identities/48bda790-0c8c-46c7-ba11-e0eebb0b8d59",
+      "_links": {
+        "avatar": {
+          "href": "https://pudding.benday.com/MovedTpc/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMzUxMjY2Njk5OC0yMjMzODc3OTY4LTU5MTI3NjE4MS0xMTA5"
+        }
+      },
+      "id": "48bda790-0c8c-46c7-ba11-e0eebb0b8d59",
+      "uniqueName": "BENDAY\\benday",
+      "imageUrl": "https://pudding.benday.com/MovedTpc/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMzUxMjY2Njk5OC0yMjMzODc3OTY4LTU5MTI3NjE4MS0xMTA5",
+      "descriptor": "win.Uy0xLTUtMjEtMzUxMjY2Njk5OC0yMjMzODc3OTY4LTU5MTI3NjE4MS0xMTA5"
+    },
+    "requestedBy": {
+      "displayName": "Ben Day",
+      "url": "https://pudding.benday.com/MovedTpc/_apis/Identities/48bda790-0c8c-46c7-ba11-e0eebb0b8d59",
+      "_links": {
+        "avatar": {
+          "href": "https://pudding.benday.com/MovedTpc/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMzUxMjY2Njk5OC0yMjMzODc3OTY4LTU5MTI3NjE4MS0xMTA5"
+        }
+      },
+      "id": "48bda790-0c8c-46c7-ba11-e0eebb0b8d59",
+      "uniqueName": "BENDAY\\benday",
+      "imageUrl": "https://pudding.benday.com/MovedTpc/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMzUxMjY2Njk5OC0yMjMzODc3OTY4LTU5MTI3NjE4MS0xMTA5",
+      "descriptor": "win.Uy0xLTUtMjEtMzUxMjY2Njk5OC0yMjMzODc3OTY4LTU5MTI3NjE4MS0xMTA5"
+    },
+    "lastChangedDate": "2024-04-15T19:06:48.74Z",
+    "lastChangedBy": {
+      "displayName": "Microsoft.TeamFoundation.System",
+      "url": "https://pudding.benday.com/MovedTpc/_apis/Identities/000007f5-0000-8888-8000-000000000000",
+      "_links": {
+        "avatar": {
+          "href": "https://pudding.benday.com/MovedTpc/_apis/GraphProfile/MemberAvatars/s2s.MDAwMDA3RjUtMDAwMC04ODg4LTgwMDAtMDAwMDAwMDAwMDAwQDAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDAwMA"
+        }
+      },
+      "id": "000007f5-0000-8888-8000-000000000000",
+      "uniqueName": "000007F5-0000-8888-8000-000000000000@00000000-0000-0000-0000-000000000000",
+      "imageUrl": "https://pudding.benday.com/MovedTpc/_apis/GraphProfile/MemberAvatars/s2s.MDAwMDA3RjUtMDAwMC04ODg4LTgwMDAtMDAwMDAwMDAwMDAwQDAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDAwMA",
+      "descriptor": "s2s.MDAwMDA3RjUtMDAwMC04ODg4LTgwMDAtMDAwMDAwMDAwMDAwQDAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDAwMA"
+    },
+    "parameters": "{\"BuildConfiguration\":\"release\",\"BuildPlatform\":\"any cpu\",\"system.debug\":\"False\"}",
+    "orchestrationPlan": { "planId": "5cc559cf-1eff-4af8-90a8-6d6b8a4396ff" },
+    "logs": {
+      "id": 0,
+      "type": "Container",
+      "url": "https://pudding.benday.com/MovedTpc/a6e45659-0bad-4712-b564-e553495ac619/_apis/build/builds/25/logs"
+    },
+    "repository": {
+      "id": "$/",
+      "type": "TfsVersionControl",
+      "name": "test20240410",
+      "url": "https://pudding.benday.com/MovedTpc/",
+      "clean": null,
+      "checkoutSubmodules": false
+    },
+    "retainedByRelease": false,
+    "triggeredByBuild": null
+  },
   "buildNumberFormat": "$(date:yyyyMMdd)$(rev:.r)",
-  "jobAuthorizationScope": 1,
+  "jobAuthorizationScope": "projectCollection",
   "jobTimeoutInMinutes": 60,
   "jobCancelTimeoutInMinutes": 5,
   "process": {
@@ -63,8 +315,7 @@
       {
         "steps": [
           {
-            "environment": {
-            },
+            "environment": {},
             "enabled": true,
             "continueOnError": false,
             "alwaysRun": false,
@@ -83,8 +334,7 @@
             }
           },
           {
-            "environment": {
-            },
+            "environment": {},
             "enabled": true,
             "continueOnError": false,
             "alwaysRun": false,
@@ -135,8 +385,7 @@
             }
           },
           {
-            "environment": {
-            },
+            "environment": {},
             "enabled": true,
             "continueOnError": false,
             "alwaysRun": false,
@@ -167,8 +416,7 @@
             }
           },
           {
-            "environment": {
-            },
+            "environment": {},
             "enabled": true,
             "continueOnError": false,
             "alwaysRun": false,
@@ -226,8 +474,7 @@
             }
           },
           {
-            "environment": {
-            },
+            "environment": {},
             "enabled": true,
             "continueOnError": true,
             "alwaysRun": false,
@@ -260,8 +507,7 @@
             }
           },
           {
-            "environment": {
-            },
+            "environment": {},
             "enabled": true,
             "continueOnError": false,
             "alwaysRun": true,
@@ -288,8 +534,7 @@
             }
           },
           {
-            "environment": {
-            },
+            "environment": {},
             "enabled": true,
             "continueOnError": false,
             "alwaysRun": true,
@@ -318,13 +563,11 @@
         "refName": "Job_1",
         "condition": "succeeded()",
         "target": {
-          "executionOptions": {
-            "type": 0
-          },
+          "executionOptions": { "type": 0 },
           "allowScriptsAuthAccessOption": false,
           "type": 1
         },
-        "jobAuthorizationScope": 1
+        "jobAuthorizationScope": "projectCollection"
       }
     ],
     "type": 1
@@ -332,7 +575,7 @@
   "repository": {
     "properties": {
       "cleanOptions": "3",
-      "tfvcMapping": "{\"mappings\":[{\"serverPath\":\"$/test20240410/Main/Benday.HelloWorld\",\"mappingType\":\"map\",\"localPath\":\"\\\\\"}]}",
+      "tfvcMapping": "{\"mappings\":[{\"serverPath\":\"$/test20240410/Main/Benday.HelloWorld\",\"mappingType\":\"map\",\"localPath\":\"\\\\test20240410\\\\Main\\\\Benday.HelloWorld\"},{\"serverPath\":\"$/AnotherProject123\",\"mappingType\":\"map\",\"localPath\":\"\\\\AnotherProject123\"}]}",
       "labelSources": "0",
       "labelSourcesFormat": "$(build.buildNumber)"
     },
@@ -340,7 +583,7 @@
     "type": "TfsVersionControl",
     "name": "test20240410",
     "url": "https://pudding.benday.com/MovedTpc/",
-    "defaultBranch": "$/test20240410/Main/Benday.HelloWorld",
+    "defaultBranch": "$/",
     "rootFolder": "$/test20240410",
     "clean": "true",
     "checkoutSubmodules": false
@@ -348,12 +591,9 @@
   "processParameters": {
     "inputs": [
       {
-        "aliases": [
-        ],
-        "options": {
-        },
-        "properties": {
-        },
+        "aliases": [],
+        "options": {},
+        "properties": {},
         "name": "solution",
         "label": "Solution",
         "defaultValue": "$/test20240410/Main/Benday.HelloWorld/Benday.HelloWorld.sln",
@@ -363,7 +603,7 @@
       }
     ]
   },
-  "quality": 1,
+  "quality": "definition",
   "authoredBy": {
     "displayName": "Ben Day",
     "url": "https://pudding.benday.com/MovedTpc/_apis/Identities/48bda790-0c8c-46c7-ba11-e0eebb0b8d59",
@@ -377,8 +617,7 @@
     "imageUrl": "https://pudding.benday.com/MovedTpc/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMzUxMjY2Njk5OC0yMjMzODc3OTY4LTU5MTI3NjE4MS0xMTA5",
     "descriptor": "win.Uy0xLTUtMjEtMzUxMjY2Njk5OC0yMjMzODc3OTY4LTU5MTI3NjE4MS0xMTA5"
   },
-  "drafts": [
-  ],
+  "drafts": [],
   "queue": {
     "_links": {
       "self": {
@@ -395,20 +634,20 @@
   },
   "id": 2,
   "name": "test20240410-.NET Desktop-CI",
-  "url": "https://pudding.benday.com/MovedTpc/a6e45659-0bad-4712-b564-e553495ac619/_apis/build/Definitions/2?revision=4",
+  "url": "https://pudding.benday.com/MovedTpc/a6e45659-0bad-4712-b564-e553495ac619/_apis/build/Definitions/2?revision=5",
   "uri": "vstfs:///Build/Definition/2",
   "path": "\\",
-  "type": 2,
-  "queueStatus": 0,
-  "revision": 4,
-  "createdDate": "2024-04-10T18:44:34.020Z",
+  "type": "build",
+  "queueStatus": "enabled",
+  "revision": 5,
+  "createdDate": "2024-04-15T19:04:45.293Z",
   "project": {
     "id": "a6e45659-0bad-4712-b564-e553495ac619",
     "name": "test20240410",
     "url": "https://pudding.benday.com/MovedTpc/_apis/projects/a6e45659-0bad-4712-b564-e553495ac619",
-    "state": 1,
+    "state": "wellFormed",
     "revision": 14,
-    "visibility": 0,
+    "visibility": "private",
     "lastUpdateTime": "2024-04-10T15:24:39.307Z"
   }
 }

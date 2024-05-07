@@ -118,6 +118,10 @@
     "import build": {
       "commandName": "Project",
       "commandLineArgs": "importbuilddef /teamproject:test20240410 /name:importtest123 /filename:C:\\temp\\builddefs\\helloworld-build-import-2.json"
+    },
+    "import build from xaml": {
+      "commandName": "Project",
+      "commandLineArgs": "importbuilddef /teamproject:test20240410 /name:importtest123xaml C:\\temp\\builddefs\\helloworld-build-import-2.json \"C:\\Users\\benday\\Downloads\\BuildDefinitionListCommand-v2\\BuildDefinitionListCommand\\HE\\HENightlyBuild.json\""
     }
   }
 }

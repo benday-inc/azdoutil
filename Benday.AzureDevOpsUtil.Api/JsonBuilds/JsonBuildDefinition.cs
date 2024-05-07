@@ -14,8 +14,11 @@ public class JsonBuildDefinition
     [JsonPropertyName("options")]
     public Option[] Options { get; set; } = new Option[0];
 
+    //[JsonPropertyName("variables")]
+    //public Variables Variables { get; set; } = new();
+
     [JsonPropertyName("variables")]
-    public Variables Variables { get; set; } = new();
+    public Dictionary<string, VariableValue> Variables { get; set; } = new();
 
     [JsonPropertyName("properties")]
     public JsonBuildProperties Properties { get; set; } = new();
@@ -509,7 +512,8 @@ public class Variables
 
     [JsonPropertyName("system.debug")]
     public SystemDebug SystemDebug { get; set; } = new();
-
+    
+    
 }
 
 
