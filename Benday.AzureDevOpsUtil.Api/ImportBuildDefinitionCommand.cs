@@ -190,7 +190,11 @@ public class ImportBuildDefinitionCommand : AzureDevOpsCommandBase
 
             xamlDumpFilename = Arguments.GetStringValue(Constants.ArgumentNameXamlDumpFilename);
 
+            WriteLine($"Verifying xaml dump file: '{xamlDumpFilename}'");
+
             xamlDumpFilename = CommandFrameworkUtilities.GetPathToSourceFile(xamlDumpFilename, true);
+
+            WriteLine($"Verified xaml dump file: '{xamlDumpFilename}'");
 
             xamlDumpInfo =
                 System.Text.Json.JsonSerializer.Deserialize<XamlBuildDumpInfo>(
@@ -198,8 +202,12 @@ public class ImportBuildDefinitionCommand : AzureDevOpsCommandBase
                         throw new KnownException($"Problem reading json file '{xamlDumpFilename}'");
         }
 
+        WriteLine($"Verifying input json file: '{originalValue}'");
+
         _Filename =
             CommandFrameworkUtilities.GetPathToSourceFile(originalValue, true);
+
+        WriteLine($"Verified input json file: '{_Filename}'");
 
         string json = File.ReadAllText(_Filename);
 
@@ -217,12 +225,22 @@ public class ImportBuildDefinitionCommand : AzureDevOpsCommandBase
                 Configuration.CollectionUrl, "$/", $"$/{_TeamProjectName}");
         }
 
+        var project = await GetExistingTeamProject(_TeamProjectName);
+
+        if (project == null)
+        {
+            throw new KnownException($"Team project '{_TeamProjectName}' not found.");
+        }
+
         var buildId = await GetBuildIdByBuildName(_BuildDefinitionName);
 
         if (buildId != null)
         {
             buildDef.Name = _BuildDefinitionName;
             buildDef.Id = int.Parse(buildId);
+            buildDef.Project.Id = project.Id;
+            buildDef.Project.Name = project.Name;
+
 
             WriteLine($"Build definition '{_BuildDefinitionName}' already exists as build definition id '{buildId}'.");
 
@@ -248,6 +266,8 @@ public class ImportBuildDefinitionCommand : AzureDevOpsCommandBase
 
             buildDef.Name = _BuildDefinitionName;
             buildDef.Id = 0;
+            buildDef.Project.Id = project.Id;
+            buildDef.Project.Name = project.Name;
 
             var requestUrl = $"{_TeamProjectName}/_apis/build/definitions?api-version=7.0";
 
@@ -265,6 +285,25 @@ public class ImportBuildDefinitionCommand : AzureDevOpsCommandBase
                 WriteLine($"Build definition '{_BuildDefinitionName}' created as build definition id '{result.Id}'.");
             }
         }
+    }
+
+    private async Task<TeamProjectInfo?> GetExistingTeamProject(string teamProjectName)
+    {
+        var teamProjectNameEncoded = teamProjectName.Replace(" ", "%20");
+
+        var requestUrl = $"_apis/projects/{teamProjectNameEncoded}?api-version=7.0&includeCapabilities=true";
+
+        try
+        {
+            var result = await CallEndpointViaGetAndGetResult<TeamProjectInfo>(requestUrl, false, false);
+
+            return result;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+
     }
 
 
@@ -285,6 +324,9 @@ public class ImportBuildDefinitionCommand : AzureDevOpsCommandBase
     private async Task<BuildDefinitionInfo?> GetBuildDefinitionByName(string name)
     {
         string requestUrl;
+
+        // encode name for url value
+        name = Uri.EscapeDataString(name);
 
         if (Arguments.GetBooleanValue(Constants.ArgumentNameXaml) == true)
         {

@@ -15,8 +15,8 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README-for-nuget.md</PackageReadmeFile>
     <PackageIcon>bdc_mark_128_128.png</PackageIcon>
-    <AssemblyVersion>2.2.0.0</AssemblyVersion>
-    <Version>$(VersionPrefix)2.2.0-alpha</Version>
+    <AssemblyVersion>2.2.2.0</AssemblyVersion>
+    <Version>$(VersionPrefix)2.2.2-alpha</Version>
     <Description>A collection of useful command line utilities for Azure DevOps</Description>
   </PropertyGroup>
   <ItemGroup>
