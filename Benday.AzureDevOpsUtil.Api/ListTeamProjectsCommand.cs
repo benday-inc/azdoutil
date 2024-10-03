@@ -36,6 +36,11 @@ public class ListTeamProjectsCommand : AzureDevOpsCommandBase
 
         var result = await client.GetStringAsync(requestUrl);
 
+        if (temp.IsSuccessStatusCode == false)
+        {
+            throw new KnownException($"Failed to get projects.  Status code: {temp.StatusCode}.  Content: {result}");
+        }
+
         var resultAsJson = JsonUtilities.GetJsonValueAsType<ListProjectsResponse>(result);
 
         LastResult = resultAsJson;

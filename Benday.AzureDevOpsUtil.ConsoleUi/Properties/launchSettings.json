@@ -12,10 +12,8 @@
       "commandName": "Project",
       "commandLineArgs": "forecastitemsinweeks /teamproject:\"Metrics and Dashboards Research\" /numberofdays:120 /forecastweeks:8"
     },
-
     "no-args": {
-      "commandName": "Project",
-      "commandLineArgs": ""
+      "commandName": "Project"
     },
     "get-project": {
       "commandName": "Project",
@@ -65,17 +63,14 @@
       "commandName": "Project",
       "commandLineArgs": "tfvc-to-git /config:demo2022 /teamproject:ProjectWithTfvc1 /tfvc-path:$/ProjectWithTfvc1/main /reponame:asdf2b"
     },
-
     "list-teams": {
       "commandName": "Project",
       "commandLineArgs": "listteams /teamproject:test20230601a"
     },
-
     "create-team": {
       "commandName": "Project",
       "commandLineArgs": "createteam /teamproject:test20230601a /name:bingbong6 /description:\"the team for bingbong6\""
     },
-
     "connection-data": {
       "commandName": "Project",
       "commandLineArgs": "connectiondata"
@@ -84,7 +79,6 @@
       "commandName": "Project",
       "commandLineArgs": "createfromgenerator /numberofsprints:2 /createproject:true /teamcount:3 /processname:\"Scrum with Backlog Refinement\" /teamproject:20230601e"
     },
-
     "thruput-cycle-time-for-team": {
       "commandName": "Project",
       "commandLineArgs": "throughputcycletime /teamproject:20230601e /numberofdays:60 /teamname:\"Team 1\""
@@ -120,6 +114,10 @@
     "cycle-time-confidence": {
       "commandName": "Project",
       "commandLineArgs": "cycletimeconfidence /teamproject:20230601e /numberofdays:80"
+    },
+    "listprojects": {
+      "commandName": "Project",
+      "commandLineArgs": "listprojects"
     }
   }
 }

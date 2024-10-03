@@ -1,5 +1,7 @@
 ﻿using System.Text.Json;
 
+using Benday.CommandsFramework;
+
 namespace Benday.AzureDevOpsUtil.Api;
 
 public static class JsonUtilities
@@ -25,6 +27,26 @@ public static class JsonUtilities
             else
             {
                 return returnValue;
+            }
+        }
+        catch (JsonException ex)
+        {
+            json = json.Trim();
+
+            var startsWithHtml = json.StartsWith("<!DOCTYPE html ");
+            var containsSigninWarning = json.Contains("Azure DevOps Services | Sign In");
+
+            if (startsWithHtml == true && containsSigninWarning == true)
+            {
+               throw new KnownException("Response from server indicates you are not signed in.  Did your token expire?");
+            }
+            else if (startsWithHtml == true)
+            {
+                throw new KnownException("Response from server is not json.");
+            }
+            else
+            {
+                throw new KnownException($"Failed to deserialize json.  {ex.Message}");
             }
         }
         catch (Exception ex)
