@@ -30,7 +30,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Benday.CommandsFramework" Version="4.0.0-beta" />
+    <PackageReference Include="Benday.CommandsFramework" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Benday.AzureDevOpsUtil.Api\Benday.AzureDevOpsUtil.Api.csproj" />
