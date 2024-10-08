@@ -35,6 +35,7 @@ public static class Constants
     public const string CommandArgumentName_ListTeams = "listteams";
     public const string CommandArgumentName_CreateTeam = "createteam";
     public const string CommandName_ConnectionData = "connectiondata";
+    public const string CommandArgumentNameExportProjectProcessTemplate = "exportprocesstemplate";
 
     public const string CommandName_ListProjects = "listprojects";
     public const string CommandName_GetProject = "getproject";
@@ -63,6 +64,7 @@ public static class Constants
 
     public const string ArgumentNameVerbose = "verbose";
     public const string ArgumentNameTeamProjectName = "teamproject";
+    public const string ArgumentNameAllProjects = "all";
     public const string ArgumentNameProcessName = "processname";
     public const string ArgumentNameRepositoryName = "reponame";
     public const string ArgumentNameTfvcFolder = "tfvc-path";
@@ -115,6 +117,7 @@ public static class Constants
     public const string CommandArg_AllPbisGoToDone = "alldone";
     public const string CommandArg_AddSessionTag = "addsessiontag";
     public const string ArgumentNameExportToPath = "exporttopath";
+    public const string ArgumentNamePathToWitAdminExe = "witadminpath";
     public const string CommandArg_State = "state";
     public const string CommandArg_StateTransitionDate = "date";
     public const string ArgumentNameWorkItemTypeName = "workitemtypename";

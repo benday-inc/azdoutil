@@ -97,6 +97,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | Version Control | [creategitrepo](#creategitrepo) | Creates a Git repository in an Azure DevOps Team Project. |
 | Version Control | [listgitrepos](#listgitrepos) | Gets list of Git repositories from an Azure DevOps Team Project. |
 | Version Control | [tfvc-to-git](#tfvc-to-git) | Converts a Team Foundation Version Control (TFVC) folder to a Git repository. |
+| Work Items | [exportprocesstemplate](#exportprocesstemplate) | Exports the process template configuration for one or more projects. This command only works on Windows and requires witadmin.exe to be installed. |
 | Work Items | [exportworkitemquery](#exportworkitemquery) | Export work item query results |
 | Work Items | [getareas](#getareas) | Gets a list of areas in an Azure DevOps Team Project. |
 | Work Items | [getfields](#getfields) | Gets a list of work item fields for a work item type in an Azure DevOps Team Project. |
@@ -369,6 +370,17 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | reponame | Required | String | Name of the new git repository |
 | tfvc-path | Required | String | Source TFVC folder to convert |
 # Work Items
+## <a name="exportprocesstemplate"></a> exportprocesstemplate
+**Exports the process template configuration for one or more projects. This command only works on Windows and requires witadmin.exe to be installed.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Optional | String | Team project name to export. |
+| all | Optional | Boolean | Export all projects in the organization or team project collection. |
+| exporttopath | Optional | String | Path to export the process template to.  If not specified, the current directory is used. |
+| witadminpath | Optional | String | Specify path to witadmin.exe if it can't be located automatically. |
 ## <a name="exportworkitemquery"></a> exportworkitemquery
 **Export work item query results**
 ### Arguments
@@ -431,6 +443,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | quiet | Optional | Boolean | Quiet mode |
 | config | Optional | String | Configuration name to use |
 | teamproject | Required | String | Team project name that contains the work item types |
+| nameonly | Optional | Boolean | Only show the name of the work item types in the results. |
 ## <a name="listworkitemqueries"></a> listworkitemqueries
 **Gets a list of all work item queries in an Azure DevOps Team Project.**
 ### Arguments

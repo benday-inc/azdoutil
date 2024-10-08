@@ -18,7 +18,7 @@
     <AssemblyVersion>2.1.0.0</AssemblyVersion>
     <Version>$(VersionPrefix)2.1.0</Version>
     <Description>A collection of useful command line utilities for Azure DevOps</Description>
-    <PackageReleaseNotes>v2.1 - Adding option to getworkitemtypes to only print the name</PackageReleaseNotes>
+    <PackageReleaseNotes>v2.1 - Added export process template command; Adding option to getworkitemtypes to only print the name</PackageReleaseNotes>
    
   </PropertyGroup>
   <ItemGroup>
