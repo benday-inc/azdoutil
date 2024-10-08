@@ -10,14 +10,16 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Authors>benday</Authors>
     <PackageProjectUrl>https://github.com/benday-inc/azdoutil</PackageProjectUrl>
-    <Copyright>2023</Copyright>
+    <Copyright>2024</Copyright>
     <RepositoryUrl>https://github.com/benday-inc/azdoutil.git</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README-for-nuget.md</PackageReadmeFile>
     <PackageIcon>bdc_mark_128_128.png</PackageIcon>
-    <AssemblyVersion>2.0.0.0</AssemblyVersion>
-    <Version>$(VersionPrefix)2.0.0</Version>
+    <AssemblyVersion>2.1.0.0</AssemblyVersion>
+    <Version>$(VersionPrefix)2.1.0</Version>
     <Description>A collection of useful command line utilities for Azure DevOps</Description>
+    <PackageReleaseNotes>v2.1 - Adding option to getworkitemtypes to only print the name</PackageReleaseNotes>
+   
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\bdc_mark_128_128.png">

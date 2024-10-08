@@ -24,12 +24,19 @@ public class GetWorkItemTypesCommand : AzureDevOpsCommandBase
         args.AddString(Constants.ArgumentNameTeamProjectName).AsRequired().
             WithDescription("Team project name that contains the work item types");
 
+        args.AddBoolean(Constants.ArgumentNameNameOnly).
+            AsNotRequired().
+            WithDefaultValue(false).
+            AllowEmptyValue().
+            WithDescription("Only show the name of the work item types in the results.");
+
         return args;
     }
 
     protected override async Task OnExecute()
     {
         var projectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);
+        var nameOnly = Arguments.GetBooleanValue(Constants.ArgumentNameNameOnly);
 
         await RunQuery(projectName);
 
@@ -37,11 +44,18 @@ public class GetWorkItemTypesCommand : AzureDevOpsCommandBase
         {
             foreach (var item in AllWorkItemTypes.Types)
             {
-                WriteLine(string.Empty);
+                if (nameOnly == false)
+                {
+                    WriteLine(string.Empty);
 
-                WriteLine($"Name: {item.Name}");
-                WriteLine($"ReferenceName: {item.ReferenceName}");
-                WriteLine($"Description: {item.Description}");
+                    WriteLine($"Name: {item.Name}");
+                    WriteLine($"ReferenceName: {item.ReferenceName}");
+                    WriteLine($"Description: {item.Description}");
+                }
+                else
+                {
+                    WriteLine(item.Name);
+                }
             }
         }
     }
