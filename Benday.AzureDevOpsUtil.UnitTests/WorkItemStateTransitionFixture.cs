@@ -1,4 +1,5 @@
 using Benday.AzureDevOpsUtil.Api;
+using Benday.AzureDevOpsUtil.Api.WorkItems;
 
 namespace Benday.AzureDevOpsUtil.UnitTests
 {

@@ -1,12 +1,12 @@
-namespace Benday.AzureDevOpsUtil.Api
+namespace Benday.AzureDevOpsUtil.Api.WorkItems
 {
     public class WorkItemStateTransition
     {
         public WorkItemStateTransition()
         {
-            From = string.Empty; 
+            From = string.Empty;
             To = string.Empty;
-            Reason= string.Empty;
+            Reason = string.Empty;
         }
 
         /// <summary>

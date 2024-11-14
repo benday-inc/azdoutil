@@ -1,4 +1,5 @@
-using Benday.AzureDevOpsUtil.Api;
+using Benday.AzureDevOpsUtil.Api.WorkItems;
+
 using System.Xml.Linq;
 public class BugWorkItemUpdaterForMissingFields
 {

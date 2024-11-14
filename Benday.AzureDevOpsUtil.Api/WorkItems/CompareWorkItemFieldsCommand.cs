@@ -6,11 +6,11 @@ using Benday.AzureDevOpsUtil.Api.Excel;
 using Benday.AzureDevOpsUtil.Api.Messages;
 using Benday.CommandsFramework;
 
-namespace Benday.AzureDevOpsUtil.Api;
+namespace Benday.AzureDevOpsUtil.Api.WorkItems;
 
 [Command(
     Category = Constants.Category_WorkItems,
-    Name = Constants.CommandArgumentNameCompareWitdFields, 
+    Name = Constants.CommandArgumentNameCompareWitdFields,
     Description = "Compare work item fields between two work item type definition files.", IsAsync = true)]
 public class CompareWorkItemFieldsCommand : AzureDevOpsCommandBase
 {

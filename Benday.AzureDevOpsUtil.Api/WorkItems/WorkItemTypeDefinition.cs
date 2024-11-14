@@ -1,6 +1,6 @@
 using System.Xml.Linq;
 
-namespace Benday.AzureDevOpsUtil.Api
+namespace Benday.AzureDevOpsUtil.Api.WorkItems
 {
     public class WorkItemTypeDefinition
     {
@@ -135,12 +135,12 @@ namespace Benday.AzureDevOpsUtil.Api
                 x.Attribute("FieldName")!.Value == refname
             ).FirstOrDefault();
 
-            return (match != null);
+            return match != null;
         }
 
         public bool HasField(string refname)
         {
-            return (GetFieldByRefname(refname) != null);
+            return GetFieldByRefname(refname) != null;
         }
 
         public bool HasPageInWebLayout(string pageName)
@@ -158,7 +158,7 @@ namespace Benday.AzureDevOpsUtil.Api
                 x.Attribute("Label")!.Value == pageName
             ).FirstOrDefault();
 
-            return (match != null);
+            return match != null;
         }
 
         public List<XElement> GetFields()
@@ -234,9 +234,9 @@ namespace Benday.AzureDevOpsUtil.Api
                 return new();
             }
 
-            var matches = (from temp in allStates
+            var matches = from temp in allStates
                            where temp.Descendants("READONLY").FirstOrDefault() != null
-                           select temp);
+                           select temp;
 
             return matches.ToList();
         }
@@ -539,8 +539,8 @@ namespace Benday.AzureDevOpsUtil.Api
 
             var matches = (from temp in transitions.Elements("TRANSITION")
                            where
-                           (XmlUtility.GetAttributeValue(temp, "from") == state ||
-                           XmlUtility.GetAttributeValue(temp, "to") == state)
+                           XmlUtility.GetAttributeValue(temp, "from") == state ||
+                           XmlUtility.GetAttributeValue(temp, "to") == state
                            select temp).ToList();
 
             foreach (var removeThis in matches)

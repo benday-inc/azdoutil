@@ -1,4 +1,4 @@
-namespace Benday.AzureDevOpsUtil.Api
+namespace Benday.AzureDevOpsUtil.Api.WorkItems
 {
     public class WorkItemStateTransitionCollection : List<WorkItemStateTransition>
     {
