@@ -555,6 +555,23 @@ namespace Benday.AzureDevOpsUtil.Api.WorkItems
             AddTransition(new WorkItemStateTransition("Done", "TemporaryDone"));
             AddTransition(new WorkItemStateTransition("TemporaryDone", "Done"));
         }
+
+        public void CopyField(WorkItemFieldDefinition sourceField)
+        {
+            var fieldsElement = GetFieldsElement();
+
+            if (fieldsElement == null)
+            {
+                throw new InvalidOperationException($"Could not locate fields element.");
+            }
+
+            fieldsElement.Add(sourceField.Element);
+        }
+
+        public void CopyField(WorkItemFieldDefinition sourceField, WorkItemFieldDefinition targetField)
+        {
+            targetField.Element.ReplaceWith(sourceField.Element);
+        }
     }
 
 }

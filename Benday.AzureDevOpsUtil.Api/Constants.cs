@@ -26,6 +26,7 @@ public static class Constants
     public const string CommandArgumentNameExportBuildDefinition = "exportbuilddef";
     public const string CommandArgumentNameCreateGitRepository = "creategitrepo";
     public const string CommandArgumentNameCompareWitdFields = "comparewitdfields";
+    public const string CommandArgumentNameCopyWitdField = "copywitdfield";
     public const string CommandArgumentNameImportTfvcToGit = "tfvc-to-git";
     public const string CommandArgumentNameListWorkItemQueries = "listworkitemqueries";
     public const string CommandArgumentNameGetIterations = "getiterations";
@@ -89,6 +90,8 @@ public static class Constants
     public const string ArgumentNameComparisonFile1 = "file1";
     public const string ArgumentNameComparisonFile2 = "file2";
     public const string ArgumentNameReverseSourceAndTarget = "flip";
+    public const string ArgumentNameFieldRefName = "refname";
+    public const string ArgumentNameOverwrite = "overwrite";
 
     public const string ArgumentNameCycleTimeNumberOfDays = "numberofdays";
     public const string ArgumentNameForecastNumberOfWeeks = "forecastweeks";
