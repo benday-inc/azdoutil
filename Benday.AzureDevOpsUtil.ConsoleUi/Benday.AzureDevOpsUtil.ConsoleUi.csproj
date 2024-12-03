@@ -15,10 +15,10 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README-for-nuget.md</PackageReadmeFile>
     <PackageIcon>bdc_mark_128_128.png</PackageIcon>
-    <AssemblyVersion>2.1.0.0</AssemblyVersion>
-    <Version>$(VersionPrefix)2.1.0</Version>
+    <AssemblyVersion>2.2.1.0</AssemblyVersion>
+    <Version>$(VersionPrefix)2.2.1</Version>
     <Description>A collection of useful command line utilities for Azure DevOps</Description>
-    <PackageReleaseNotes>v2.1 - Added export process template command; Adding option to getworkitemtypes to only print the name</PackageReleaseNotes>
+    <PackageReleaseNotes></PackageReleaseNotes>
    
   </PropertyGroup>
   <ItemGroup>
@@ -32,7 +32,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Benday.CommandsFramework" Version="4.3.0" />
+    <PackageReference Include="Benday.CommandsFramework" Version="4.4.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Benday.AzureDevOpsUtil.Api\Benday.AzureDevOpsUtil.Api.csproj" />

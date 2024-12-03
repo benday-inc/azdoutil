@@ -30,7 +30,7 @@ public class CopyWorkItemFieldCommand : AzureDevOpsCommandBase
             .FromPositionalArgument(1);
 
         args.AddString(Constants.ArgumentNameComparisonFile2).AsRequired().
-            WithDescription("Path to the source work item type definition file.")
+            WithDescription("Path to the target work item type definition file.")
             .FromPositionalArgument(2);
 
         args.AddString(Constants.ArgumentNameFieldRefName).AsRequired().
