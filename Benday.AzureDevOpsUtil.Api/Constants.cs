@@ -28,6 +28,7 @@ public static class Constants
     public const string CommandArgumentNameCompareWitdFields = "comparewitdfields";
     public const string CommandArgumentNameCopyWitdField = "copywitdfield";
     public const string CommandArgumentNameCopyCategory = "copycategory";
+    public const string CommandArgumentNameUpdateProcessConfig = "updateprocessconfig";
     public const string CommandArgumentNameImportTfvcToGit = "tfvc-to-git";
     public const string CommandArgumentNameListWorkItemQueries = "listworkitemqueries";
     public const string CommandArgumentNameGetIterations = "getiterations";

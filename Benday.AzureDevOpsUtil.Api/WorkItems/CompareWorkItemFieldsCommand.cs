@@ -74,8 +74,8 @@ public class CompareWorkItemFieldsCommand : AzureDevOpsCommandBase
         var fields1 = GetFieldDefinitions(witd1.GetFields());
         var fields2 = GetFieldDefinitions(witd2.GetFields());
 
-        var fieldNames1 = fields1.Select(x => x.Name).OrderBy(x => x).ToList();
-        var fieldNames2 = fields2.Select(x => x.Name).OrderBy(x => x).ToList();
+        var fieldNames1 = fields1.Select(x => x.RefName).OrderBy(x => x).ToList();
+        var fieldNames2 = fields2.Select(x => x.RefName).OrderBy(x => x).ToList();
 
         var in1Not2 = fieldNames1.Except(fieldNames2).ToList();
         var in2Not1 = fieldNames2.Except(fieldNames1).ToList();

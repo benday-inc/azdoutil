@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
@@ -15,8 +15,8 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README-for-nuget.md</PackageReadmeFile>
     <PackageIcon>bdc_mark_128_128.png</PackageIcon>
-    <AssemblyVersion>2.2.1.0</AssemblyVersion>
-    <Version>$(VersionPrefix)2.2.1</Version>
+    <AssemblyVersion>2.3.0.0</AssemblyVersion>
+    <Version>$(VersionPrefix)2.3.0</Version>
     <Description>A collection of useful command line utilities for Azure DevOps</Description>
     <PackageReleaseNotes></PackageReleaseNotes>
    
