@@ -16,4 +16,6 @@ else
     ./uninstall.sh
 fi
 
+dotnet build
+
 dotnet tool install --global --add-source ./Benday.AzureDevOpsUtil.ConsoleUi/bin/Debug azdoutil

@@ -45,6 +45,7 @@ public static class Constants
     public const string CommandName_GetProject = "getproject";
     public const string CommandName_CreateWorkItemsFromExcelScript = "createfromexcel";
     public const string CommandName_CreateWorkItemsFromDataGenerator = "createfromgenerator";
+    public const string CommandName_CreateWorkItemsRandom = "createrandomworkitems";
     public const string CommandName_CreateProject = "createproject";
     public const string CommandName_ListProcessTemplates = "listprocesstemplates";
     public const string CommandName_SetIteration = "setiteration";
@@ -122,6 +123,7 @@ public static class Constants
     public const string CommandArg_EndDate = "enddate";
     public const string CommandArg_IterationName = "name";
     public const string CommandArg_SprintCount = "numberofsprints";
+    public const string CommandArg_TitlesOnly = "titlesonly";
     public const string CommandArg_WorkItemId = "id";
     public const string CommandArg_AllPbisGoToDone = "alldone";
     public const string CommandArg_AddSessionTag = "addsessiontag";
