@@ -93,9 +93,13 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | Project Administration | listteams | Gets list of teams in an Azure DevOps Team Project. |
 | Test Data | createfromexcel | Create work items using Excel script |
 | Test Data | createfromgenerator | Create work items using random data generator |
+| Test Data | createrandomtitles | Create fake work item titles using random data generator without creating any work items. |
 | Version Control | creategitrepo | Creates a Git repository in an Azure DevOps Team Project. |
 | Version Control | listgitrepos | Gets list of Git repositories from an Azure DevOps Team Project. |
 | Version Control | tfvc-to-git | Converts a Team Foundation Version Control (TFVC) folder to a Git repository. |
+| Work Items | comparewitdfields | Compare work item fields between two work item type definition files. |
+| Work Items | copycategory | Copy category type from one category file to another. |
+| Work Items | copywitdfield | Copy work item field from one work item type definition to another. |
 | Work Items | exportprocesstemplate | Exports the process template configuration for one or more projects. This command only works on Windows and requires witadmin.exe to be installed. |
 | Work Items | exportworkitemquery | Export work item query results |
 | Work Items | getareas | Gets a list of areas in an Azure DevOps Team Project. |
@@ -340,6 +344,13 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | addsessiontag | Optional | Boolean | Add a session tag to work items |
 | output | Optional | String | Save generated script file to disk in this directory. Note the filename will be auto-generated. |
 | scriptonly | Optional | Boolean | Creates the excel export script. Requires an arg value for 'output' |
+## createrandomtitles
+**Create fake work item titles using random data generator without creating any work items.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
 # Version Control
 ## creategitrepo
 **Creates a Git repository in an Azure DevOps Team Project.**
@@ -369,6 +380,32 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | reponame | Required | String | Name of the new git repository |
 | tfvc-path | Required | String | Source TFVC folder to convert |
 # Work Items
+## comparewitdfields
+**Compare work item fields between two work item type definition files.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| file1 | Required | String | Path to the source work item type definition file. |
+| file2 | Required | String | Path to the source work item type definition file. |
+| flip | Optional | Boolean | Reverse the source and target files. |
+## copycategory
+**Copy category type from one category file to another.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| file1 | Required | String | Path to the source category definition file. |
+| file2 | Required | String | Path to the target category definition file. |
+| refname | Required | String | Refname of the category to copy. |
+| overwrite | Required | Boolean | Overwrite the target field if it already exists. |
+## copywitdfield
+**Copy work item field from one work item type definition to another.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| file1 | Required | String | Path to the source work item type definition file. |
+| file2 | Required | String | Path to the target work item type definition file. |
+| refname | Required | String | Refname of the field to copy. |
+| overwrite | Required | Boolean | Overwrite the target field if it already exists. |
 ## exportprocesstemplate
 **Exports the process template configuration for one or more projects. This command only works on Windows and requires witadmin.exe to be installed.**
 ### Arguments

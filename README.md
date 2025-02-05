@@ -4,8 +4,6 @@ A collection of useful Azure DevOps utilities.
 Written by Benjamin Day  
 Pluralsight Author | Microsoft MVP | Scrum.org Professional Scrum Trainer  
 https://www.benday.com  
-https://www.slidespeaker.ai
-
 info@benday.com 
 
 *Got ideas for Azure DevOps utilities you'd like to see? Found a bug? Let us know by submitting an issue https://github.com/benday-inc/azdoutil/issues*. *Want to contribute? Submit a pull request.*
@@ -96,9 +94,13 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | Project Administration | [listteams](#listteams) | Gets list of teams in an Azure DevOps Team Project. |
 | Test Data | [createfromexcel](#createfromexcel) | Create work items using Excel script |
 | Test Data | [createfromgenerator](#createfromgenerator) | Create work items using random data generator |
+| Test Data | [createrandomtitles](#createrandomtitles) | Create fake work item titles using random data generator without creating any work items. |
 | Version Control | [creategitrepo](#creategitrepo) | Creates a Git repository in an Azure DevOps Team Project. |
 | Version Control | [listgitrepos](#listgitrepos) | Gets list of Git repositories from an Azure DevOps Team Project. |
 | Version Control | [tfvc-to-git](#tfvc-to-git) | Converts a Team Foundation Version Control (TFVC) folder to a Git repository. |
+| Work Items | [comparewitdfields](#comparewitdfields) | Compare work item fields between two work item type definition files. |
+| Work Items | [copycategory](#copycategory) | Copy category type from one category file to another. |
+| Work Items | [copywitdfield](#copywitdfield) | Copy work item field from one work item type definition to another. |
 | Work Items | [exportprocesstemplate](#exportprocesstemplate) | Exports the process template configuration for one or more projects. This command only works on Windows and requires witadmin.exe to be installed. |
 | Work Items | [exportworkitemquery](#exportworkitemquery) | Export work item query results |
 | Work Items | [getareas](#getareas) | Gets a list of areas in an Azure DevOps Team Project. |
@@ -343,6 +345,13 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | addsessiontag | Optional | Boolean | Add a session tag to work items |
 | output | Optional | String | Save generated script file to disk in this directory. Note the filename will be auto-generated. |
 | scriptonly | Optional | Boolean | Creates the excel export script. Requires an arg value for 'output' |
+## <a name="createrandomtitles"></a> createrandomtitles
+**Create fake work item titles using random data generator without creating any work items.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
 # Version Control
 ## <a name="creategitrepo"></a> creategitrepo
 **Creates a Git repository in an Azure DevOps Team Project.**
@@ -372,6 +381,32 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | reponame | Required | String | Name of the new git repository |
 | tfvc-path | Required | String | Source TFVC folder to convert |
 # Work Items
+## <a name="comparewitdfields"></a> comparewitdfields
+**Compare work item fields between two work item type definition files.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| file1 | Required | String | Path to the source work item type definition file. |
+| file2 | Required | String | Path to the source work item type definition file. |
+| flip | Optional | Boolean | Reverse the source and target files. |
+## <a name="copycategory"></a> copycategory
+**Copy category type from one category file to another.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| file1 | Required | String | Path to the source category definition file. |
+| file2 | Required | String | Path to the target category definition file. |
+| refname | Required | String | Refname of the category to copy. |
+| overwrite | Required | Boolean | Overwrite the target field if it already exists. |
+## <a name="copywitdfield"></a> copywitdfield
+**Copy work item field from one work item type definition to another.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| file1 | Required | String | Path to the source work item type definition file. |
+| file2 | Required | String | Path to the target work item type definition file. |
+| refname | Required | String | Refname of the field to copy. |
+| overwrite | Required | Boolean | Overwrite the target field if it already exists. |
 ## <a name="exportprocesstemplate"></a> exportprocesstemplate
 **Exports the process template configuration for one or more projects. This command only works on Windows and requires witadmin.exe to be installed.**
 ### Arguments
