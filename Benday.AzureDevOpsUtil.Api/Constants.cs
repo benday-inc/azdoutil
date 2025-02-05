@@ -45,7 +45,7 @@ public static class Constants
     public const string CommandName_GetProject = "getproject";
     public const string CommandName_CreateWorkItemsFromExcelScript = "createfromexcel";
     public const string CommandName_CreateWorkItemsFromDataGenerator = "createfromgenerator";
-    public const string CommandName_CreateWorkItemsRandom = "createrandomworkitems";
+    public const string CommandName_CreateRandomTitles = "createrandomtitles";
     public const string CommandName_CreateProject = "createproject";
     public const string CommandName_ListProcessTemplates = "listprocesstemplates";
     public const string CommandName_SetIteration = "setiteration";

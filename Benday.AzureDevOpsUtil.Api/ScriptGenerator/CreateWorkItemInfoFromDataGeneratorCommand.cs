@@ -8,8 +8,8 @@ namespace Benday.AzureDevOpsUtil.Api.ScriptGenerator;
 
 [Command(
     Category = Constants.Category_TestData,
-    Name = Constants.CommandName_CreateWorkItemsRandom,
-        Description = "Create work items data using random data generator",
+    Name = Constants.CommandName_CreateRandomTitles,
+        Description = "Create fake work item titles using random data generator without creating any work items.",
         IsAsync = true)]
 public class CreateWorkItemInfoFromDataGeneratorCommand : AzureDevOpsCommandBase
 {
