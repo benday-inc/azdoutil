@@ -15,10 +15,12 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README-for-nuget.md</PackageReadmeFile>
     <PackageIcon>bdc_mark_128_128.png</PackageIcon>
-    <AssemblyVersion>2.3.0.0</AssemblyVersion>
-    <Version>$(VersionPrefix)2.3.0</Version>
+    <AssemblyVersion>2.4.0.0</AssemblyVersion>
+    <Version>$(VersionPrefix)2.4.0</Version>
     <Description>A collection of useful command line utilities for Azure DevOps</Description>
-    <PackageReleaseNotes></PackageReleaseNotes>
+    <PackageReleaseNotes>
+      v2.4 - added support for work item type definition comparison
+    </PackageReleaseNotes>
    
   </PropertyGroup>
   <ItemGroup>
