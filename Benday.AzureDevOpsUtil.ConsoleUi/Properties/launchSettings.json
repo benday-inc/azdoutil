@@ -118,6 +118,10 @@
     "listprojects": {
       "commandName": "Project",
       "commandLineArgs": "listprojects"
+    },
+    "listagentpools": {
+      "commandName": "Project",
+      "commandLineArgs": "listagentpools"
     }
   }
 }

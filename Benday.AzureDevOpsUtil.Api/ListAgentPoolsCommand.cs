@@ -2,56 +2,42 @@
 using System.Text;
 
 using Benday.AzureDevOpsUtil.Api.Messages;
+using Benday.AzureDevOpsUtil.Api.Messages.AgentPools;
 using Benday.CommandsFramework;
 
 namespace Benday.AzureDevOpsUtil.Api;
 
 [Command(
     Category = Constants.Category_Builds,
-    Name = Constants.CommandArgumentNameListBuildDefinitions,
-        Description = "List build definitions",
+    Name = Constants.CommandArgumentNameListAgentPools,
+        Description = "List agent pools",
         IsAsync = true)]
-public class ListBuildDefinitionsCommand : AzureDevOpsCommandBase
+public class ListAgentPoolsCommand : AzureDevOpsCommandBase
 {
-    private string _TeamProjectName = string.Empty;
+    public GetAgentPoolsResponse? LastResult { get; private set; }
 
-    public BuildDefinitionInfoResponse? LastResult { get; private set; }
-
-    public ListBuildDefinitionsCommand(
+    public ListAgentPoolsCommand(
         CommandExecutionInfo info, ITextOutputProvider outputProvider) : base(info, outputProvider)
     {
     }
 
     public override ArgumentCollection GetArguments()
     {
-        var arguments = new ArgumentCollection();
-
-        arguments.AddString(Constants.ArgumentNameTeamProjectName)
-            .WithDescription("Team project name");
-
-        arguments.AddBoolean(Constants.ArgumentNameNameOnly)
-            .AllowEmptyValue()
-            .WithDescription("Only display the build definition name")
-            .AsNotRequired();
-
-        arguments.AddBoolean(Constants.ArgumentNameXaml)
-            .AllowEmptyValue()
-            .WithDescription("List XAML build definitions")
-            .AsNotRequired();
+        var arguments = new ArgumentCollection();        
 
         return arguments;
     }
 
     protected override async Task OnExecute()
     {
-        _TeamProjectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);
+        // _TeamProjectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);
 
         var results = await GetResult();
 
         if (results == null)
         {
             WriteLine(String.Empty);
-            WriteLine("No build definitions found");
+            WriteLine("No agent pools found");
         }
         else
         {
@@ -59,43 +45,85 @@ public class ListBuildDefinitionsCommand : AzureDevOpsCommandBase
 
             WriteLine($"Result count: {results.Count}");
 
-            results.ForEach(x => WriteLine(ToString(x)));
+            foreach (var item in results.Pools)
+            {
+                Print(item);
+
+            }
         }
     }
-
-    private async Task<List<BuildDefinitionInfo>?> GetResult()
+    private void WriteLine(string label, string? value)
     {
-        string requestUrl;
+        WriteLine($"{label}: {value}");
+    }
 
-        if (Arguments.GetBooleanValue(Constants.ArgumentNameXaml) == true)
+    private void WriteLine(string label, bool value)
+    {
+        WriteLine(label, value.ToString());
+    }
+
+    private void WriteLine(string label, int value)
+    {
+        WriteLine(label, value.ToString());
+    }
+
+
+    private void WriteLine(string label, int? value)
+    {
+        if (value.HasValue == true)
         {
-            WriteLine("** GETTING XAML BUILD DEFINITIONS **");
-            requestUrl = $"{_TeamProjectName}/_apis/build/definitions?api-version=2.2";
+            WriteLine(label, value.Value);
         }
         else
         {
-            requestUrl = $"{_TeamProjectName}/_apis/build/definitions?api-version=7.0";
+            WriteLine(label, "null");
         }
+    }
 
-        var result = await CallEndpointViaGetAndGetResult<BuildDefinitionInfoResponse>(requestUrl);
+    private void WriteLine(string label, Owner? value)
+    {
+        if (value == null)
+        {
+            WriteLine(label, "null");
+        }
+        else
+        {
+            WriteLine(label, value.DisplayName);
+        }
+    }
+
+    private void Print(AgentPool item)
+    {
+        WriteLine("***********");
+        WriteLine("Name", item.Name);
+        WriteLine("Id", item.Id);
+        WriteLine("IsHosted", item.IsHosted);
+        WriteLine("IsLegacy", item.IsLegacy);
+        WriteLine("PoolType", item.PoolType);
+        WriteLine("Size", item.Size);
+        WriteLine("Options", item.Options);
+        WriteLine("CreatedOn", item.CreatedOn);
+        WriteLine("AutoProvision", item.AutoProvision);
+        WriteLine("AutoUpdate", item.AutoUpdate);
+        WriteLine("AutoSize", item.AutoSize);
+        WriteLine("TargetSize", item.TargetSize);
+        WriteLine("AgentCloudId", item.AgentCloudId);
+        WriteLine("CreatedBy", item.CreatedBy);
+        WriteLine("Owner", item.Owner);
+        WriteLine("Scope", item.Scope);
+
+        WriteLine();
+    }
+
+    private async Task<GetAgentPoolsResponse?> GetResult()
+    {
+        string requestUrl;
+        requestUrl = $"_apis/distributedtask/pools?api-version=7.1-preview.1";
+
+        var result = await CallEndpointViaGetAndGetResult<GetAgentPoolsResponse>(requestUrl);
 
         LastResult = result;
 
-        return result?.Values;
-    }
-
-    private string ToString(BuildDefinitionInfo definition)
-    {
-        var builder = new StringBuilder();
-        builder.Append(definition.Name);
-
-        if (Arguments.GetBooleanValue(Constants.ArgumentNameNameOnly) == false)
-        {
-            builder.Append(" (");
-            builder.Append(definition.Id);
-            builder.Append(")");
-        }
-
-        return builder.ToString();
+        return result;
     }
 }
