@@ -13,6 +13,9 @@ public class BuildDefinitionInfo
     [JsonPropertyName("itemType")]
     public string ItemType { get; set; } = string.Empty;
 
+    [JsonPropertyName("queue")]
+    public BuildDefinitionQueue Queue { get; set; } = new();
+
     [JsonPropertyName("revision")]
     public int Revision { get; set; }
 

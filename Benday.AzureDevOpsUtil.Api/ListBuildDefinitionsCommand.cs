@@ -74,7 +74,7 @@ public class ListBuildDefinitionsCommand : AzureDevOpsCommandBase
         }
         else
         {
-            requestUrl = $"{_TeamProjectName}/_apis/build/definitions?api-version=7.0";
+            requestUrl = $"{_TeamProjectName}/_apis/build/definitions?api-version=7.1";
         }
 
         var result = await CallEndpointViaGetAndGetResult<BuildDefinitionInfoResponse>(requestUrl);
@@ -93,7 +93,18 @@ public class ListBuildDefinitionsCommand : AzureDevOpsCommandBase
         {
             builder.Append(" (");
             builder.Append(definition.Id);
-            builder.Append(")");
+            builder.Append(")");      
+            
+            if (definition.Queue != null && definition.Queue.Pool != null)
+            {
+                builder.Append(" - [Queue Name: ");
+                builder.Append(definition.Queue.Pool.Name);
+                builder.Append(", Queue Pool Id: ");
+                builder.Append(definition.Queue.Pool.Id);
+                builder.Append(", Pool Is Hosted: ");
+                builder.Append(definition.Queue.Pool.IsHosted);
+                builder.Append("]");
+            }
         }
 
         return builder.ToString();
