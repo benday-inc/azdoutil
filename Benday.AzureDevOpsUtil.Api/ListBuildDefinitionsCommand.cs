@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Text;
+using System.Text.Json;
 
 using Benday.AzureDevOpsUtil.Api.Messages;
 using Benday.CommandsFramework;
@@ -39,12 +40,29 @@ public class ListBuildDefinitionsCommand : AzureDevOpsCommandBase
             .WithDescription("List XAML build definitions")
             .AsNotRequired();
 
+        arguments.AddBoolean(Constants.CommandArgumentNameToJson)
+            .AllowEmptyValue()
+            .WithDescription("Export to JSON")
+            .AsNotRequired();
+
         return arguments;
+    }
+
+    private string SerializeObjectToJson(List<BuildDefinitionInfo> results)
+    {
+        var json = JsonSerializer.Serialize(results, new JsonSerializerOptions
+        {
+            WriteIndented = true
+        });
+
+        return json;
     }
 
     protected override async Task OnExecute()
     {
         _TeamProjectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);
+
+        var toJson = Arguments.GetBooleanValue(Constants.CommandArgumentNameToJson);
 
         var results = await GetResult();
 
@@ -52,6 +70,10 @@ public class ListBuildDefinitionsCommand : AzureDevOpsCommandBase
         {
             WriteLine(String.Empty);
             WriteLine("No build definitions found");
+        }
+        else if (toJson == true)
+        {
+            WriteLine(SerializeObjectToJson(results));
         }
         else
         {
