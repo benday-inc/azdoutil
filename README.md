@@ -20,7 +20,7 @@ info@benday.com
 
 <dt>Flow Metrics</dt>
 <dd>Tools for forecasting project management details using Flow Metrics such as throughput and cycle time. <p /><p><i>Want to learn more about how to use Flow Metrics to run your projects? Check out this course: <br />
-    <b><a href="https://courses.benday.com/c/flow-metrics-2023">Predicting the Future, Estimating, and Running Your Projects with Flow Metrics</a></b>.</i></p></dd>
+    <b><a href="https://www.youtube.com/playlist?list=PLGxFXI4dC2sh6yEbibjMCWHECEVB7lRFi">Predicting the Future, Estimating, and Running Your Projects with Flow Metrics</a></b>.</i></p></dd>
 
 <dt>Process Templates</dt>
 <dd>Process template customization and administration utilities</dd>
@@ -46,7 +46,7 @@ The azdoutil is distributed as a .NET Core Tool via NuGet. To install it go to t
 `dotnet tool install azdoutil -g`
 
 ### Prerequisites
-- You'll need to install .NET Core 7 from https://dotnet.microsoft.com/
+- You'll need to install .NET Core 8+ from https://dotnet.microsoft.com/
 
 ## Getting Started
 Everything starts with a configuration. After you've installed azdoutil, you'll need to run `azdoutil addconfig` to add a configuration. A configuration is how you store the URL for your Azure DevOps instance and the personal access token (PAT) for authenticating to that instance.  
