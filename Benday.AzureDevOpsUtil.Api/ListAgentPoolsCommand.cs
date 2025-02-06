@@ -32,7 +32,7 @@ public class ListAgentPoolsCommand : AzureDevOpsCommandBase
     {
         // _TeamProjectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);
 
-        var results = await GetResult();
+        var results = await GetAgentPools();
 
         if (results == null)
         {
@@ -115,7 +115,21 @@ public class ListAgentPoolsCommand : AzureDevOpsCommandBase
         WriteLine();
     }
 
-    private async Task<GetAgentPoolsResponse?> GetResult()
+    // _apis/distributedtask/pools/{poolId}/agents?api-version=7.1-preview.1
+    private async Task<GetAgentPoolsResponse?> GetAgentsInPool(int poolId)
+    {
+        string requestUrl;
+        requestUrl = $"_apis/distributedtask/pools/{poolId}/agents?api-version=7.1-preview.1";
+
+        var result = await CallEndpointViaGetAndGetResult<GetAgentPoolsResponse>(requestUrl);
+
+        LastResult = result;
+
+        return result;
+    }
+
+
+    private async Task<GetAgentPoolsResponse?> GetAgentPools()
     {
         string requestUrl;
         requestUrl = $"_apis/distributedtask/pools?api-version=7.1-preview.1";
