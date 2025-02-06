@@ -19,6 +19,7 @@ public static class Constants
 
     public const string CommandArgumentNameShowConfig = "showconfig";
     public const string CommandArgumentNameWithAgents = "agents";
+    public const string CommandArgumentNameToJson = "json";
     public const string CommandArgumentNameAddUpdateConfig = "addconfig";
     public const string CommandArgumentNameRemoveConfig = "removeconfig";
     public const string CommandArgumentNameListConfig = "listconfig";

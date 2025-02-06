@@ -126,6 +126,10 @@
     "listagentpools with agents": {
       "commandName": "Project",
       "commandLineArgs": "listagentpools /agents"
+    },
+    "listagentpools with agents to json": {
+      "commandName": "Project",
+      "commandLineArgs": "listagentpools /agents /json"
     }
   }
 }

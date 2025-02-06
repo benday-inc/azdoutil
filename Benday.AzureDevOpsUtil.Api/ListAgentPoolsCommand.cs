@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Text;
+using System.Text.Json;
 
 using Benday.AzureDevOpsUtil.Api.Messages;
 using Benday.AzureDevOpsUtil.Api.Messages.AgentPools;
@@ -25,7 +26,10 @@ public class ListAgentPoolsCommand : AzureDevOpsCommandBase
     {
         var arguments = new ArgumentCollection();    
         
-        arguments.AddBoolean(Constants.CommandArgumentNameWithAgents).WithDescription("Get agents in each pool").WithDefaultValue(false).AllowEmptyValue().AsNotRequired();
+        arguments.AddBoolean(Constants.CommandArgumentNameWithAgents).
+            WithDescription("Get agents in each pool").WithDefaultValue(false).AllowEmptyValue().AsNotRequired();
+        arguments.AddBoolean(Constants.CommandArgumentNameToJson).
+            WithDescription("Output as JSON").WithDefaultValue(false).AllowEmptyValue().AsNotRequired();
 
         return arguments;
     }
@@ -33,6 +37,7 @@ public class ListAgentPoolsCommand : AzureDevOpsCommandBase
     protected override async Task OnExecute()
     {
         var withAgents = Arguments.GetBooleanValue(Constants.CommandArgumentNameWithAgents);
+        var toJson = Arguments.GetBooleanValue(Constants.CommandArgumentNameToJson);
 
         var results = await GetAgentPools();
 
@@ -43,10 +48,7 @@ public class ListAgentPoolsCommand : AzureDevOpsCommandBase
         }
         else
         {
-            WriteLine(String.Empty);
-
-            WriteLine($"Result count: {results.Count}");
-
+            
             if (withAgents == true)
             {
                 foreach (var item in results.Pools)
@@ -60,9 +62,21 @@ public class ListAgentPoolsCommand : AzureDevOpsCommandBase
                 }
             }
 
-            foreach (var item in results.Pools)
+            if (toJson == false)
             {
-                Print(item);
+                WriteLine(String.Empty);
+                WriteLine($"Result count: {results.Count}");
+
+                foreach (var item in results.Pools)
+                {
+                    Print(item);
+                }
+            }
+            else
+            {
+                var json = JsonSerializer.Serialize(results, new JsonSerializerOptions { WriteIndented = true });
+                WriteLine(String.Empty);
+                WriteLine(json);
             }
         }
     }
