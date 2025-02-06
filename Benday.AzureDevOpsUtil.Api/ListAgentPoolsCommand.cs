@@ -23,14 +23,16 @@ public class ListAgentPoolsCommand : AzureDevOpsCommandBase
 
     public override ArgumentCollection GetArguments()
     {
-        var arguments = new ArgumentCollection();        
+        var arguments = new ArgumentCollection();    
+        
+        arguments.AddBoolean(Constants.CommandArgumentNameWithAgents).WithDescription("Get agents in each pool").WithDefaultValue(false).AllowEmptyValue().AsNotRequired();
 
         return arguments;
     }
 
     protected override async Task OnExecute()
     {
-        // _TeamProjectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);
+        var withAgents = Arguments.GetBooleanValue(Constants.CommandArgumentNameWithAgents);
 
         var results = await GetAgentPools();
 
@@ -45,10 +47,22 @@ public class ListAgentPoolsCommand : AzureDevOpsCommandBase
 
             WriteLine($"Result count: {results.Count}");
 
+            if (withAgents == true)
+            {
+                foreach (var item in results.Pools)
+                {
+                    var agents = await GetAgentsInPool(item.Id);
+
+                    if (agents != null)
+                    {
+                        item.Agents = agents;
+                    }
+                }
+            }
+
             foreach (var item in results.Pools)
             {
                 Print(item);
-
             }
         }
     }
@@ -112,18 +126,48 @@ public class ListAgentPoolsCommand : AzureDevOpsCommandBase
         WriteLine("Owner", item.Owner);
         WriteLine("Scope", item.Scope);
 
-        WriteLine();
+        if (item.Agents != null)
+        {
+            WriteLine("Agents.Count", item.Agents.Count);
+
+            var agentNumber = 0;
+
+            foreach (var agent in item.Agents.Value)
+            {
+                agentNumber++;
+                WriteLine($"Agent {agentNumber}");
+                WriteLine("\tName", agent.Name);
+                WriteLine("\t" +
+                    "Id", agent.Id);
+                WriteLine("\t" +
+                    "Version", agent.Version);
+                WriteLine("\t" +
+                    "OperatingSystem", agent.OperatingSystem);
+                WriteLine("\t" +
+                    "Enabled", agent.Enabled);
+                WriteLine("\t" +
+                    "Status", agent.Status);
+                WriteLine("\t" +
+                    "ProvisioningState", agent.ProvisioningState);
+                WriteLine("\t" +
+                    "CreatedOn", agent.CreatedOn);
+                WriteLine("\t" +
+                    "StatusChangedOn", agent.StatusChangedOn);
+                WriteLine("\t" +
+                    "MaxParallelism",
+                    agent.MaxParallelism);
+                WriteLine("Agent.Version", agent.Version);
+                WriteLine();
+            }
+        }
     }
 
-    // _apis/distributedtask/pools/{poolId}/agents?api-version=7.1-preview.1
-    private async Task<GetAgentPoolsResponse?> GetAgentsInPool(int poolId)
+    private async Task<GetAgentsByPoolIdResponse?> GetAgentsInPool(int poolId)
     {
         string requestUrl;
         requestUrl = $"_apis/distributedtask/pools/{poolId}/agents?api-version=7.1-preview.1";
 
-        var result = await CallEndpointViaGetAndGetResult<GetAgentPoolsResponse>(requestUrl);
-
-        LastResult = result;
+        var result = await CallEndpointViaGetAndGetResult<GetAgentsByPoolIdResponse>(requestUrl);
 
         return result;
     }

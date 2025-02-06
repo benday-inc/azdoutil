@@ -55,5 +55,8 @@ public class AgentPool
     [JsonPropertyName("options")]
     public string Options { get; set; } = string.Empty;
 
+    [JsonPropertyName("agents")]
+    public GetAgentsByPoolIdResponse? Agents { get; set; }
+
 }
 
