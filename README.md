@@ -74,6 +74,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | AzdoUtil Configuration | [listconfig](#listconfig) | List an Azure DevOps configuration. For example, which server or account plus auth information. |
 | AzdoUtil Configuration | [removeconfig](#removeconfig) | Remove an Azure DevOps configuration. For example, which server or account plus auth information. |
 | Builds | [exportbuilddef](#exportbuilddef) | Export build definition |
+| Builds | [listagentpools](#listagentpools) | List agent pools |
 | Builds | [listbuilddefs](#listbuilddefs) | List build definitions |
 | Flow Metrics | [agingwork](#agingwork) | Get aging in-progress work items |
 | Flow Metrics | [cycletimeconfidence](#cycletimeconfidence) | Get item cycle time for 50% and 85% levels. This helps you understand how items typically are delivered. |
@@ -149,14 +150,23 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | csv | Optional | Boolean | Output results in CSV format |
 | csv-noheader | Optional | Boolean | Do not print the CSV column header info |
 | raw | Optional | Boolean | Output raw build definition |
+## <a name="listagentpools"></a> listagentpools
+**List agent pools**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| agents | Optional | Boolean | Get agents in each pool |
+| json | Optional | Boolean | Output as JSON |
 ## <a name="listbuilddefs"></a> listbuilddefs
 **List build definitions**
 ### Arguments
 | Argument | Is Optional | Data Type | Description |
 | --- | --- | --- | --- |
-| teamproject | Required | String | Team project name |
+| teamproject | Optional | String | Team project name |
+| all | Optional | Boolean | All build in all projects in this collection |
 | nameonly | Optional | Boolean | Only display the build definition name |
 | xaml | Optional | Boolean | List XAML build definitions |
+| json | Optional | Boolean | Export to JSON |
 # Flow Metrics
 ## <a name="agingwork"></a> agingwork
 **Get aging in-progress work items**
