@@ -85,14 +85,23 @@ public abstract class AzureDevOpsCommandBase : AsynchronousCommand
         }
     }
 
-    protected HttpClient GetHttpClientInstanceForAzureDevOps()
+    protected HttpClient GetHttpClientInstanceForAzureDevOps(
+        AzureDevOpsUrlTargetType azureDevOpsUrlTargetType = AzureDevOpsUrlTargetType.Default)
     {
+        var baseUrl = Configuration.CollectionUrl;
+
+        if (azureDevOpsUrlTargetType == AzureDevOpsUrlTargetType.Release &&
+            Configuration.IsAzureDevOpsService == true)
+        {
+            baseUrl = baseUrl.Replace("https://dev.", "https://vsrm.dev.");
+        }
+
+        var baseUri = new Uri(baseUrl);
+
         if (Configuration.IsWindowsAuth == true)
         {
             var client = new HttpClient(
-                new HttpClientHandler() {  UseDefaultCredentials = true });
-
-            var baseUri = new Uri(Configuration.CollectionUrl);
+                new HttpClientHandler() {  UseDefaultCredentials = true });           
 
             client.BaseAddress = baseUri;
 
@@ -100,9 +109,7 @@ public abstract class AzureDevOpsCommandBase : AsynchronousCommand
         }
         else
         {
-            var client = new HttpClient();
-
-            var baseUri = new Uri(Configuration.CollectionUrl);
+            var client = new HttpClient();            
 
             client.BaseAddress = baseUri;
 
@@ -114,17 +121,21 @@ public abstract class AzureDevOpsCommandBase : AsynchronousCommand
         }        
     }
 
-    protected async Task<T?> CallEndpointViaGetAndGetResult<T>(string requestUrl, bool writeStringContentToInfo = false, bool throwExceptionOnError = true)
+    protected async Task<T?> CallEndpointViaGetAndGetResult<T>(
+        string requestUrl, bool writeStringContentToInfo = false, bool throwExceptionOnError = true,
+        AzureDevOpsUrlTargetType azureDevOpsUrlTargetType = AzureDevOpsUrlTargetType.Default)
     {
         try
         {
-            return await CallEndpointViaGetAndGetResultSingleAttempt<T>(requestUrl, writeStringContentToInfo, throwExceptionOnError);
+            return await CallEndpointViaGetAndGetResultSingleAttempt<T>(
+                requestUrl, writeStringContentToInfo, throwExceptionOnError, azureDevOpsUrlTargetType);
         }
         catch
         {
             await Task.Delay(Constants.RetryDelayInMillisecs);
 
-            var result = await CallEndpointViaGetAndGetResultSingleAttempt<T>(requestUrl, writeStringContentToInfo);
+            var result = await CallEndpointViaGetAndGetResultSingleAttempt<T>(
+                requestUrl, writeStringContentToInfo, azureDevOpsUrlTargetType: azureDevOpsUrlTargetType);
 
             return result;
         }
@@ -159,9 +170,11 @@ public abstract class AzureDevOpsCommandBase : AsynchronousCommand
     }
 
     private async Task<T?> CallEndpointViaGetAndGetResultSingleAttempt<T>(
-        string requestUrl, bool writeStringContentToInfo = false, bool throwExceptionOnError = true)
+        string requestUrl, bool writeStringContentToInfo = false, 
+        bool throwExceptionOnError = true,
+        AzureDevOpsUrlTargetType azureDevOpsUrlTargetType = AzureDevOpsUrlTargetType.Default)
     {
-        using var client = GetHttpClientInstanceForAzureDevOps();
+        using var client = GetHttpClientInstanceForAzureDevOps(azureDevOpsUrlTargetType);
 
         var result = await client.GetAsync(requestUrl);
 

@@ -130,6 +130,14 @@
     "listagentpools with agents to json": {
       "commandName": "Project",
       "commandLineArgs": "listagentpools /agents /json"
+    },
+    "list release defs all": {
+      "commandName": "Project",
+      "commandLineArgs": "listreleasedefs /all"
+    },
+    "list release defs for project": {
+      "commandName": "Project",
+      "commandLineArgs": "listreleasedefs /teamproject:gab-presidents-20180421"
     }
   }
 }
