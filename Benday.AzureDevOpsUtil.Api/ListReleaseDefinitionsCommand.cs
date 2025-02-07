@@ -188,11 +188,12 @@ public class ListReleaseDefinitionsCommand : AzureDevOpsCommandBase
     {
         foreach (var release in releases)
         {
+            
             var teamProjectName = release.ProjectReference.Name;
 
-            var releaseId = release.Id;
+            var releaseId = release.ReleaseDefinition.Id;
 
-            var requestUrl = $"{teamProjectName}/_apis/release/releases/{releaseId}?api-version=7.1";
+            var requestUrl = $"{teamProjectName}/_apis/release/definitions/{releaseId}?api-version=7.1";
 
             var result = await CallEndpointViaGetAndGetResult<GetReleaseDetailResponse>(
                 requestUrl, azureDevOpsUrlTargetType: AzureDevOpsUrlTargetType.Release);
@@ -230,9 +231,10 @@ public class ListReleaseDefinitionsCommand : AzureDevOpsCommandBase
 
                 foreach (var environment in definition.Details.Environments)
                 {
-                    foreach (var phase in environment.DeployPhasesSnapshot)
+                    foreach (var phase in environment.DeployPhases)
                     {
-                        usesAgents.Add(phase.DeploymentInput.AgentSpecification.Identifier);
+                        // usesAgents.Add(phase.DeploymentInput.AgentSpecification.Identifier);
+                        usesAgents.Add(phase.DeploymentInput.QueueId.ToString());
                     }
                 }
 
@@ -240,7 +242,7 @@ public class ListReleaseDefinitionsCommand : AzureDevOpsCommandBase
 
                 if (usesAgents.Count > 0)
                 {
-                    builder.Append(" - Uses agents: ");
+                    builder.Append(" - Uses agent queue ids: ");
                     builder.Append(string.Join(", ", usesAgents));
                 }
             }
