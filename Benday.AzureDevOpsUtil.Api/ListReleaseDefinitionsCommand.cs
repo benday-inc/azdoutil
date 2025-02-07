@@ -94,6 +94,8 @@ public class ListReleaseDefinitionsCommand : AzureDevOpsCommandBase
             await ListForAllProjects(toJson);
         }
     }
+    
+
     private async Task ListForAllProjects(bool json)
     {
         // call ListTeamProjectsCommand
@@ -120,6 +122,8 @@ public class ListReleaseDefinitionsCommand : AzureDevOpsCommandBase
                 if (result != null && result.Count > 0)
                 {
                     results.AddRange(result.Releases);
+
+                    await PopulateReleaseDetails(result.Releases);
                 }
             }
 
@@ -156,6 +160,11 @@ public class ListReleaseDefinitionsCommand : AzureDevOpsCommandBase
     {
         var results = await GetResult(teamProjectName);
 
+        if (results != null)
+        {
+            await PopulateReleaseDetails(results.Releases);
+        }
+
         if (results == null)
         {
             WriteLine(String.Empty);
@@ -172,6 +181,23 @@ public class ListReleaseDefinitionsCommand : AzureDevOpsCommandBase
             WriteLine($"Result count: {results.Count}");
 
             results.Releases.ToList().ForEach(x => WriteLine(ToString(x)));
+        }
+    }
+
+    private async Task PopulateReleaseDetails(ReleaseInfo[] releases)
+    {
+        foreach (var release in releases)
+        {
+            var teamProjectName = release.ProjectReference.Name;
+
+            var releaseId = release.Id;
+
+            var requestUrl = $"{teamProjectName}/_apis/release/releases/{releaseId}?api-version=7.1";
+
+            var result = await CallEndpointViaGetAndGetResult<GetReleaseDetailResponse>(
+                requestUrl, azureDevOpsUrlTargetType: AzureDevOpsUrlTargetType.Release);
+
+            release.Details = result;
         }
     }
 
@@ -196,20 +222,29 @@ public class ListReleaseDefinitionsCommand : AzureDevOpsCommandBase
         {
             builder.Append(" (");
             builder.Append(definition.Id);
-            builder.Append(")");      
-            
-            /*
-            if (definition.Queue != null && definition.Queue.Pool != null)
+            builder.Append(")");
+
+            if (definition.Details != null)
             {
-                builder.Append(" - [Queue Name: ");
-                builder.Append(definition.Queue.Pool.Name);
-                builder.Append(", Queue Pool Id: ");
-                builder.Append(definition.Queue.Pool.Id);
-                builder.Append(", Pool Is Hosted: ");
-                builder.Append(definition.Queue.Pool.IsHosted);
-                builder.Append("]");
+                var usesAgents = new List<string>();
+
+                foreach (var environment in definition.Details.Environments)
+                {
+                    foreach (var phase in environment.DeployPhasesSnapshot)
+                    {
+                        usesAgents.Add(phase.DeploymentInput.AgentSpecification.Identifier);
+                    }
+                }
+
+                usesAgents = usesAgents.Distinct().ToList();
+
+                if (usesAgents.Count > 0)
+                {
+                    builder.Append(" - Uses agents: ");
+                    builder.Append(string.Join(", ", usesAgents));
+                }
             }
-            */
+            
         }
 
         return builder.ToString();
