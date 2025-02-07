@@ -15,10 +15,11 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README-for-nuget.md</PackageReadmeFile>
     <PackageIcon>bdc_mark_128_128.png</PackageIcon>
-    <AssemblyVersion>2.5.1.0</AssemblyVersion>
-    <Version>$(VersionPrefix)2.5.1</Version>
+    <AssemblyVersion>2.6.0.0</AssemblyVersion>
+    <Version>$(VersionPrefix)2.6.0</Version>
     <Description>A collection of useful command line utilities for Azure DevOps</Description>
-    <PackageReleaseNotes>v2.5 - added list agent pools command; added support for viewing all builds in a collection; added support for viewing the pool for a build definition;
+    <PackageReleaseNotes>v2.6 - added support for viewing release definitions in a project and/or collection
+v2.5 - added list agent pools command; added support for viewing all builds in a collection; added support for viewing the pool for a build definition;
 v2.4 - added support for work item type definition comparison
     </PackageReleaseNotes>
     <Title>Azure DevOps Utilities</Title>

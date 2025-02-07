@@ -75,6 +75,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | Builds | exportbuilddef | Export build definition |
 | Builds | listagentpools | List agent pools |
 | Builds | listbuilddefs | List build definitions |
+| Builds | listreleasedefs | List release definitions |
 | Flow Metrics | agingwork | Get aging in-progress work items |
 | Flow Metrics | cycletimeconfidence | Get item cycle time for 50% and 85% levels. This helps you understand how items typically are delivered. |
 | Flow Metrics | forecastdurationforitemcount | Use throughput data to forecast likely number of weeks to get given number of items done using Monte Carlo simulation |
@@ -162,9 +163,17 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | Argument | Is Optional | Data Type | Description |
 | --- | --- | --- | --- |
 | teamproject | Optional | String | Team project name |
-| all | Optional | Boolean | All build in all projects in this collection |
+| all | Optional | Boolean | All builds in all projects in this collection |
 | nameonly | Optional | Boolean | Only display the build definition name |
 | xaml | Optional | Boolean | List XAML build definitions |
+| json | Optional | Boolean | Export to JSON |
+## listreleasedefs
+**List release definitions**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| teamproject | Optional | String | Team project name |
+| all | Optional | Boolean | All releases in all projects in this collection |
 | json | Optional | Boolean | Export to JSON |
 # Flow Metrics
 ## agingwork
