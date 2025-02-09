@@ -45,6 +45,8 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
             .MustExist()
             .AsRequired();
 
+        arguments.AddBoolean(Constants.ArgumentNamePreviewOnly).WithDescription("Preview only. Do not update build definitions.").AsNotRequired().AllowEmptyValue().WithDefaultValue(false);
+
         return arguments;
     }
 
@@ -61,6 +63,8 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
 
     protected override async Task OnExecute()
     {
+        var previewOnly = Arguments.GetBooleanValue(Constants.ArgumentNamePreviewOnly);
+
         if (Arguments.HasValue(Constants.ArgumentNameAllProjects) == false &&
             Arguments.HasValue(Constants.ArgumentNameTeamProjectName) == false)
         {
@@ -108,15 +112,15 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
 
         if (allProjects == false)
         {
-            await RepairForSingleProject(originalAgentPoolInfo, currentAgentPoolInfo, _TeamProjectName);
+            await RepairForSingleProject(originalAgentPoolInfo, currentAgentPoolInfo, _TeamProjectName, previewOnly);
         }
         else
         {
-            await RepairForAllProjects(originalAgentPoolInfo, currentAgentPoolInfo);
+            await RepairForAllProjects(originalAgentPoolInfo, currentAgentPoolInfo, previewOnly);
         }
     }
 
-    private async Task RepairForAllProjects(GetAgentPoolsResponse agentPoolInfoOriginal, GetAgentPoolsResponse agentPoolInfoCurrent)
+    private async Task RepairForAllProjects(GetAgentPoolsResponse agentPoolInfoOriginal, GetAgentPoolsResponse agentPoolInfoCurrent, bool previewOnly)
     {
         throw new NotImplementedException();
 
@@ -170,7 +174,9 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
 
     }
 
-    private async Task RepairForSingleProject(GetAgentPoolsResponse agentPoolInfoOriginal, GetAgentPoolsResponse agentPoolInfoCurrent, string teamProjectName)
+    private async Task RepairForSingleProject(GetAgentPoolsResponse agentPoolInfoOriginal,
+                                              GetAgentPoolsResponse agentPoolInfoCurrent,
+                                              string teamProjectName, bool previewOnly)
     {
         var results = await GetResult(teamProjectName);
 
@@ -187,14 +193,14 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
 
             foreach (var buildDefInfo in results)
             {
-                await RepairAgentPoolForBuildDef(agentPoolInfoOriginal, agentPoolInfoCurrent, buildDefInfo);
+                await RepairAgentPoolForBuildDef(agentPoolInfoOriginal, agentPoolInfoCurrent, buildDefInfo, previewOnly);
             }
         }
     }
     private async Task RepairAgentPoolForBuildDef(
         GetAgentPoolsResponse agentPoolInfoOriginal,
         GetAgentPoolsResponse agentPoolInfoCurrent,
-        BuildDefinitionInfo buildDefInfo)
+        BuildDefinitionInfo buildDefInfo, bool previewOnly)
     {
         var execInfo = ExecutionInfo.GetCloneOfArguments(
              Constants.CommandArgumentNameExportBuildDefinition,
@@ -243,15 +249,32 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
 
         string updatedBuildDef = UpdatePool(buildDefJson, originalPool, currentPool);
 
-        WriteLine("PREVIEW: updated build definition JSON");
+        if (previewOnly == true)
+        {
+            WriteLine("PREVIEW: updated build definition JSON");
+            WriteLine(updatedBuildDef);
+        }
+        else
+        {
+            throw new NotImplementedException();
+        }
     }
 
     private string UpdatePool(string buildDefJson, AgentPool originalPool, AgentPool currentPool)
     {
         var editor = new JsonEditor(buildDefJson, true);
 
-        editor.SetValue(currentPool.Id, "queue", "pool", "id");
+        var currentPoolIdFromJson = editor.GetValueAsInt32("queue", "pool", "id");
 
+        if (currentPoolIdFromJson != originalPool.Id)
+        {
+            throw new InvalidOperationException($"Original pool id '{originalPool.Id}' does not match current pool id '{currentPoolIdFromJson}'.");
+        }
+
+        WriteLine($"Updating pool id from '{originalPool.Id}' to '{currentPool.Id}'.");
+
+        editor.SetValue(currentPool.Id, "queue", "pool", "id");
+        
         var json = editor.ToJson(true);
 
         return json;
