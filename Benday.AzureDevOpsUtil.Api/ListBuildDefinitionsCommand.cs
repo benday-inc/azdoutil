@@ -27,6 +27,8 @@ public class ListBuildDefinitionsCommand : AzureDevOpsCommandBase
     {
         var arguments = new ArgumentCollection();
 
+        AddCommonArguments(arguments);
+
         arguments.AddString(Constants.ArgumentNameTeamProjectName)
             .WithDescription("Team project name").
             AsNotRequired();

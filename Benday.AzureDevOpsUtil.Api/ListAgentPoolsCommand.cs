@@ -24,8 +24,10 @@ public class ListAgentPoolsCommand : AzureDevOpsCommandBase
 
     public override ArgumentCollection GetArguments()
     {
-        var arguments = new ArgumentCollection();    
-        
+        var arguments = new ArgumentCollection();
+
+        AddCommonArguments(arguments);
+
         arguments.AddBoolean(Constants.CommandArgumentNameWithAgents).
             WithDescription("Get agents in each pool").WithDefaultValue(false).AllowEmptyValue().AsNotRequired();
         arguments.AddBoolean(Constants.CommandArgumentNameToJson).

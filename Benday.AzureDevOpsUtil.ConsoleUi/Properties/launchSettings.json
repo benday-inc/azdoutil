@@ -142,6 +142,10 @@
     "list release defs for all projects to json": {
       "commandName": "Project",
       "commandLineArgs": "listreleasedefs /all /json"
+    },
+    "list build defs anico": {
+      "commandName": "Project",
+      "commandLineArgs": "listbuilddefs /all /json /config:anico"
     }
   }
 }
