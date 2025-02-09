@@ -197,6 +197,17 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
             }
         }
     }
+
+    private async Task UpdateBuildDefinition(BuildDefinitionInfo buildDefInfo, string updatedBuildDef)
+    {
+        var requestUrl = $"{buildDefInfo.Project.Name}/_apis/build/definitions/{buildDefInfo.Id}?api-version=7.1";
+
+        _ = await SendPutForBodySingleAttempt(requestUrl, updatedBuildDef, true);
+
+        WriteLine($"Updated build definition '{buildDefInfo.Name}' with new agent pool id.");
+        WriteLine();
+    }
+
     private async Task RepairAgentPoolForBuildDef(
         GetAgentPoolsResponse agentPoolInfoOriginal,
         GetAgentPoolsResponse agentPoolInfoCurrent,
@@ -256,7 +267,7 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
         }
         else
         {
-            throw new NotImplementedException();
+            await UpdateBuildDefinition(buildDefInfo, updatedBuildDef);
         }
     }
 

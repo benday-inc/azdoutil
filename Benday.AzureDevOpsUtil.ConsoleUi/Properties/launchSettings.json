@@ -149,7 +149,7 @@
     },
     "repair agent pool": {
       "commandName": "Project",
-      "commandLineArgs": "repairbuilddefagentpool /teamproject:gab-presidents-20180421 /poolinfofile:agent-pools-orig.json /preview",
+      "commandLineArgs": "repairbuilddefagentpool /teamproject:gab-presidents-20180421 /poolinfofile:agent-pools-orig.json",
       "workingDirectory": "C:\\code\\temp\\build-agent-temp"
     }
   }
