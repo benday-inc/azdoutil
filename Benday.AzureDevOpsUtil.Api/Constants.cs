@@ -25,6 +25,7 @@ public static class Constants
     public const string CommandArgumentNameListConfig = "listconfig";
     public const string CommandArgumentName_ListGitRepos = "listgitrepos";
     public const string CommandArgumentNameListBuildDefinitions = "listbuilddefs";
+    public const string CommandArgumentNameRepairBuildDefAgentPool = "repairbuilddefagentpool";
     public const string CommandArgumentNameListReleaseDefinitions = "listreleasedefs";
     public const string CommandArgumentNameListAgentPools = "listagentpools";
     public const string CommandArgumentNameExportBuildDefinition = "exportbuilddef";
@@ -74,6 +75,7 @@ public static class Constants
     public const string ArgumentNameVerbose = "verbose";
     public const string ArgumentNameTeamProjectName = "teamproject";
     public const string ArgumentNameAllProjects = "all";
+    public const string ArgumentNameAgentPoolInfo = "poolinfofile";
     public const string ArgumentNameProcessName = "processname";
     public const string ArgumentNameRepositoryName = "reponame";
     public const string ArgumentNameTfvcFolder = "tfvc-path";
