@@ -209,10 +209,21 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
     {
         var requestUrl = $"{buildDefInfo.Project.Name}/_apis/build/definitions/{buildDefInfo.Id}?api-version=7.1";
 
-        _ = await SendPutForBodySingleAttempt(requestUrl, updatedBuildDef, true);
+        WriteLine($"Sending update request for build definition '{buildDefInfo.Name}' in '{buildDefInfo.Project.Name}'...");
 
-        WriteLine($"Updated build definition '{buildDefInfo.Name}' with new agent pool id.");
-        WriteLine();
+        try
+        {
+            await SendPutForBodySingleAttempt(requestUrl, updatedBuildDef, true);
+
+            WriteLine($"Updated build definition '{buildDefInfo.Name}' in '{buildDefInfo.Project.Name}' with new agent pool id.");
+            WriteLine();
+        }
+        catch (Exception ex)
+        {
+            var message = $"Error updating build definition '{buildDefInfo.Name}' in '{buildDefInfo.Project.Name}': {ex.Message}";
+
+            _notUpdated.Add(message);
+        }
     }
 
     private async Task RepairAgentPoolForBuildDef(
@@ -339,7 +350,7 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
             throw new InvalidOperationException($"Could not find current queue with name '{originalQueueName}' for build '{buildDefInfo.Name}' in project '{buildDefInfo.Project.Name}'");
         }
 
-        string updatedBuildDef = UpdateQueueAndVerifyJobAuthorizationScope(buildDefJson, currentQueue);
+        string updatedBuildDef = UpdateQueueAndVerifyJobAuthorizationScope(buildDefJson, currentQueue, buildDefInfo.Project.Name);
 
         if (previewOnly == true)
         {
@@ -358,7 +369,8 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
 
     private List<string> _notUpdated = new List<string>();
 
-    private string UpdateQueueAndVerifyJobAuthorizationScope(string buildDefJson, BuildQueueInfo currentQueue)
+    private string UpdateQueueAndVerifyJobAuthorizationScope(
+        string buildDefJson, BuildQueueInfo currentQueue, string teamProjectName)
     {
         var editor = new JsonEditor(buildDefJson, true);
 
@@ -366,7 +378,7 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
 
         var jobAuthorizationScope = editor.GetValue("jobAuthorizationScope");
 
-        WriteLine($"Updating build def '{name}' queue and pool...");
+        WriteLine($"Updating build def '{name}' in '{teamProjectName}' queue and pool...");
 
         editor.SetValue(currentQueue.Pool.Id, "queue", "pool", "id");
         editor.SetValue(currentQueue.Pool.Name, "queue", "pool", "name");
@@ -382,7 +394,7 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
 
         if (json.Contains(invalidJobAuthorizationScope) == true)
         {
-            WriteLine($"Updating build def '{name}' job authorization scope to '{jobAuthorizationScope}'...");
+            WriteLine($"Updating build def '{name}' in '{teamProjectName}' job authorization scope to '{jobAuthorizationScope}'...");
             json = json.Replace(invalidJobAuthorizationScope, validJobAuthorizationScope);
         }
 
