@@ -31,6 +31,9 @@ public class BuildQueueInfo
     [JsonPropertyName("pool")]
     public Pool Pool { get; set; } = new();
 
+    [JsonPropertyName("projectName")]
+    public string TeamProjectName { get; set; } = string.Empty;
+
 }
 
 

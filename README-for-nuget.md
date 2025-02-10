@@ -75,7 +75,9 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | Builds | exportbuilddef | Export build definition |
 | Builds | listagentpools | List agent pools |
 | Builds | listbuilddefs | List build definitions |
+| Builds | listqueues | List build queues in a team project or team projects |
 | Builds | listreleasedefs | List release definitions |
+| Builds | repairbuilddefagentpool | Repairs the agent pool setting for the build definitions in a team project or team projects. This is helpful after an on-prem to cloud migration. |
 | Flow Metrics | agingwork | Get aging in-progress work items |
 | Flow Metrics | cycletimeconfidence | Get item cycle time for 50% and 85% levels. This helps you understand how items typically are delivered. |
 | Flow Metrics | forecastdurationforitemcount | Use throughput data to forecast likely number of weeks to get given number of items done using Monte Carlo simulation |
@@ -143,6 +145,8 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 ### Arguments
 | Argument | Is Optional | Data Type | Description |
 | --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
 | teamproject | Required | String | Team project name |
 | name | Required | String | Build definition name |
 | xaml | Optional | Boolean | List XAML build definitions |
@@ -155,6 +159,8 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 ### Arguments
 | Argument | Is Optional | Data Type | Description |
 | --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
 | agents | Optional | Boolean | Get agents in each pool |
 | json | Optional | Boolean | Output as JSON |
 ## listbuilddefs
@@ -162,19 +168,45 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 ### Arguments
 | Argument | Is Optional | Data Type | Description |
 | --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
 | teamproject | Optional | String | Team project name |
 | all | Optional | Boolean | All builds in all projects in this collection |
 | nameonly | Optional | Boolean | Only display the build definition name |
 | xaml | Optional | Boolean | List XAML build definitions |
 | json | Optional | Boolean | Export to JSON |
+## listqueues
+**List build queues in a team project or team projects**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Optional | String | Team project name |
+| all | Optional | Boolean | All builds in all projects in this collection |
+| json | Optional | Boolean | Output as JSON |
 ## listreleasedefs
 **List release definitions**
 ### Arguments
 | Argument | Is Optional | Data Type | Description |
 | --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
 | teamproject | Optional | String | Team project name |
 | all | Optional | Boolean | All releases in all projects in this collection |
 | json | Optional | Boolean | Export to JSON |
+## repairbuilddefagentpool
+**Repairs the agent pool setting for the build definitions in a team project or team projects. This is helpful after an on-prem to cloud migration.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Optional | String | Team project name |
+| all | Optional | Boolean | All builds in all projects in this collection |
+| PrintJsonOnPreview | Optional | Boolean | Print modified json in preview mode |
+| preview | Optional | Boolean | Preview only. Do not update build definitions. |
+| originalbuildinfofile | Required | String | Build def JSON file from on-prem server. Assumes that pools have been recreated in the cloud using the same name. |
 # Flow Metrics
 ## agingwork
 **Get aging in-progress work items**
