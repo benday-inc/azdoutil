@@ -151,6 +151,16 @@
       "commandName": "Project",
       "commandLineArgs": "repairbuilddefagentpool /teamproject:gab-presidents-20180421 /poolinfofile:agent-pools-orig.json",
       "workingDirectory": "C:\\code\\temp\\build-agent-temp"
+    },
+    "repair agent pool anico preview": {
+      "commandName": "Project",
+      "commandLineArgs": "repairbuilddefagentpool /teamproject:ebs-csharp /preview /config:anico .\\on-prem\\build-defs.json",
+      "workingDirectory": "C:\\code\\agent-pool-info-anico-2"
+    },
+    "repair agent pool anico (no preview))": {
+      "commandName": "Project",
+      "commandLineArgs": "repairbuilddefagentpool /teamproject:ebs-csharp /config:anico .\\on-prem\\build-defs.json",
+      "workingDirectory": "C:\\code\\agent-pool-info-anico-2"
     }
   }
 }

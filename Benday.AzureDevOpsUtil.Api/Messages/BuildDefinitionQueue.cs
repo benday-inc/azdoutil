@@ -16,6 +16,6 @@ public class BuildDefinitionQueue
     public string Url { get; set; } = string.Empty;
 
     [JsonPropertyName("pool")]
-    public BuildDefinitionQueuePool Pool { get; set; } = new();
+    public BuildDefinitionQueuePool? Pool { get; set; }
 
 }

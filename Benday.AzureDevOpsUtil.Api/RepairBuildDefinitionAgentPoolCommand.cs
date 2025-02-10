@@ -4,6 +4,7 @@ using System.Text.Json;
 
 using Benday.AzureDevOpsUtil.Api.Messages;
 using Benday.AzureDevOpsUtil.Api.Messages.AgentPools;
+using Benday.AzureDevOpsUtil.Api.Messages.BuildQueues;
 using Benday.CommandsFramework;
 using Benday.JsonUtilities;
 
@@ -17,6 +18,7 @@ namespace Benday.AzureDevOpsUtil.Api;
 public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
 {
     private string _TeamProjectName = string.Empty;
+    private const string PRINT_JSON_ON_PREVIEW = "PrintJsonOnPreview";
 
     public BuildDefinitionInfoResponse? LastResult { get; private set; }
 
@@ -40,12 +42,16 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
             .WithDescription("All builds in all projects in this collection")
             .AsNotRequired();
 
-        arguments.AddFile(Constants.ArgumentNameAgentPoolInfo)
-            .WithDescription("Agent pool info JSON file from on-prem server. Assumes that pools have been recreated in the cloud using the same name.")
-            .MustExist()
-            .AsRequired();
+        arguments.AddBoolean(PRINT_JSON_ON_PREVIEW).AllowEmptyValue().WithDefaultValue(false).AsNotRequired().WithDescription("Print modified json in preview mode");
 
         arguments.AddBoolean(Constants.ArgumentNamePreviewOnly).WithDescription("Preview only. Do not update build definitions.").AsNotRequired().AllowEmptyValue().WithDefaultValue(false);
+
+        arguments.AddFile(Constants.ArgumentNameOriginalBuildInfo)
+            .WithDescription("Build def JSON file from on-prem server. Assumes that pools have been recreated in the cloud using the same name.")
+            .MustExist()
+            .AsRequired().FromPositionalArgument(1);
+
+        
 
         return arguments;
     }
@@ -59,6 +65,15 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
         await command.ExecuteAsync();
 
         return command.LastResult;
+    }
+
+    private async Task<GetBuildQueuesResponse?> GetBuildQueues(string teamProjectName)
+    {
+        var requestUrl = $"{teamProjectName}/_apis/distributedtask/queues?api-version=7.1";
+
+        var result = await CallEndpointViaGetAndGetResult<GetBuildQueuesResponse>(requestUrl);
+
+        return result;
     }
 
     protected override async Task OnExecute()
@@ -91,16 +106,14 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
             allProjects = false;
         }
 
-        var agentPoolInfoFilePath = Arguments.GetPathToFile(Constants.ArgumentNameAgentPoolInfo);
+        var agentPoolInfoFilePath = Arguments.GetPathToFile(Constants.ArgumentNameOriginalBuildInfo);
 
-        GetAgentPoolsResponse? originalAgentPoolInfo = null;
-
-        originalAgentPoolInfo = JsonSerializer.Deserialize<GetAgentPoolsResponse>(
+        var originalBuildDefInfos = JsonSerializer.Deserialize<List<BuildDefinitionInfo>> (
             File.ReadAllText(agentPoolInfoFilePath));
 
-        if (originalAgentPoolInfo == null)
+        if (originalBuildDefInfos == null)
         {
-            throw new KnownException("Could not deserialize agent pool info file.");
+            throw new KnownException("Could not deserialize build def info file.");
         }
 
         var currentAgentPoolInfo = await GetAgentPools();
@@ -112,18 +125,19 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
 
         if (allProjects == false)
         {
-            await RepairForSingleProject(originalAgentPoolInfo, currentAgentPoolInfo, _TeamProjectName, previewOnly);
+            await RepairForSingleProject(originalBuildDefInfos, currentAgentPoolInfo, _TeamProjectName, previewOnly);
         }
         else
         {
-            await RepairForAllProjects(originalAgentPoolInfo, currentAgentPoolInfo, previewOnly);
+            await RepairForAllProjects(originalBuildDefInfos, currentAgentPoolInfo, previewOnly);
         }
     }
 
-    private async Task RepairForAllProjects(GetAgentPoolsResponse agentPoolInfoOriginal, GetAgentPoolsResponse agentPoolInfoCurrent, bool previewOnly)
+    private async Task RepairForAllProjects(
+        List<BuildDefinitionInfo> originalBuildDefs, 
+        GetAgentPoolsResponse agentPoolInfoCurrent, 
+        bool previewOnly)
     {
-        throw new NotImplementedException();
-
         // call ListTeamProjectsCommand
         var command = new ListTeamProjectsCommand(
             ExecutionInfo.GetCloneOfArguments(
@@ -143,40 +157,15 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
 
             foreach (var teamProject in teamProjects)
             {
-                var result = await GetResult(teamProject.Name);
-
-                if (result != null && result.Count > 0)
-                {
-                    results.AddRange(result);
-                }
+                await RepairForSingleProject(originalBuildDefs, agentPoolInfoCurrent, teamProject.Name, previewOnly);
             }
-
-            WriteLine(String.Empty);
-            WriteLine($"Result count: {results.Count}");
-
-            var groupedResults = results.GroupBy(x => x.Project.Name);
-
-            // order by team project name
-            groupedResults = groupedResults.OrderBy(x => x.Key);
-
-            foreach (var groupedResult in groupedResults)
-            {
-                WriteLine();
-                WriteLine("** Team Project: " + groupedResult.Key);
-
-                foreach (var item in groupedResult)
-                {
-                    WriteLine(ToString(item));
-                }
-            }
-
         }
-
     }
 
-    private async Task RepairForSingleProject(GetAgentPoolsResponse agentPoolInfoOriginal,
-                                              GetAgentPoolsResponse agentPoolInfoCurrent,
-                                              string teamProjectName, bool previewOnly)
+    private async Task RepairForSingleProject(
+        List<BuildDefinitionInfo> originalBuildDefs,
+        GetAgentPoolsResponse agentPoolInfoCurrent,
+        string teamProjectName, bool previewOnly)
     {
         var results = await GetResult(teamProjectName);
 
@@ -187,13 +176,20 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
         }       
         else
         {
+            var currentQueues = await GetBuildQueues(teamProjectName);
+
+            if (currentQueues == null)
+            {
+                throw new KnownException("Could not get current build queues from Azure DevOps.");
+            }
+
             WriteLine(String.Empty);
 
             WriteLine($"Result count: {results.Count}");
 
             foreach (var buildDefInfo in results)
             {
-                await RepairAgentPoolForBuildDef(agentPoolInfoOriginal, agentPoolInfoCurrent, buildDefInfo, previewOnly);
+                await RepairAgentPoolForBuildDef(originalBuildDefs, currentQueues, agentPoolInfoCurrent, buildDefInfo, previewOnly);
             }
         }
     }
@@ -209,7 +205,8 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
     }
 
     private async Task RepairAgentPoolForBuildDef(
-        GetAgentPoolsResponse agentPoolInfoOriginal,
+        List<BuildDefinitionInfo> originalBuildDefs,
+        GetBuildQueuesResponse currentQueues,
         GetAgentPoolsResponse agentPoolInfoCurrent,
         BuildDefinitionInfo buildDefInfo, bool previewOnly)
     {
@@ -238,32 +235,59 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
         if (buildDef == null)
         {
             throw new InvalidOperationException("Could not get build definition from last result.");
-        }
+        }        
 
-        var currentPoolId = buildDef.Queue.Pool.Id;
+        var originalBuildDef = originalBuildDefs.Where(x => x.Name == buildDef.Name && x.Project.Name == buildDef.Project.Name).FirstOrDefault();
 
-        var originalPool = agentPoolInfoOriginal.Pools.Where(x => x.Id == currentPoolId).FirstOrDefault();
-
-        if (originalPool == null)
+        if (originalBuildDef == null)
         {
-            throw new InvalidOperationException($"Could not find original pool with id '{currentPoolId}'.");
+            throw new InvalidOperationException($"Could not find original build definition with name '{buildDef.Name}' in project '{buildDef.Project.Name}'.");
         }
+
+        var originalPoolName = originalBuildDef.Queue.Pool?.Name;
+        
+        if (string.IsNullOrEmpty(originalPoolName) == true)
+        {
+            throw new InvalidOperationException($"Could not find original pool with name '{originalPoolName}'.");
+        }
+
+        var originalQueueName = originalBuildDef.Queue.Name;
+
+        if (string.IsNullOrEmpty(originalQueueName) == true)
+        {
+            throw new InvalidOperationException($"Could not find original with name '{originalQueueName}'.");
+        }
+
+        var originalPoolId = originalBuildDef.Queue.Pool?.Id ?? -1;
 
         var currentPool = agentPoolInfoCurrent.Pools
-            .Where(x => x.Name.Equals(originalPool.Name, StringComparison.OrdinalIgnoreCase))
+            .Where(x => x.Name.Equals(originalPoolName, StringComparison.OrdinalIgnoreCase))
             .FirstOrDefault();
 
         if (currentPool == null)
         {
-            throw new InvalidOperationException($"Could not find current pool with name '{originalPool.Name}'.");
+            throw new InvalidOperationException($"Could not find current pool with name '{originalPoolName}'.");
         }
 
-        string updatedBuildDef = UpdatePool(buildDefJson, originalPool, currentPool);
+        var currentQueue = currentQueues.Value
+           .Where(x => x.Name.Equals(originalQueueName, StringComparison.OrdinalIgnoreCase))
+           .FirstOrDefault();
+
+        if (currentQueue == null)
+        {
+            throw new InvalidOperationException($"Could not find current queue with name '{originalQueueName}'.");
+        }
+
+        string updatedBuildDef = UpdatePool(buildDefJson, originalPoolId, currentPool, currentQueue);
 
         if (previewOnly == true)
         {
-            WriteLine("PREVIEW: updated build definition JSON");
-            WriteLine(updatedBuildDef);
+            WriteLine("PREVIEW ONLY: not updating build definition in azure devops");
+            
+            if (Arguments.GetBooleanValue(PRINT_JSON_ON_PREVIEW) == true)
+            {                
+                WriteLine(updatedBuildDef);
+            }            
         }
         else
         {
@@ -271,22 +295,33 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
         }
     }
 
-    private string UpdatePool(string buildDefJson, AgentPool originalPool, AgentPool currentPool)
+    private string UpdatePool(string buildDefJson, int originalPoolId, AgentPool currentPool, BuildQueueInfo currentQueue)
     {
         var editor = new JsonEditor(buildDefJson, true);
 
-        var currentPoolIdFromJson = editor.GetValueAsInt32("queue", "pool", "id");
+        var name = editor.GetValue("name");
 
-        if (currentPoolIdFromJson != originalPool.Id)
-        {
-            throw new InvalidOperationException($"Original pool id '{originalPool.Id}' does not match current pool id '{currentPoolIdFromJson}'.");
-        }
+        var jobAuthorizationScope = editor.GetValue("jobAuthorizationScope");
 
-        WriteLine($"Updating pool id from '{originalPool.Id}' to '{currentPool.Id}'.");
+        WriteLine($"Updating pool id from '{originalPoolId}' to '{currentPool.Id}' for build def '{name}' and job authorization scope '{jobAuthorizationScope}'.");
 
-        editor.SetValue(currentPool.Id, "queue", "pool", "id");
+        //editor.SetValue(currentPool.Id, "queue", "pool", "id");
+        //editor.SetValue(currentPool.Name, "queue", "pool", "name");
+        //editor.SetValue(currentPool.IsHosted, "queue", "pool", "isHosted");
+
+        editor.SetValue(currentQueue.Pool.Id, "queue", "pool", "id");
+        editor.SetValue(currentQueue.Pool.Name, "queue", "pool", "name");
+        editor.SetValue(currentQueue.Pool.IsHosted, "queue", "pool", "isHosted");
+
+        editor.SetValue(currentQueue.Id, "queue", "id");
+        editor.SetValue(currentQueue.Name, "queue", "name");
         
         var json = editor.ToJson(true);
+
+        var invalidJobAuthorizationScope = "\"jobAuthorizationScope\": 0";
+        var validJobAuthorizationScope = $"\"jobAuthorizationScope\": \"{jobAuthorizationScope}\"";
+
+        json = json.Replace(invalidJobAuthorizationScope, validJobAuthorizationScope);
 
         return json;
     }

@@ -190,14 +190,16 @@ public class ListBuildDefinitionsCommand : AzureDevOpsCommandBase
     {
         string requestUrl;
 
+        var teamProjectNameEscaped = WebUtility.UrlEncode(teamProjectName);
+
         if (Arguments.GetBooleanValue(Constants.ArgumentNameXaml) == true)
         {
             WriteLine("** GETTING XAML BUILD DEFINITIONS **");
-            requestUrl = $"{teamProjectName}/_apis/build/definitions?api-version=2.2";
+            requestUrl = $"{teamProjectNameEscaped}/_apis/build/definitions?api-version=2.2";
         }
         else
         {
-            requestUrl = $"{teamProjectName}/_apis/build/definitions?api-version=7.1";
+            requestUrl = $"{teamProjectNameEscaped}/_apis/build/definitions?api-version=7.1";
         }
 
         var result = await CallEndpointViaGetAndGetResult<BuildDefinitionInfoResponse>(requestUrl);

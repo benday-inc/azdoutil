@@ -75,7 +75,7 @@ public static class Constants
     public const string ArgumentNameVerbose = "verbose";
     public const string ArgumentNameTeamProjectName = "teamproject";
     public const string ArgumentNameAllProjects = "all";
-    public const string ArgumentNameAgentPoolInfo = "poolinfofile";
+    public const string ArgumentNameOriginalBuildInfo = "originalbuildinfofile";
     public const string ArgumentNamePreviewOnly = "preview";
     public const string ArgumentNameProcessName = "processname";
     public const string ArgumentNameRepositoryName = "reponame";
