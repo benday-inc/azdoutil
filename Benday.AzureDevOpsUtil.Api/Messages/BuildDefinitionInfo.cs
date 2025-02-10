@@ -33,4 +33,7 @@ public class BuildDefinitionInfo
 
     [JsonPropertyName("authoredBy")]
     public PersonInfo AuthoredBy { get; set; } = new();
+
+    [JsonPropertyName("process")]
+    public ProcessInfo Process { get; set; } = new();
 }

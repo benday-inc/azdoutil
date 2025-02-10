@@ -51,7 +51,7 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
             .MustExist()
             .AsRequired().FromPositionalArgument(1);
 
-        
+
 
         return arguments;
     }
@@ -108,7 +108,7 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
 
         var agentPoolInfoFilePath = Arguments.GetPathToFile(Constants.ArgumentNameOriginalBuildInfo);
 
-        var originalBuildDefInfos = JsonSerializer.Deserialize<List<BuildDefinitionInfo>> (
+        var originalBuildDefInfos = JsonSerializer.Deserialize<List<BuildDefinitionInfo>>(
             File.ReadAllText(agentPoolInfoFilePath));
 
         if (originalBuildDefInfos == null)
@@ -131,11 +131,20 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
         {
             await RepairForAllProjects(originalBuildDefInfos, currentAgentPoolInfo, previewOnly);
         }
+
+        if (_notUpdated.Count > 0)
+        {
+            WriteLine("The following build definitions were not updated:");
+            foreach (var item in _notUpdated)
+            {
+                WriteLine(item);
+            }
+        }
     }
 
     private async Task RepairForAllProjects(
-        List<BuildDefinitionInfo> originalBuildDefs, 
-        GetAgentPoolsResponse agentPoolInfoCurrent, 
+        List<BuildDefinitionInfo> originalBuildDefs,
+        GetAgentPoolsResponse agentPoolInfoCurrent,
         bool previewOnly)
     {
         // call ListTeamProjectsCommand
@@ -167,13 +176,15 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
         GetAgentPoolsResponse agentPoolInfoCurrent,
         string teamProjectName, bool previewOnly)
     {
+        WriteLine($"Getting build definitions for project '{teamProjectName}'...");
+
         var results = await GetResult(teamProjectName);
 
         if (results == null)
         {
             WriteLine(String.Empty);
             WriteLine($"No build definitions found for project '{teamProjectName}'");
-        }       
+        }
         else
         {
             var currentQueues = await GetBuildQueues(teamProjectName);
@@ -185,7 +196,7 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
 
             WriteLine(String.Empty);
 
-            WriteLine($"Result count: {results.Count}");
+            WriteLine($"Result count for project '{teamProjectName}': {results.Count}");
 
             foreach (var buildDefInfo in results)
             {
@@ -218,6 +229,18 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
             Constants.ArgumentNameBuildDefinitionName,
             buildDefInfo.Name);
 
+        if (execInfo.Arguments.ContainsKey(Constants.ArgumentNameAllProjects) == true)
+        {
+            execInfo.Arguments.Remove(Constants.ArgumentNameAllProjects);
+        }
+
+        if (execInfo.Arguments.ContainsKey(Constants.ArgumentNameTeamProjectName) == false)
+        {
+            execInfo.Arguments.Add(
+                Constants.ArgumentNameTeamProjectName,
+                buildDefInfo.Project.Name);
+        }
+
         var command = new ExportBuildDefinitionCommand(
          execInfo, _OutputProvider);
 
@@ -227,7 +250,8 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
 
         if (String.IsNullOrWhiteSpace(buildDefJson) == true)
         {
-            throw new InvalidOperationException("Could not get build definition JSON.");
+            throw new InvalidOperationException(
+                $"Could not get build definition JSON for build '{buildDefInfo.Name}' in project '{buildDefInfo.Project.Name}'.");
         }
 
         var buildDef = command.LastResult;
@@ -235,27 +259,56 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
         if (buildDef == null)
         {
             throw new InvalidOperationException("Could not get build definition from last result.");
-        }        
+        }
+
+        if (buildDef.Process.Type == 2)
+        {
+            var message = $"Skipping build definition '{buildDef.Name}' in project '{buildDef.Project.Name}' because it is a YAML build.";
+
+            WriteLine(message);
+
+            _notUpdated.Add(message);
+
+            return;
+        }
 
         var originalBuildDef = originalBuildDefs.Where(x => x.Name == buildDef.Name && x.Project.Name == buildDef.Project.Name).FirstOrDefault();
 
         if (originalBuildDef == null)
         {
-            throw new InvalidOperationException($"Could not find original build definition with name '{buildDef.Name}' in project '{buildDef.Project.Name}'.");
+            var message = $"Could not find original build definition with name '{buildDef.Name}' in project '{buildDef.Project.Name}'.";
+
+            _notUpdated.Add(message);
+
+            WriteLine(message + ": skipping");
+
+            return;
         }
 
         var originalPoolName = originalBuildDef.Queue.Pool?.Name;
-        
+
         if (string.IsNullOrEmpty(originalPoolName) == true)
         {
-            throw new InvalidOperationException($"Could not find original pool with name '{originalPoolName}'.");
+            var message = $"Could not find original pool with name '{originalPoolName}' for build '{buildDefInfo.Name}' in project '{buildDefInfo.Project.Name}'";
+
+            _notUpdated.Add(message);
+
+            WriteLine(message + ": skipping");
+
+            return;
         }
 
         var originalQueueName = originalBuildDef.Queue.Name;
 
         if (string.IsNullOrEmpty(originalQueueName) == true)
         {
-            throw new InvalidOperationException($"Could not find original with name '{originalQueueName}'.");
+            var message = $"Could not find original with name '{originalQueueName}' for build '{buildDefInfo.Name}' in project '{buildDefInfo.Project.Name}'";
+
+            _notUpdated.Add(message);
+
+            WriteLine(message + ": skipping");
+
+            return;
         }
 
         var originalPoolId = originalBuildDef.Queue.Pool?.Id ?? -1;
@@ -266,7 +319,15 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
 
         if (currentPool == null)
         {
-            throw new InvalidOperationException($"Could not find current pool with name '{originalPoolName}'.");
+            var message = $"Could not find current pool with name '{originalPoolName}' for build '{buildDefInfo.Name}' in project '{buildDefInfo.Project.Name}'";
+
+            // throw new InvalidOperationException(message);
+
+            _notUpdated.Add(message);
+
+            WriteLine(message + ": skipping");
+
+            return;
         }
 
         var currentQueue = currentQueues.Value
@@ -275,19 +336,19 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
 
         if (currentQueue == null)
         {
-            throw new InvalidOperationException($"Could not find current queue with name '{originalQueueName}'.");
+            throw new InvalidOperationException($"Could not find current queue with name '{originalQueueName}' for build '{buildDefInfo.Name}' in project '{buildDefInfo.Project.Name}'");
         }
 
-        string updatedBuildDef = UpdatePool(buildDefJson, originalPoolId, currentPool, currentQueue);
+        string updatedBuildDef = UpdateQueueAndVerifyJobAuthorizationScope(buildDefJson, currentQueue);
 
         if (previewOnly == true)
         {
             WriteLine("PREVIEW ONLY: not updating build definition in azure devops");
-            
+
             if (Arguments.GetBooleanValue(PRINT_JSON_ON_PREVIEW) == true)
-            {                
+            {
                 WriteLine(updatedBuildDef);
-            }            
+            }
         }
         else
         {
@@ -295,7 +356,9 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
         }
     }
 
-    private string UpdatePool(string buildDefJson, int originalPoolId, AgentPool currentPool, BuildQueueInfo currentQueue)
+    private List<string> _notUpdated = new List<string>();
+
+    private string UpdateQueueAndVerifyJobAuthorizationScope(string buildDefJson, BuildQueueInfo currentQueue)
     {
         var editor = new JsonEditor(buildDefJson, true);
 
@@ -303,11 +366,7 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
 
         var jobAuthorizationScope = editor.GetValue("jobAuthorizationScope");
 
-        WriteLine($"Updating pool id from '{originalPoolId}' to '{currentPool.Id}' for build def '{name}' and job authorization scope '{jobAuthorizationScope}'.");
-
-        //editor.SetValue(currentPool.Id, "queue", "pool", "id");
-        //editor.SetValue(currentPool.Name, "queue", "pool", "name");
-        //editor.SetValue(currentPool.IsHosted, "queue", "pool", "isHosted");
+        WriteLine($"Updating build def '{name}' queue and pool...");
 
         editor.SetValue(currentQueue.Pool.Id, "queue", "pool", "id");
         editor.SetValue(currentQueue.Pool.Name, "queue", "pool", "name");
@@ -315,13 +374,17 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
 
         editor.SetValue(currentQueue.Id, "queue", "id");
         editor.SetValue(currentQueue.Name, "queue", "name");
-        
+
         var json = editor.ToJson(true);
 
         var invalidJobAuthorizationScope = "\"jobAuthorizationScope\": 0";
         var validJobAuthorizationScope = $"\"jobAuthorizationScope\": \"{jobAuthorizationScope}\"";
 
-        json = json.Replace(invalidJobAuthorizationScope, validJobAuthorizationScope);
+        if (json.Contains(invalidJobAuthorizationScope) == true)
+        {
+            WriteLine($"Updating build def '{name}' job authorization scope to '{jobAuthorizationScope}'...");
+            json = json.Replace(invalidJobAuthorizationScope, validJobAuthorizationScope);
+        }
 
         return json;
     }
