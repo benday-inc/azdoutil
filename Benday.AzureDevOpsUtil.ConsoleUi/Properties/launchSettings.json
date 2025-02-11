@@ -166,6 +166,11 @@
     "list release defs for all projects to json queueinfo": {
       "commandName": "Project",
       "commandLineArgs": "listreleasedefs /all /json /queueinfo"
+    },
+    "repair releases preview": {
+      "commandName": "Project",
+      "commandLineArgs": "repairreleasedefagentpool /all /config:anico .\\on-prem\\on-prem-release-queue-info.json /preview",
+      "workingDirectory": "C:\\code\\agent-pool-info-anico-2"
     }
   }
 }

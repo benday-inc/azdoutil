@@ -1,5 +1,4 @@
-﻿/*
-using System.Net;
+﻿using System.Net;
 using System.Text;
 using System.Text.Json;
 
@@ -49,13 +48,8 @@ public class RepairReleaseDefinitionAgentPoolCommand : AzureDevOpsCommandBase
 
         arguments.AddBoolean(Constants.ArgumentNamePreviewOnly).WithDescription("Preview only. Do not update release definitions.").AsNotRequired().AllowEmptyValue().WithDefaultValue(false);
 
-        arguments.AddFile(Constants.ArgumentNameOriginalQueueInfo)
-            .WithDescription("Queue info JSON file from on-prem server. Assumes that pools have been recreated in the cloud using the same name.")
-            .MustExist()
-            .AsRequired().FromPositionalArgument(2);
-
         arguments.AddFile(Constants.ArgumentNameOriginalReleaseInfo)
-            .WithDescription("Release def JSON file from on-prem server. Assumes that pools have been recreated in the cloud using the same name.")
+            .WithDescription("Release def agent pool references JSON file from on-prem server. Assumes that pools have been recreated in the cloud using the same name.")
             .MustExist()
             .AsRequired().FromPositionalArgument(1);
 
@@ -64,25 +58,6 @@ public class RepairReleaseDefinitionAgentPoolCommand : AzureDevOpsCommandBase
         return arguments;
     }
 
-    private async Task<GetAgentPoolsResponse?> GetAgentPools()
-    {
-        var command = new ListAgentPoolsCommand(
-            ExecutionInfo.GetCloneOfArguments(
-               Constants.CommandArgumentNameListAgentPools, true), _OutputProvider);
-
-        await command.ExecuteAsync();
-
-        return command.LastResult;
-    }
-
-    private async Task<GetBuildQueuesResponse?> GetBuildQueues(string teamProjectName)
-    {
-        var requestUrl = $"{teamProjectName}/_apis/distributedtask/queues?api-version=7.1";
-
-        var result = await CallEndpointViaGetAndGetResult<GetBuildQueuesResponse>(requestUrl);
-
-        return result;
-    }
 
     protected override async Task OnExecute()
     {
@@ -114,34 +89,23 @@ public class RepairReleaseDefinitionAgentPoolCommand : AzureDevOpsCommandBase
             allProjects = false;
         }
 
-        var origQueueInfoFilePath = Arguments.GetPathToFile(Constants.ArgumentNameOriginalQueueInfo);
-
-        var originalQueueInfos = 
-            JsonSerializer.Deserialize<List<BuildQueueInfo>>(
-                File.ReadAllText(origQueueInfoFilePath));
-
-        if (originalQueueInfos == null)
-        {
-            throw new KnownException("Could not deserialize queue info file.");
-        }
-
         var origReleaseInfoFilePath = Arguments.GetPathToFile(Constants.ArgumentNameOriginalReleaseInfo);
 
-        var originalReleaseDefInfos = JsonSerializer.Deserialize<List<GetReleaseDefinitionDetailResponse>>(
+        var originalReleaseDefInfos = JsonSerializer.Deserialize<List<ReleaseQueueInfo>>(
             File.ReadAllText(origReleaseInfoFilePath));
 
         if (originalReleaseDefInfos == null)
         {
-            throw new KnownException("Could not deserialize release def info file.");
+            throw new KnownException("Could not deserialize release def agent pool reference info file.");
         }
 
         if (allProjects == false)
         {
-            await RepairForSingleProject(originalReleaseDefInfos, originalQueueInfos, agentPoolInfoCurrent, _TeamProjectName, previewOnly);
+            await RepairForSingleProject(originalReleaseDefInfos, _TeamProjectName, previewOnly);
         }
         else
         {
-            await RepairForAllProjects(originalReleaseDefInfos, originalQueueInfos, previewOnly);
+            await RepairForAllProjects(originalReleaseDefInfos, previewOnly);
         }
 
         if (_notUpdated.Count > 0)
@@ -155,9 +119,7 @@ public class RepairReleaseDefinitionAgentPoolCommand : AzureDevOpsCommandBase
     }
 
     private async Task RepairForAllProjects(
-        List<ReleaseInfo> originalReleaseDefs,
-        List<BuildQueueInfo> originalQueueInfos,
-        GetAgentPoolsResponse agentPoolInfoCurrent,
+        List<ReleaseQueueInfo> originalReleaseDefs,
         bool previewOnly)
     {
         // call ListTeamProjectsCommand
@@ -179,15 +141,13 @@ public class RepairReleaseDefinitionAgentPoolCommand : AzureDevOpsCommandBase
 
             foreach (var teamProject in teamProjects)
             {
-                await RepairForSingleProject(originalReleaseDefs, originalQueueInfos, agentPoolInfoCurrent, teamProject.Name, previewOnly);
+                await RepairForSingleProject(originalReleaseDefs, teamProject.Name, previewOnly);
             }
         }
     }
 
     private async Task RepairForSingleProject(
-        List<ReleaseInfo> originalReleaseDefs,
-        List<BuildQueueInfo> originalQueueInfos,
-        GetAgentPoolsResponse agentPoolInfoCurrent,
+        List<ReleaseQueueInfo> originalReleaseDefs,
         string teamProjectName, bool previewOnly)
     {
         WriteLine($"Getting release definitions for project '{teamProjectName}'...");
@@ -215,10 +175,22 @@ public class RepairReleaseDefinitionAgentPoolCommand : AzureDevOpsCommandBase
             foreach (var releaseDefInfo in results.Releases)
             {
                 await RepairAgentPoolForBuildDef(
-                    originalReleaseDefs, originalQueueInfos, 
-                    currentQueues, agentPoolInfoCurrent, releaseDefInfo, previewOnly);
+                    originalReleaseDefs,  
+                    currentQueues, releaseDefInfo, previewOnly, teamProjectName);
             }
         }
+    }
+
+
+
+
+    private async Task<GetBuildQueuesResponse?> GetBuildQueues(string teamProjectName)
+    {
+        var requestUrl = $"{teamProjectName}/_apis/distributedtask/queues?api-version=7.1";
+
+        var result = await CallEndpointViaGetAndGetResult<GetBuildQueuesResponse>(requestUrl);
+
+        return result;
     }
 
     private async Task UpdateBuildDefinition(BuildDefinitionInfo buildDefInfo, string updatedBuildDef)
@@ -243,10 +215,123 @@ public class RepairReleaseDefinitionAgentPoolCommand : AzureDevOpsCommandBase
     }
 
     private async Task RepairAgentPoolForBuildDef(
-        List<GetReleaseDefinitionDetailResponse> originalReleaseDefs,
+        List<ReleaseQueueInfo> originalReleaseDefs,
         GetBuildQueuesResponse currentQueues,
-        GetAgentPoolsResponse agentPoolInfoCurrent,
-        ReleaseInfo releaseDefInfo, bool previewOnly)
+        ReleaseInfo releaseDefInfo, bool previewOnly, string teamProjectName)
+    {
+        var temp = originalReleaseDefs.Where(x => x.ReleaseName == releaseDefInfo.Name).ToList();
+
+        var projectReleaseDefs = originalReleaseDefs.Where(
+            x => x.TeamProjectName ==  teamProjectName)
+            .OrderBy(x => x.ReleaseName)
+            .ToList();
+
+        var releaseQueueInfo = projectReleaseDefs
+            .Where(x => x.ReleaseId == releaseDefInfo.Id &&
+                x.ReleaseName == releaseDefInfo.Name)
+            .FirstOrDefault();
+
+        if (releaseQueueInfo == null)
+        {
+            var message = $"Could not find original release definition with id '{releaseDefInfo.Id}' name '{releaseDefInfo.Name}' in project '{teamProjectName}'.";
+
+            _notUpdated.Add(message);
+
+            WriteLine(message + ": skipping");
+
+            return;
+        }
+
+        if (releaseQueueInfo.QueueReferences.Count == 0)
+        {
+            var message = $"No queue references found for release id '{releaseDefInfo.Id}' name '{releaseDefInfo.Name}' in project '{teamProjectName}'.";
+            _notUpdated.Add(message);
+            WriteLine(message + ": skipping");
+            return;
+        }
+
+        var releaseDefJson =
+            await GetReleaseDefinitionJson(releaseDefInfo, teamProjectName);
+
+        if (String.IsNullOrWhiteSpace(releaseDefJson) == true)
+        {
+            var message = $"Could not get build definition JSON for release id '{releaseDefInfo.Id}' name '{releaseDefInfo.Name}' in project '{teamProjectName}'.";
+
+            _notUpdated.Add(message);
+
+            WriteLine(message + ": skipping");
+
+            return;
+        }
+
+
+        var editor = new JsonEditor(releaseDefJson, true);
+
+        foreach (var queueRef in releaseQueueInfo.QueueReferences)
+        {
+            var currentQueue = currentQueues.Value
+                .Where(x => x.Name == queueRef.QueueName)
+                .FirstOrDefault();
+
+            if (currentQueue == null)
+            {
+                var message = $"Could not find target queue with name '{queueRef.QueueName}' for release id '{releaseDefInfo.Id}' name '{releaseDefInfo.Name}' in project '{teamProjectName}'.";
+                _notUpdated.Add(message);
+                WriteLine(message + ": skipping");
+                continue;
+            }
+
+            UpdateQueueAndVerifyJobAuthorizationScope(editor, currentQueue, queueRef, teamProjectName);
+        }
+
+        var updatedBuildDef = editor.ToJson(true);
+
+        if (previewOnly == true)
+        {
+            WriteLine("PREVIEW ONLY: not updating build definition in azure devops");
+
+            if (Arguments.GetBooleanValue(PRINT_JSON_ON_PREVIEW) == true)
+            {
+                WriteLine(updatedBuildDef);
+            }
+        }
+        else
+        {
+            // await UpdateBuildDefinition(releaseDefInfo, updatedBuildDef);
+            throw new NotImplementedException();
+        }
+    }
+    private void UpdateQueueAndVerifyJobAuthorizationScope(
+        JsonEditor editor, BuildQueueInfo targetQueue, QueueReference queueRef, string teamProjectName)
+    {
+        var environmentName = queueRef.EnvironmentName;
+        var environmentId = queueRef.EnvironmentId;
+
+        var environment = editor.Root.GetArrayItem(
+            "environments", "id", environmentId.ToString());
+
+        var deployPhases = environment.GetArray("deployPhases");
+
+        var deploymentInput = deployPhases.FirstOrDefaultWithPropertyName("deploymentInput");
+
+        if (deploymentInput == null)
+        {
+            var message = $"Could not find deployment input for environment '{environmentName}' id '{environmentId}' in release definition for project '{teamProjectName}'.";
+            _notUpdated.Add(message);
+
+            WriteLine(message + ": skipping");
+        }
+        else
+        {
+            var oldQueueId = deploymentInput.GetInt32("queueId");
+
+            deploymentInput["queueId"] = targetQueue.Id;
+
+            WriteLine($"Updated queue id for environment '{environmentName}' id '{environmentId}' from '{oldQueueId}' to '{targetQueue.Id}' in release definition for project '{teamProjectName}'.");
+        }
+    }
+
+    private async Task<string?> GetReleaseDefinitionJson(ReleaseInfo releaseDefInfo, string teamProjectName)
     {
         var execInfo = ExecutionInfo.GetCloneOfArguments(
              Constants.CommandArgumentNameExportReleaseDefinition,
@@ -265,116 +350,17 @@ public class RepairReleaseDefinitionAgentPoolCommand : AzureDevOpsCommandBase
         {
             execInfo.Arguments.Add(
                 Constants.ArgumentNameTeamProjectName,
-                releaseDefInfo.ProjectReference.Name);
+                teamProjectName);
         }
 
         var command = new ExportReleaseDefinitionCommand(
-         execInfo, _OutputProvider);
+            execInfo, _OutputProvider);
 
         await command.ExecuteAsync();
 
         var releaseDefJson = command.LastResultRawJson;
 
-        if (String.IsNullOrWhiteSpace(releaseDefJson) == true)
-        {
-            throw new InvalidOperationException(
-                $"Could not get build definition JSON for build '{releaseDefInfo.Name}' in project '{releaseDefInfo.Project.Name}'.");
-        }
-
-        var releaseDef = command.LastResult;
-
-        if (releaseDef == null)
-        {
-            throw new InvalidOperationException("Could not get build definition from last result.");
-        }
-
-        var originalReleaseDef = originalReleaseDefs.
-                Where(x => 
-                    x.Name == releaseDef.Name && 
-                    x.ProjectReference.Name == releaseDefInfo.ProjectReference.Name).FirstOrDefault();
-
-        if (originalReleaseDef == null)
-        {
-            var message = $"Could not find original release definition with name '{releaseDef.Name}' in project '{releaseDefInfo.ProjectReference.Name}'.";
-
-            _notUpdated.Add(message);
-
-            WriteLine(message + ": skipping");
-
-            return;
-        }
-
-        originalReleaseDef.Queue.
-
-        var originalPoolName = originalReleaseDef.Queue.Pool?.Name;
-
-        if (string.IsNullOrEmpty(originalPoolName) == true)
-        {
-            var message = $"Could not find original pool with name '{originalPoolName}' for build '{releaseDefInfo.Name}' in project '{releaseDefInfo.Project.Name}'";
-
-            _notUpdated.Add(message);
-
-            WriteLine(message + ": skipping");
-
-            return;
-        }
-
-        var originalQueueName = originalReleaseDef.Queue.Name;
-
-        if (string.IsNullOrEmpty(originalQueueName) == true)
-        {
-            var message = $"Could not find original with name '{originalQueueName}' for build '{releaseDefInfo.Name}' in project '{releaseDefInfo.Project.Name}'";
-
-            _notUpdated.Add(message);
-
-            WriteLine(message + ": skipping");
-
-            return;
-        }
-
-        var originalPoolId = originalReleaseDef.Queue.Pool?.Id ?? -1;
-
-        var currentPool = agentPoolInfoCurrent.Pools
-            .Where(x => x.Name.Equals(originalPoolName, StringComparison.OrdinalIgnoreCase))
-            .FirstOrDefault();
-
-        if (currentPool == null)
-        {
-            var message = $"Could not find current pool with name '{originalPoolName}' for build '{releaseDefInfo.Name}' in project '{releaseDefInfo.Project.Name}'";
-
-            // throw new InvalidOperationException(message);
-
-            _notUpdated.Add(message);
-
-            WriteLine(message + ": skipping");
-
-            return;
-        }
-
-        var currentQueue = currentQueues.Value
-           .Where(x => x.Name.Equals(originalQueueName, StringComparison.OrdinalIgnoreCase))
-           .FirstOrDefault();
-
-        if (currentQueue == null)
-        {
-            throw new InvalidOperationException($"Could not find current queue with name '{originalQueueName}' for build '{releaseDefInfo.Name}' in project '{releaseDefInfo.Project.Name}'");
-        }
-
-        string updatedBuildDef = UpdateQueueAndVerifyJobAuthorizationScope(releaseDefJson, currentQueue, releaseDefInfo.Project.Name);
-
-        if (previewOnly == true)
-        {
-            WriteLine("PREVIEW ONLY: not updating build definition in azure devops");
-
-            if (Arguments.GetBooleanValue(PRINT_JSON_ON_PREVIEW) == true)
-            {
-                WriteLine(updatedBuildDef);
-            }
-        }
-        else
-        {
-            await UpdateBuildDefinition(releaseDefInfo, updatedBuildDef);
-        }
+        return releaseDefJson;
     }
 
     private List<string> _notUpdated = new List<string>();
@@ -413,7 +399,7 @@ public class RepairReleaseDefinitionAgentPoolCommand : AzureDevOpsCommandBase
 
     private async Task<GetReleasesForProjectResponse?> GetReleasesForProject(string teamProjectName)
     {
-        var requestUrl = $"{teamProjectName}/_apis/release/releases?api-version=7.1";
+        var requestUrl = $"{teamProjectName}/_apis/release/definitions?api-version=7.1";
 
         var result = await CallEndpointViaGetAndGetResult<GetReleasesForProjectResponse>(
             requestUrl, azureDevOpsUrlTargetType: AzureDevOpsUrlTargetType.Release);
@@ -423,30 +409,5 @@ public class RepairReleaseDefinitionAgentPoolCommand : AzureDevOpsCommandBase
         return result;
     }
 
-    private string ToString(BuildDefinitionInfo definition)
-    {
-        var builder = new StringBuilder();
-        builder.Append(definition.Name);
 
-        if (Arguments.GetBooleanValue(Constants.ArgumentNameNameOnly) == false)
-        {
-            builder.Append(" (");
-            builder.Append(definition.Id);
-            builder.Append(")");
-
-            if (definition.Queue != null && definition.Queue.Pool != null)
-            {
-                builder.Append(" - [Queue Name: ");
-                builder.Append(definition.Queue.Pool.Name);
-                builder.Append(", Queue Pool Id: ");
-                builder.Append(definition.Queue.Pool.Id);
-                builder.Append(", Pool Is Hosted: ");
-                builder.Append(definition.Queue.Pool.IsHosted);
-                builder.Append("]");
-            }
-        }
-
-        return builder.ToString();
-    }
 }
-*/

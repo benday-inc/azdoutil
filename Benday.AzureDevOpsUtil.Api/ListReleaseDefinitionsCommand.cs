@@ -128,7 +128,7 @@ public class ListReleaseDefinitionsCommand : AzureDevOpsCommandBase
         }
         else
         {
-            var queueInfo = await DumpQueueInfo(command.LastResult.Projects);
+            List<ReleaseQueueInfo> queueInfo = await DumpQueueInfo(command.LastResult.Projects);
 
             if (queueInfo == null || queueInfo.Count == 0)
             {

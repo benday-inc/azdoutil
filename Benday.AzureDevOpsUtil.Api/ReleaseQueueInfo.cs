@@ -1,5 +1,8 @@
-﻿namespace Benday.AzureDevOpsUtil.Api;
+﻿using System.Diagnostics;
 
+namespace Benday.AzureDevOpsUtil.Api;
+
+[DebuggerDisplay("ReleaseId: {ReleaseId}, Name: {ReleaseName}, Project: {TeamProjectName}")]
 public class ReleaseQueueInfo
 {
     public int ReleaseId { get; set; }
@@ -25,5 +28,10 @@ public class ReleaseQueueInfo
         queue.EnvironmentName = environmentName;
         queue.AgentSpecification = agentSpecification;
         AddQueue(queue);
+    }
+
+    private string GetDebuggerDisplay()
+    {
+        return ToString();
     }
 }

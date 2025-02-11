@@ -170,7 +170,7 @@ public class ExportReleaseDefinitionCommand : AzureDevOpsCommandBase
 
     private async Task<TeamProjectInfo?> GetTeamProject(string teamProjectName)
     {
-        var teamProjectNameEncoded = HttpUtility.UrlEncode(teamProjectName);
+        var teamProjectNameEncoded = HttpUtility.UrlPathEncode(teamProjectName);
 
         var requestUrl = $"_apis/projects/{teamProjectNameEncoded}?api-version=7.0";
 
