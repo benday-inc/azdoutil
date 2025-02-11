@@ -161,6 +161,11 @@
       "commandName": "Project",
       "commandLineArgs": "repairbuilddefagentpool /all /config:anico .\\on-prem\\build-defs.json",
       "workingDirectory": "C:\\code\\agent-pool-info-anico-2"
+    },
+    "export release def": {
+      "commandName": "Project",
+      "commandLineArgs": "exportreleasedef /teamproject:\"gab-presidents-20180421\" /name:deploy /queueinfo /json",
+      "workingDirectory": "C:\\code\\agent-pool-info-anico-2"
     }
   }
 }
