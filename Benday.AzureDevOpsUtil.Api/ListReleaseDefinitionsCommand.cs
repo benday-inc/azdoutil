@@ -44,6 +44,11 @@ public class ListReleaseDefinitionsCommand : AzureDevOpsCommandBase
             .WithDescription("Export to JSON")
             .AsNotRequired();
 
+        arguments.AddBoolean(Constants.CommandArgumentNameQueueInfo)
+            .WithDescription("Only display queue info")
+            .AllowEmptyValue()
+            .AsNotRequired();
+
         return arguments;
     }
 
@@ -86,8 +91,19 @@ public class ListReleaseDefinitionsCommand : AzureDevOpsCommandBase
         }
 
         var toJson = Arguments.GetBooleanValue(Constants.CommandArgumentNameToJson);
+        var queueInfoOnly = Arguments.GetBooleanValue(Constants.CommandArgumentNameQueueInfo);
 
-        if (allProjects == false)
+        if (queueInfoOnly == true && allProjects == false)
+        {
+            throw new KnownException(
+                $"You cannot specify /{Constants.CommandArgumentNameQueueInfo} and /{Constants.ArgumentNameTeamProjectName} at the same time.");
+        }
+
+        if (allProjects == true && queueInfoOnly == true)
+        {
+            await DumpQueueInfo();
+        }
+        else if (allProjects == false)
         {
             await ListForSingleProject(toJson, _TeamProjectName);
         }
@@ -96,7 +112,97 @@ public class ListReleaseDefinitionsCommand : AzureDevOpsCommandBase
             await ListForAllProjects(toJson);
         }
     }
+
+    private async Task DumpQueueInfo()
+    {
+        // call ListTeamProjectsCommand
+        var command = new ListTeamProjectsCommand(
+            ExecutionInfo.GetCloneOfArguments(
+               Constants.CommandName_ListProcessTemplates, true), _OutputProvider);
+
+        await command.ExecuteAsync();
+
+        if (command.LastResult == null)
+        {
+            throw new KnownException("No team projects found.");
+        }
+        else
+        {
+            var queueInfo = await DumpQueueInfo(command.LastResult.Projects);
+
+            if (queueInfo == null || queueInfo.Count == 0)
+            {
+                WriteLine("No queue info found.");
+            }
+            else
+            {
+                var json = JsonSerializer.Serialize(queueInfo, new JsonSerializerOptions
+                {
+                    WriteIndented = true
+                });
+
+                WriteLine(json);
+            }
+        }
+
+    }
+    private async Task<ReleaseQueueInfo?> GetQueueReferences(
+        TeamProjectInfo project, ReleaseInfo releaseInfo)
+    {
+        var command = new ExportReleaseDefinitionCommand(
+            ExecutionInfo.GetCloneOfArguments(
+               Constants.CommandArgumentNameExportReleaseDefinition, true),
+            _OutputProvider);
+
+        // remove the all argument
+        command.ExecutionInfo.RemoveArgumentValue(Constants.ArgumentNameAllProjects);
+
+        command.ExecutionInfo.RemoveArgumentValue(Constants.ArgumentNameTeamProjectName);
+
+        command.ExecutionInfo.AddArgumentValue(Constants.ArgumentNameTeamProjectName, project.Name);
+        command.ExecutionInfo.AddArgumentValue(
+            Constants.ArgumentNameReleaseDefinitionName, releaseInfo.ReleaseDefinition.Name);
+        command.ExecutionInfo.AddArgumentValue(Constants.CommandArgumentNameQueueInfo, true.ToString());
+
+        await command.ExecuteAsync();
+
+        var returnValue = command.QueueInfo;
+
+        return returnValue;
+    }
     
+    private async Task<List<ReleaseQueueInfo>> DumpQueueInfo(TeamProjectInfo[] projects)
+    {
+        var returnValues = new List<ReleaseQueueInfo>();
+
+        foreach (var project in projects)
+        {
+            var releases = await GetResult(project.Name);
+
+            if (releases == null || releases.Count == 0)
+            {
+                continue;
+            }
+            else
+            {
+                foreach (var release in releases.Releases)
+                {
+                    var queueRefs = await GetQueueReferences(project, release);
+
+                    if (queueRefs == null)
+                    {
+                        continue;
+                    }
+                    else 
+                    {
+                        returnValues.Add(queueRefs);
+                    }
+                }
+            }
+        }
+
+        return returnValues;
+    }
 
     private async Task ListForAllProjects(bool json)
     {

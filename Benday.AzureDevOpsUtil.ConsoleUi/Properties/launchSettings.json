@@ -139,10 +139,6 @@
       "commandName": "Project",
       "commandLineArgs": "listreleasedefs /teamproject:gab-presidents-20180421"
     },
-    "list release defs for all projects to json": {
-      "commandName": "Project",
-      "commandLineArgs": "listreleasedefs /all /json"
-    },
     "list build defs anico": {
       "commandName": "Project",
       "commandLineArgs": "listbuilddefs /all /json /config:anico"
@@ -166,6 +162,10 @@
       "commandName": "Project",
       "commandLineArgs": "exportreleasedef /teamproject:\"gab-presidents-20180421\" /name:deploy /queueinfo /json",
       "workingDirectory": "C:\\code\\agent-pool-info-anico-2"
+    },
+    "list release defs for all projects to json queueinfo": {
+      "commandName": "Project",
+      "commandLineArgs": "listreleasedefs /all /json /queueinfo"
     }
   }
 }

@@ -52,7 +52,7 @@ public class ExportReleaseDefinitionCommand : AzureDevOpsCommandBase
         return arguments;
     }
 
-    public ReleaseQueueInfo? _QueueInfo { get; set; }
+    public ReleaseQueueInfo? QueueInfo { get; set; }
     public string? LastResultRawJson { get; private set; }
 
     protected override async Task OnExecute()
@@ -112,7 +112,7 @@ public class ExportReleaseDefinitionCommand : AzureDevOpsCommandBase
                 TeamProjectId = teamProject.Id
             };
 
-            _QueueInfo = info;
+            QueueInfo = info;
 
             foreach (var environment in releaseDefinition.Environments)
             {
@@ -122,14 +122,23 @@ public class ExportReleaseDefinitionCommand : AzureDevOpsCommandBase
 
                     var queue = queues?.Value.FirstOrDefault(x => x.Id == queueId);
 
+                    var agentIdentifier =
+                        deployPhase?.DeploymentInput?.AgentSpecification?.Identifier ??
+                        string.Empty;
+
                     info.AddQueue(
                         queueId, queue?.Name ?? string.Empty,
                         environment.Id, environment.Name,
-                        deployPhase.DeploymentInput.AgentSpecification.Identifier);
+                        agentIdentifier);
                 }
             }
 
-            if (toJson == false)
+
+            if (IsQuietMode == true)
+            {
+                return;
+            }
+            else if (toJson == false)
             {
                 foreach (var queueRef in info.QueueReferences)
                 {
