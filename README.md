@@ -208,6 +208,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | teamproject | Optional | String | Team project name |
 | all | Optional | Boolean | All releases in all projects in this collection |
 | json | Optional | Boolean | Export to JSON |
+| queueinfo | Optional | Boolean | Only display queue info |
 ## <a name="repairbuilddefagentpool"></a> repairbuilddefagentpool
 **Repairs the agent pool setting for the build definitions in a team project or team projects. This is helpful after an on-prem to cloud migration.**
 ### Arguments
