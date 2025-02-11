@@ -73,6 +73,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | AzdoUtil Configuration | listconfig | List an Azure DevOps configuration. For example, which server or account plus auth information. |
 | AzdoUtil Configuration | removeconfig | Remove an Azure DevOps configuration. For example, which server or account plus auth information. |
 | Builds | exportbuilddef | Export build definition |
+| Builds | exportreleasedef | Export release definition |
 | Builds | listagentpools | List agent pools |
 | Builds | listbuilddefs | List build definitions |
 | Builds | listqueues | List build queues in a team project or team projects |
@@ -154,6 +155,17 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | csv | Optional | Boolean | Output results in CSV format |
 | csv-noheader | Optional | Boolean | Do not print the CSV column header info |
 | raw | Optional | Boolean | Output raw build definition |
+## exportreleasedef
+**Export release definition**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Required | String | Team project name |
+| name | Required | String | Release definition name |
+| queueinfo | Optional | Boolean | Only display queue info |
+| json | Optional | Boolean | Export to JSON |
 ## listagentpools
 **List agent pools**
 ### Arguments
