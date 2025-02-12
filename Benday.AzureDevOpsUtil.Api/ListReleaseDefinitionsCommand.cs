@@ -161,7 +161,7 @@ public class ListReleaseDefinitionsCommand : AzureDevOpsCommandBase
 
         command.ExecutionInfo.AddArgumentValue(Constants.ArgumentNameTeamProjectName, project.Name);
         command.ExecutionInfo.AddArgumentValue(
-            Constants.ArgumentNameReleaseDefinitionName, releaseInfo.ReleaseDefinition.Name);
+            Constants.ArgumentNameReleaseDefinitionName, releaseInfo.Name);
         command.ExecutionInfo.AddArgumentValue(Constants.CommandArgumentNameQueueInfo, true.ToString());
 
         await command.ExecuteAsync();
@@ -312,7 +312,7 @@ public class ListReleaseDefinitionsCommand : AzureDevOpsCommandBase
 
     private async Task<GetReleasesForProjectResponse?> GetResult(string teamProjectName)
     {
-        var requestUrl = $"{teamProjectName}/_apis/release/releases?api-version=7.1";
+        var requestUrl = $"{teamProjectName}/_apis/release/definitions?api-version=7.1";
         
         var result = await CallEndpointViaGetAndGetResult<GetReleasesForProjectResponse>(
             requestUrl, azureDevOpsUrlTargetType: AzureDevOpsUrlTargetType.Release);
