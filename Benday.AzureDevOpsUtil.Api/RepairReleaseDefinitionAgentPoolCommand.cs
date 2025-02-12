@@ -108,13 +108,34 @@ public class RepairReleaseDefinitionAgentPoolCommand : AzureDevOpsCommandBase
             await RepairForAllProjects(originalReleaseDefInfos, previewOnly);
         }
 
+        var outputFileName = $"not-updated_{DateTime.Now.Ticks}.txt";
+
+        var currentDir = System.Environment.CurrentDirectory;
+
+        var outputFilePath = Path.Combine(currentDir, outputFileName);
+
         if (_notUpdated.Count > 0)
         {
-            WriteLine("The following build definitions were not updated:");
+            var builder = new StringBuilder();
+
+            builder.AppendLine($"Count: {_notUpdated.Count}");
+
+            builder.AppendLine("The following build definitions were not updated:");
+
             foreach (var item in _notUpdated)
             {
-                WriteLine(item);
+                builder.AppendLine(item);
             }
+
+            WriteLine(builder.ToString());
+
+            File.WriteAllText(outputFilePath, builder.ToString());
+
+            WriteLine($"Wrote output log to: {outputFilePath}");
+        }
+        else
+        {
+            WriteLine("All items updated");
         }
     }
 

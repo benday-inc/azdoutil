@@ -10,7 +10,7 @@ public class ReleaseQueueInfo
     public string TeamProjectName { get; set; } = string.Empty;
     public string TeamProjectId { get; set; } = string.Empty;
 
-    public List<QueueReference> QueueReferences { get; private set; } = new();
+    public List<QueueReference> QueueReferences { get; set; } = new();
 
     public void AddQueue(QueueReference queue)
     {
@@ -28,10 +28,5 @@ public class ReleaseQueueInfo
         queue.EnvironmentName = environmentName;
         queue.AgentSpecification = agentSpecification;
         AddQueue(queue);
-    }
-
-    private string GetDebuggerDisplay()
-    {
-        return ToString();
-    }
+    }    
 }
