@@ -171,6 +171,11 @@
       "commandName": "Project",
       "commandLineArgs": "repairreleasedefagentpool /all /config:anico .\\on-prem\\on-prem-release-queue-info.json /preview",
       "workingDirectory": "C:\\code\\agent-pool-info-anico-2"
+    },
+    "repair releases ANICO NO PREVIEW": {
+      "commandName": "Project",
+      "commandLineArgs": "repairreleasedefagentpool /all /config:anico .\\on-prem\\on-prem-release-queue-info.json",
+      "workingDirectory": "C:\\code\\agent-pool-info-anico-2"
     }
   }
 }

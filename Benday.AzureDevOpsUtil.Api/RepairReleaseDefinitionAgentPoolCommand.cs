@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Text;
 using System.Text.Json;
+using System.Web;
 
 using Benday.AzureDevOpsUtil.Api.Messages;
 using Benday.AzureDevOpsUtil.Api.Messages.AgentPools;
@@ -58,6 +59,21 @@ public class RepairReleaseDefinitionAgentPoolCommand : AzureDevOpsCommandBase
         return arguments;
     }
 
+    private string _OutputDir = string.Empty;
+
+    private void PopulateOutputDir()
+    {
+        var currentDir = System.Environment.CurrentDirectory;
+
+        var outputDir = Path.Combine(currentDir, "output", DateTime.Now.Ticks.ToString());
+
+        if (Directory.Exists(outputDir) == false)
+        {
+            Directory.CreateDirectory(outputDir);
+        }
+
+        _OutputDir = outputDir;
+    }
 
     protected override async Task OnExecute()
     {
@@ -99,6 +115,8 @@ public class RepairReleaseDefinitionAgentPoolCommand : AzureDevOpsCommandBase
             throw new KnownException("Could not deserialize release def agent pool reference info file.");
         }
 
+        PopulateOutputDir();
+
         if (allProjects == false)
         {
             await RepairForSingleProject(originalReleaseDefInfos, _TeamProjectName, previewOnly);
@@ -110,9 +128,7 @@ public class RepairReleaseDefinitionAgentPoolCommand : AzureDevOpsCommandBase
 
         var outputFileName = $"not-updated_{DateTime.Now.Ticks}.txt";
 
-        var currentDir = System.Environment.CurrentDirectory;
-
-        var outputFilePath = Path.Combine(currentDir, outputFileName);
+        var outputFilePath = Path.Combine(_OutputDir, outputFileName);
 
         if (_notUpdated.Count > 0)
         {
@@ -214,22 +230,24 @@ public class RepairReleaseDefinitionAgentPoolCommand : AzureDevOpsCommandBase
         return result;
     }
 
-    private async Task UpdateBuildDefinition(BuildDefinitionInfo buildDefInfo, string updatedBuildDef)
+    private async Task UpdateReleaseDefinition(ReleaseInfo releaseDefInfo, string teamProjectName, string updatedBuildDefJson)
     {
-        var requestUrl = $"{buildDefInfo.Project.Name}/_apis/build/definitions/{buildDefInfo.Id}?api-version=7.1";
+        var teamProjectNameEscaped = HttpUtility.UrlPathEncode(teamProjectName);
 
-        WriteLine($"Sending update request for build definition '{buildDefInfo.Name}' in '{buildDefInfo.Project.Name}'...");
+        var requestUrl = $"{teamProjectNameEscaped}/_apis/release/definitions/{releaseDefInfo.Id}?api-version=7.1";
+
+        WriteLine($"Sending update request for release definition '{releaseDefInfo.Id}' '{releaseDefInfo.Name}' in '{teamProjectName}'...");
 
         try
         {
-            await SendPutForBodySingleAttempt(requestUrl, updatedBuildDef, true);
+            await SendPutForBodySingleAttempt(requestUrl, updatedBuildDefJson, true);
 
-            WriteLine($"Updated build definition '{buildDefInfo.Name}' in '{buildDefInfo.Project.Name}' with new agent pool id.");
+            WriteLine($"Updated release definition '{releaseDefInfo.Id}' '{releaseDefInfo.Name}' in '{teamProjectName}' with new queue ids.");
             WriteLine();
         }
         catch (Exception ex)
         {
-            var message = $"Error updating build definition '{buildDefInfo.Name}' in '{buildDefInfo.Project.Name}': {ex.Message}";
+            var message = $"Error updating release definition '{releaseDefInfo.Name}' in '{teamProjectName}': {ex.Message}";
 
             _notUpdated.Add(message);
         }
@@ -243,7 +261,7 @@ public class RepairReleaseDefinitionAgentPoolCommand : AzureDevOpsCommandBase
         var temp = originalReleaseDefs.Where(x => x.ReleaseName == releaseDefInfo.Name).ToList();
 
         var projectReleaseDefs = originalReleaseDefs.Where(
-            x => x.TeamProjectName ==  teamProjectName)
+            x => x.TeamProjectName == teamProjectName)
             .OrderBy(x => x.ReleaseName)
             .ToList();
 
@@ -285,6 +303,26 @@ public class RepairReleaseDefinitionAgentPoolCommand : AzureDevOpsCommandBase
             return;
         }
 
+        var teamProjectDirName = teamProjectName.ToLower().Replace(' ', '-');
+
+        teamProjectDirName = string.Concat(teamProjectDirName.Split(Path.GetInvalidFileNameChars()));
+
+        var outputDirForTeamProject = Path.Combine(_OutputDir, teamProjectDirName);
+
+        if (Directory.Exists(outputDirForTeamProject) == false)
+        {
+            Directory.CreateDirectory(outputDirForTeamProject);
+        }
+
+        var releaseNameCleaned = releaseDefInfo.Name.ToLower().Replace(' ', '-');
+
+        releaseNameCleaned = string.Concat(releaseNameCleaned.Split(Path.GetInvalidFileNameChars()));
+
+        var originalFileName = $"release-def-{releaseNameCleaned}-{releaseDefInfo.Id}.original.json";
+
+        File.WriteAllText(Path.Combine(outputDirForTeamProject, originalFileName), releaseDefJson);
+
+        var updatedFileName = $"release-def-{releaseNameCleaned}-{releaseDefInfo.Id}.updated.json";
 
         var editor = new JsonEditor(releaseDefJson, true);
 
@@ -307,6 +345,8 @@ public class RepairReleaseDefinitionAgentPoolCommand : AzureDevOpsCommandBase
 
         var updatedBuildDef = editor.ToJson(true);
 
+        File.WriteAllText(Path.Combine(outputDirForTeamProject, updatedFileName), releaseDefJson);
+
         if (previewOnly == true)
         {
             WriteLine("PREVIEW ONLY: not updating build definition in azure devops");
@@ -318,8 +358,7 @@ public class RepairReleaseDefinitionAgentPoolCommand : AzureDevOpsCommandBase
         }
         else
         {
-            // await UpdateBuildDefinition(releaseDefInfo, updatedBuildDef);
-            throw new NotImplementedException();
+            await UpdateReleaseDefinition(releaseDefInfo, teamProjectName, updatedBuildDef);
         }
     }
     private void UpdateQueueAndVerifyJobAuthorizationScope(
