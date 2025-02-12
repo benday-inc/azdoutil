@@ -211,7 +211,7 @@ public class RepairReleaseDefinitionAgentPoolCommand : AzureDevOpsCommandBase
 
             foreach (var releaseDefInfo in results.Releases)
             {
-                await RepairAgentPoolForBuildDef(
+                await RepairAgentPoolForReleaseDef(
                     originalReleaseDefs,  
                     currentQueues, releaseDefInfo, previewOnly, teamProjectName);
             }
@@ -234,13 +234,15 @@ public class RepairReleaseDefinitionAgentPoolCommand : AzureDevOpsCommandBase
     {
         var teamProjectNameEscaped = HttpUtility.UrlPathEncode(teamProjectName);
 
+        using var client = GetHttpClientInstanceForAzureDevOps(AzureDevOpsUrlTargetType.Release);
+
         var requestUrl = $"{teamProjectNameEscaped}/_apis/release/definitions/{releaseDefInfo.Id}?api-version=7.1";
 
         WriteLine($"Sending update request for release definition '{releaseDefInfo.Id}' '{releaseDefInfo.Name}' in '{teamProjectName}'...");
 
         try
         {
-            await SendPutForBodySingleAttempt(requestUrl, updatedBuildDefJson, true);
+            await SendPutForBodySingleAttempt(client, requestUrl, updatedBuildDefJson, true);
 
             WriteLine($"Updated release definition '{releaseDefInfo.Id}' '{releaseDefInfo.Name}' in '{teamProjectName}' with new queue ids.");
             WriteLine();
@@ -250,24 +252,24 @@ public class RepairReleaseDefinitionAgentPoolCommand : AzureDevOpsCommandBase
             var message = $"Error updating release definition '{releaseDefInfo.Name}' in '{teamProjectName}': {ex.Message}";
 
             _notUpdated.Add(message);
+
+            throw;
         }
     }
 
-    private async Task RepairAgentPoolForBuildDef(
+    private async Task RepairAgentPoolForReleaseDef(
         List<ReleaseQueueInfo> originalReleaseDefs,
         GetBuildQueuesResponse currentQueues,
         ReleaseInfo releaseDefInfo, bool previewOnly, string teamProjectName)
     {
-        var temp = originalReleaseDefs.Where(x => x.ReleaseName == releaseDefInfo.Name).ToList();
-
         var projectReleaseDefs = originalReleaseDefs.Where(
-            x => x.TeamProjectName == teamProjectName)
+            x => string.Equals(x.TeamProjectName, teamProjectName, StringComparison.InvariantCultureIgnoreCase))
             .OrderBy(x => x.ReleaseName)
             .ToList();
 
         var releaseQueueInfo = projectReleaseDefs
             .Where(x => x.ReleaseId == releaseDefInfo.Id &&
-                x.ReleaseName == releaseDefInfo.Name)
+                string.Equals(x.ReleaseName, releaseDefInfo.Name, StringComparison.InvariantCultureIgnoreCase))
             .FirstOrDefault();
 
         if (releaseQueueInfo == null)

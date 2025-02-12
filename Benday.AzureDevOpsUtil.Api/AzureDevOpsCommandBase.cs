@@ -387,6 +387,52 @@ public abstract class AzureDevOpsCommandBase : AsynchronousCommand
         }
     }
 
+    protected async Task<bool> SendPutForBodySingleAttempt(
+        HttpClient client,
+        string requestUrl,
+        string bodyJson,
+        bool throwExceptionOnError = true
+    )
+    {
+        if (string.IsNullOrEmpty(requestUrl))
+        {
+            throw new ArgumentException($"{nameof(requestUrl)} is null or empty.", nameof(requestUrl));
+        }
+
+        if (string.IsNullOrEmpty(bodyJson) == true)
+        {
+            throw new ArgumentException($"{nameof(bodyJson)} is null or empty.", nameof(bodyJson));
+        }
+
+        var content = new StringContent(bodyJson, Encoding.UTF8, "application/json");
+
+        var request = new HttpRequestMessage(new HttpMethod("PUT"), requestUrl)
+        {
+            Content = content
+        };
+
+        var result = await client.SendAsync(request);
+
+        if (result.IsSuccessStatusCode == false)
+        {
+            var responseContent = await result.Content.ReadAsStringAsync();
+
+            if (throwExceptionOnError == true)
+            {
+                throw new InvalidOperationException(
+                    $"Problem with server call to {requestUrl}. {result.StatusCode} {result.ReasonPhrase} - {responseContent}");
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return true;
+        }
+    }
+
     protected async Task<T> SendPatchForBodyAndGetTypedResponse<T>(
         string requestUrl,
         WorkItemFieldOperationValueCollection body, bool writeStringContentToInfo = false,
