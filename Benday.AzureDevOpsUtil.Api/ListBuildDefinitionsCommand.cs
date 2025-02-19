@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Text;
 using System.Text.Json;
+using System.Web;
 
 using Benday.AzureDevOpsUtil.Api.Messages;
 using Benday.CommandsFramework;
@@ -190,7 +191,7 @@ public class ListBuildDefinitionsCommand : AzureDevOpsCommandBase
     {
         string requestUrl;
 
-        var teamProjectNameEscaped = WebUtility.UrlEncode(teamProjectName);
+        var teamProjectNameEscaped = HttpUtility.UrlPathEncode(teamProjectName);
 
         if (Arguments.GetBooleanValue(Constants.ArgumentNameXaml) == true)
         {
