@@ -176,9 +176,29 @@ public class RepairReleaseDefinitionAgentPoolCommand : AzureDevOpsCommandBase
 
             var results = new List<BuildDefinitionInfo>();
 
+            var alreadyProcessed = new List<string>();
+                        
+            var count = 0;
+            var total = teamProjects.Length;
+
             foreach (var teamProject in teamProjects)
             {
-                await RepairForSingleProject(originalReleaseDefs, teamProject.Name, previewOnly);
+                count++;
+                WriteLine();
+                WriteLine();
+                WriteLine($"Processing project '{teamProject.Name}' ({count} of {total})...");
+
+                if (alreadyProcessed.Contains(teamProject.Name.ToLower()))
+                {
+                    WriteLine($"Skipping project '{teamProject.Name}' because it was already processed.");
+                    _notUpdated.Add($"Skipping project '{teamProject.Name}' because it was already processed.");
+
+                    continue;
+                }
+                else
+                {
+                    await RepairForSingleProject(originalReleaseDefs, teamProject.Name, previewOnly);
+                }
             }
         }
     }
@@ -252,8 +272,6 @@ public class RepairReleaseDefinitionAgentPoolCommand : AzureDevOpsCommandBase
             var message = $"Error updating release definition '{releaseDefInfo.Name}' in '{teamProjectName}': {ex.Message}";
 
             _notUpdated.Add(message);
-
-            throw;
         }
     }
 
