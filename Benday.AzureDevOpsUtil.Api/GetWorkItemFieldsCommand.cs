@@ -26,8 +26,13 @@ public class GetWorkItemFieldsCommand : AzureDevOpsCommandBase
         AddCommonArguments(args);
         args.AddString(Constants.ArgumentNameTeamProjectName).AsRequired().
             WithDescription("Team project name that contains the work item type");
+
         args.AddString(Constants.ArgumentNameWorkItemTypeName).AsRequired().
             WithDescription("Name of the work item type");
+
+        args.AddString(Constants.ArgumentNameFilter).AsNotRequired().
+            WithDescription("Case insensitive string filter for the results.").
+            WithDefaultValue(string.Empty);
 
         return args;
     }
@@ -36,6 +41,8 @@ public class GetWorkItemFieldsCommand : AzureDevOpsCommandBase
     {
         var projectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);
         var workItemTypeName = Arguments.GetStringValue(Constants.ArgumentNameWorkItemTypeName);
+        var filter = Arguments.GetStringValue(Constants.ArgumentNameFilter);
+        var hasFilter = String.IsNullOrWhiteSpace(filter) == false;
 
         await GetFieldsForWorkItemType(projectName, workItemTypeName);
         await GetWorkItemFieldsForProject(projectName);
@@ -54,7 +61,15 @@ public class GetWorkItemFieldsCommand : AzureDevOpsCommandBase
 
             foreach (var item in LastResult.Fields)
             {
-                formatter.AddData(item.ReferenceName, item.Name, item.DataType, item.AlwaysRequired.ToString(), item.DefaultValue);
+                if (hasFilter == true)
+                {
+                    formatter.AddDataWithFilter(filter, item.ReferenceName, item.Name, item.DataType, item.AlwaysRequired.ToString(), item.DefaultValue);
+                }
+                else
+                {
+                    // no filter
+                    formatter.AddData(item.ReferenceName, item.Name, item.DataType, item.AlwaysRequired.ToString(), item.DefaultValue);
+                }
             }
 
             var formatted = formatter.FormatTable();

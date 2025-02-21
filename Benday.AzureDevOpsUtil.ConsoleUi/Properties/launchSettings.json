@@ -180,6 +180,10 @@
     "get fields": {
       "commandName": "Project",
       "commandLineArgs": "getfields /teamproject:testscrum20250221 /workitemtypename:task"      
+    },
+    "get fields with filter": {
+      "commandName": "Project",
+      "commandLineArgs": "getfields /teamproject:testscrum20250221 /workitemtypename:task /filter:vsts"      
     }
   }
 }

@@ -101,4 +101,28 @@ public class TableFormatter
         return builder.ToString();
     }
 
+    /// <summary>
+    /// Add data to the table if any of the values contain the filter.
+    /// </summary>
+    /// <param name="filter"></param>
+    /// <param name="data"></param>    
+    public void AddDataWithFilter(string filter, params string[] data)
+    {
+        if (data != null && data.Length > 0)
+        {
+            foreach (var item in data)
+            {
+                if (item == null)
+                {
+                    continue;
+                }
+                
+                if (item.Contains(filter, StringComparison.CurrentCultureIgnoreCase) == true)
+                {
+                    AddData(data);
+                    break;
+                }
+            }
+        }
+    }
 }
