@@ -20,7 +20,7 @@ Commands that help with automated builds and automated releases
 Tools for forecasting project management details using Flow Metrics such as throughput and cycle time. 
 
 _Want to learn more about how to use Flow Metrics to run your projects? Check out this course:   
-**[Predicting the Future, Estimating, and Running Your Projects with Flow Metrics](https://courses.benday.com/c/flow-metrics-2023)**._
+**[Predicting the Future, Estimating, and Running Your Projects with Flow Metrics](https://www.youtube.com/playlist?list=PLGxFXI4dC2sh6yEbibjMCWHECEVB7lRFi)**._
 
 * **Process Templates** - 
 Process template customization and administration utilities
@@ -45,7 +45,7 @@ The azdoutil is distributed as a .NET Core Tool via NuGet. To install it go to t
 `dotnet tool install azdoutil -g`
 
 ### Prerequisites
-- You'll need to install .NET Core 7 from https://dotnet.microsoft.com/
+- You'll need to install .NET Core 8+ from https://dotnet.microsoft.com/
 
 ## Getting Started
 Everything starts with a configuration. After you've installed azdoutil, you'll need to run `azdoutil addconfig` to add a configuration. A configuration is how you store the URL for your Azure DevOps instance and the personal access token (PAT) for authenticating to that instance.  
@@ -73,7 +73,13 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | AzdoUtil Configuration | listconfig | List an Azure DevOps configuration. For example, which server or account plus auth information. |
 | AzdoUtil Configuration | removeconfig | Remove an Azure DevOps configuration. For example, which server or account plus auth information. |
 | Builds | exportbuilddef | Export build definition |
+| Builds | exportreleasedef | Export release definition |
+| Builds | listagentpools | List agent pools |
 | Builds | listbuilddefs | List build definitions |
+| Builds | listqueues | List build queues in a team project or team projects |
+| Builds | listreleasedefs | List release definitions |
+| Builds | repairbuilddefagentpool | Repairs the agent pool setting for the build definitions in a team project or team projects. This is helpful after an on-prem to cloud migration. |
+| Builds | repairreleasedefagentpool | Repairs the agent pool setting for the release definitions in a team project or team projects. This is helpful after an on-prem to cloud migration. |
 | Flow Metrics | agingwork | Get aging in-progress work items |
 | Flow Metrics | cycletimeconfidence | Get item cycle time for 50% and 85% levels. This helps you understand how items typically are delivered. |
 | Flow Metrics | forecastdurationforitemcount | Use throughput data to forecast likely number of weeks to get given number of items done using Monte Carlo simulation |
@@ -141,6 +147,8 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 ### Arguments
 | Argument | Is Optional | Data Type | Description |
 | --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
 | teamproject | Required | String | Team project name |
 | name | Required | String | Build definition name |
 | xaml | Optional | Boolean | List XAML build definitions |
@@ -148,14 +156,83 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | csv | Optional | Boolean | Output results in CSV format |
 | csv-noheader | Optional | Boolean | Do not print the CSV column header info |
 | raw | Optional | Boolean | Output raw build definition |
+## exportreleasedef
+**Export release definition**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Required | String | Team project name |
+| name | Required | String | Release definition name |
+| queueinfo | Optional | Boolean | Only display queue info |
+| json | Optional | Boolean | Export to JSON |
+## listagentpools
+**List agent pools**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| agents | Optional | Boolean | Get agents in each pool |
+| json | Optional | Boolean | Output as JSON |
 ## listbuilddefs
 **List build definitions**
 ### Arguments
 | Argument | Is Optional | Data Type | Description |
 | --- | --- | --- | --- |
-| teamproject | Required | String | Team project name |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Optional | String | Team project name |
+| all | Optional | Boolean | All builds in all projects in this collection |
 | nameonly | Optional | Boolean | Only display the build definition name |
 | xaml | Optional | Boolean | List XAML build definitions |
+| json | Optional | Boolean | Export to JSON |
+## listqueues
+**List build queues in a team project or team projects**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Optional | String | Team project name |
+| all | Optional | Boolean | All builds in all projects in this collection |
+| json | Optional | Boolean | Output as JSON |
+## listreleasedefs
+**List release definitions**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Optional | String | Team project name |
+| all | Optional | Boolean | All releases in all projects in this collection |
+| json | Optional | Boolean | Export to JSON |
+| queueinfo | Optional | Boolean | Only display queue info |
+## repairbuilddefagentpool
+**Repairs the agent pool setting for the build definitions in a team project or team projects. This is helpful after an on-prem to cloud migration.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Optional | String | Team project name |
+| all | Optional | Boolean | All builds in all projects in this collection |
+| PrintJsonOnPreview | Optional | Boolean | Print modified json in preview mode |
+| preview | Optional | Boolean | Preview only. Do not update build definitions. |
+| originalbuildinfofile | Required | String | Build def JSON file from on-prem server. Assumes that pools have been recreated in the cloud using the same name. |
+## repairreleasedefagentpool
+**Repairs the agent pool setting for the release definitions in a team project or team projects. This is helpful after an on-prem to cloud migration.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Optional | String | Team project name |
+| all | Optional | Boolean | All releases in all projects in this collection |
+| PrintJsonOnPreview | Optional | Boolean | Print modified json in preview mode |
+| preview | Optional | Boolean | Preview only. Do not update release definitions. |
+| originalreleaseinfofile | Required | String | Release def agent pool references JSON file from on-prem server. Assumes that pools have been recreated in the cloud using the same name. |
 # Flow Metrics
 ## agingwork
 **Get aging in-progress work items**
@@ -445,6 +522,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | config | Optional | String | Configuration name to use |
 | teamproject | Required | String | Team project name that contains the work item type |
 | workitemtypename | Required | String | Name of the work item type |
+| filter | Optional | String | Case insensitive string filter for the results. |
 ## getiterations
 **Gets a list of iterations in an Azure DevOps Team Project.**
 ### Arguments

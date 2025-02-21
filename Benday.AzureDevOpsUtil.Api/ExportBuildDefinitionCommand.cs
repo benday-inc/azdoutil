@@ -16,7 +16,7 @@ public class ExportBuildDefinitionCommand : AzureDevOpsCommandBase
     private string _TeamProjectName = string.Empty;
     private string _BuildDefinitionName = string.Empty;
 
-    public BuildDefinitionInfoResponse? LastResult { get; private set; }
+    public BuildDefinitionInfo? LastResult { get; private set; }
 
     public ExportBuildDefinitionCommand(
         CommandExecutionInfo info, ITextOutputProvider outputProvider) : base(info, outputProvider)
@@ -26,6 +26,8 @@ public class ExportBuildDefinitionCommand : AzureDevOpsCommandBase
     public override ArgumentCollection GetArguments()
     {
         var arguments = new ArgumentCollection();
+
+        AddCommonArguments(arguments);
 
         arguments.AddString(Constants.ArgumentNameTeamProjectName)
             .WithDescription("Team project name");
@@ -64,6 +66,8 @@ public class ExportBuildDefinitionCommand : AzureDevOpsCommandBase
 
     private bool _isXamlMode;
 
+    public string? LastResultRawJson { get; private set; }
+
     protected override async Task OnExecute()
     {
         // XamlBuildRunInfo
@@ -97,7 +101,19 @@ public class ExportBuildDefinitionCommand : AzureDevOpsCommandBase
 
             WriteLine();
 
-            if (json == null)
+            if (base.IsQuietMode == true)
+            {
+                if (string.IsNullOrEmpty(json) == true)
+                {
+                    throw new InvalidOperationException("Result was null.");
+                }
+                else
+                {
+                    LastResultRawJson = json;
+                    LastResult = JsonUtilities.GetJsonValueAsType<BuildDefinitionInfo>(json);
+                }
+            }
+            else if (json == null)
             {
                 WriteLine("** Result was null **");
             }

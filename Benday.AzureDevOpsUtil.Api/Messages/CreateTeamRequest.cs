@@ -23,7 +23,7 @@ public class CreateTeamRequest
     [JsonPropertyName("newUsersJson")]
     public string NewUsersJson { get; set; } = "[]";
 
-    private List<string> _existingUsers = new List<string>();
+    private readonly List<string> _existingUsers = new List<string>();
 
     public void AddUser(string id)
     {

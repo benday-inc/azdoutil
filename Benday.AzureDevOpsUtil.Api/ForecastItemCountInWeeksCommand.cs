@@ -175,7 +175,7 @@ public class ForecastItemCountInWeeksCommand : AzureDevOpsCommandBase
 
     private int _NumberOfWeeksOfForecast;
     private int _NumberOfDaysOfHistory;
-    private string _TeamProjectName;
+    private string _TeamProjectName = string.Empty;
 
     public Dictionary<DateTime, ThroughputIteration> DataGroupedByWeek { get; private set; } = new();
     private readonly List<ForecastGroup> _forecasts = new();

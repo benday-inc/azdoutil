@@ -10,7 +10,7 @@
 
 <dt>Flow Metrics</dt>
 <dd>Tools for forecasting project management details using Flow Metrics such as throughput and cycle time. <p /><p><i>Want to learn more about how to use Flow Metrics to run your projects? Check out this course: <br />
-    <b><a href="https://courses.benday.com/c/flow-metrics-2023">Predicting the Future, Estimating, and Running Your Projects with Flow Metrics</a></b>.</i></p></dd>
+    <b><a href="https://www.youtube.com/playlist?list=PLGxFXI4dC2sh6yEbibjMCWHECEVB7lRFi">Predicting the Future, Estimating, and Running Your Projects with Flow Metrics</a></b>.</i></p></dd>
 
 <dt>Process Templates</dt>
 <dd>Process template customization and administration utilities</dd>

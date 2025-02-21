@@ -18,12 +18,21 @@ public static class Constants
 
 
     public const string CommandArgumentNameShowConfig = "showconfig";
+    public const string CommandArgumentNameWithAgents = "agents";
+    public const string CommandArgumentNameToJson = "json";
+    public const string CommandArgumentNameQueueInfo = "queueinfo";
     public const string CommandArgumentNameAddUpdateConfig = "addconfig";
     public const string CommandArgumentNameRemoveConfig = "removeconfig";
     public const string CommandArgumentNameListConfig = "listconfig";
     public const string CommandArgumentName_ListGitRepos = "listgitrepos";
     public const string CommandArgumentNameListBuildDefinitions = "listbuilddefs";
+    public const string CommandArgumentNameRepairBuildDefAgentPool = "repairbuilddefagentpool";
+    public const string CommandArgumentNameRepairReleaseDefAgentPool = "repairreleasedefagentpool";
+    public const string CommandArgumentNameListReleaseDefinitions = "listreleasedefs";
+    public const string CommandArgumentNameListAgentPools = "listagentpools";
+    public const string CommandArgumentNameListQueues = "listqueues";
     public const string CommandArgumentNameExportBuildDefinition = "exportbuilddef";
+    public const string CommandArgumentNameExportReleaseDefinition = "exportreleasedef";
     public const string CommandArgumentNameCreateGitRepository = "creategitrepo";
     public const string CommandArgumentNameCompareWitdFields = "comparewitdfields";
     public const string CommandArgumentNameCopyWitdField = "copywitdfield";
@@ -70,6 +79,10 @@ public static class Constants
     public const string ArgumentNameVerbose = "verbose";
     public const string ArgumentNameTeamProjectName = "teamproject";
     public const string ArgumentNameAllProjects = "all";
+    public const string ArgumentNameOriginalBuildInfo = "originalbuildinfofile";
+    public const string ArgumentNameOriginalReleaseInfo = "originalreleaseinfofile";
+    public const string ArgumentNameOriginalQueueInfo = "originalqueueinfofile";
+    public const string ArgumentNamePreviewOnly = "preview";
     public const string ArgumentNameProcessName = "processname";
     public const string ArgumentNameRepositoryName = "reponame";
     public const string ArgumentNameTfvcFolder = "tfvc-path";
@@ -84,6 +97,7 @@ public static class Constants
     public const string ArgumentNameXaml = "xaml";
     public const string ArgumentNameOutputRaw = "raw";
     public const string ArgumentNameBuildDefinitionName = "name";
+    public const string ArgumentNameReleaseDefinitionName = "name";
     public const string ArgumentNameTeamName = "teamname";
     public const string ArgumentNamePercent = "percent";
     public const string ArgumentNameTeamDescription = "description";
@@ -132,6 +146,7 @@ public static class Constants
     public const string CommandArg_State = "state";
     public const string CommandArg_StateTransitionDate = "date";
     public const string ArgumentNameWorkItemTypeName = "workitemtypename";
+    public const string ArgumentNameFilter = "filter";
     public const string CommandArgumentNameOverride = "override";
 
 

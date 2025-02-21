@@ -213,7 +213,7 @@ public class ForecastDurationForItemCountCommand : AzureDevOpsCommandBase
 
     private int _NumberOfItemsToForecast;
     private int _NumberOfDaysOfHistory;
-    private string _TeamProjectName;
+    private string _TeamProjectName = string.Empty;
 
     public Dictionary<DateTime, ThroughputIteration> DataGroupedByWeek { get; private set; } = new();
     private readonly List<ForecastGroup> _forecasts = new();

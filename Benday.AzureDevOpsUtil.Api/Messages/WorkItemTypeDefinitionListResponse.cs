@@ -9,6 +9,6 @@ public class WorkItemTypeDefinitionListResponse
 
 
     [JsonPropertyName("value")]
-    public WorkItemTypeDefinitionResponse[] Types { get; set; }
+    public WorkItemTypeDefinitionResponse[] Types { get; set; } = [];
 }
 

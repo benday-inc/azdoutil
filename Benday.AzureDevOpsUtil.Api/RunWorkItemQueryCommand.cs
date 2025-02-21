@@ -86,7 +86,7 @@ public class RunWorkItemQueryCommand : AzureDevOpsCommandBase
         return responseContent;
     }
 
-    public string LastResultContent { get; private set; }
+    public string LastResultContent { get; private set; } = string.Empty;
     public WorkItemQueryExecutionResult? LastResult
     {
         get;

@@ -46,10 +46,10 @@ public static class JsonUtilities
             }
             else
             {
-                throw new KnownException($"Failed to deserialize json.  {ex.Message}");
+                throw new InvalidOperationException($"Failed to deserialize json.  {ex.Message}");
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             throw;
         }

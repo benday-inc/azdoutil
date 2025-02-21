@@ -85,14 +85,23 @@ public abstract class AzureDevOpsCommandBase : AsynchronousCommand
         }
     }
 
-    protected HttpClient GetHttpClientInstanceForAzureDevOps()
+    protected HttpClient GetHttpClientInstanceForAzureDevOps(
+        AzureDevOpsUrlTargetType azureDevOpsUrlTargetType = AzureDevOpsUrlTargetType.Default)
     {
+        var baseUrl = Configuration.CollectionUrl;
+
+        if (azureDevOpsUrlTargetType == AzureDevOpsUrlTargetType.Release &&
+            Configuration.IsAzureDevOpsService == true)
+        {
+            baseUrl = baseUrl.Replace("https://dev.", "https://vsrm.dev.");
+        }
+
+        var baseUri = new Uri(baseUrl);
+
         if (Configuration.IsWindowsAuth == true)
         {
             var client = new HttpClient(
-                new HttpClientHandler() {  UseDefaultCredentials = true });
-
-            var baseUri = new Uri(Configuration.CollectionUrl);
+                new HttpClientHandler() {  UseDefaultCredentials = true });           
 
             client.BaseAddress = baseUri;
 
@@ -100,9 +109,7 @@ public abstract class AzureDevOpsCommandBase : AsynchronousCommand
         }
         else
         {
-            var client = new HttpClient();
-
-            var baseUri = new Uri(Configuration.CollectionUrl);
+            var client = new HttpClient();            
 
             client.BaseAddress = baseUri;
 
@@ -114,17 +121,21 @@ public abstract class AzureDevOpsCommandBase : AsynchronousCommand
         }        
     }
 
-    protected async Task<T?> CallEndpointViaGetAndGetResult<T>(string requestUrl, bool writeStringContentToInfo = false, bool throwExceptionOnError = true)
+    protected async Task<T?> CallEndpointViaGetAndGetResult<T>(
+        string requestUrl, bool writeStringContentToInfo = false, bool throwExceptionOnError = true,
+        AzureDevOpsUrlTargetType azureDevOpsUrlTargetType = AzureDevOpsUrlTargetType.Default)
     {
         try
         {
-            return await CallEndpointViaGetAndGetResultSingleAttempt<T>(requestUrl, writeStringContentToInfo, throwExceptionOnError);
+            return await CallEndpointViaGetAndGetResultSingleAttempt<T>(
+                requestUrl, writeStringContentToInfo, throwExceptionOnError, azureDevOpsUrlTargetType);
         }
         catch
         {
             await Task.Delay(Constants.RetryDelayInMillisecs);
 
-            var result = await CallEndpointViaGetAndGetResultSingleAttempt<T>(requestUrl, writeStringContentToInfo);
+            var result = await CallEndpointViaGetAndGetResultSingleAttempt<T>(
+                requestUrl, writeStringContentToInfo, azureDevOpsUrlTargetType: azureDevOpsUrlTargetType);
 
             return result;
         }
@@ -159,9 +170,11 @@ public abstract class AzureDevOpsCommandBase : AsynchronousCommand
     }
 
     private async Task<T?> CallEndpointViaGetAndGetResultSingleAttempt<T>(
-        string requestUrl, bool writeStringContentToInfo = false, bool throwExceptionOnError = true)
+        string requestUrl, bool writeStringContentToInfo = false, 
+        bool throwExceptionOnError = true,
+        AzureDevOpsUrlTargetType azureDevOpsUrlTargetType = AzureDevOpsUrlTargetType.Default)
     {
-        using var client = GetHttpClientInstanceForAzureDevOps();
+        using var client = GetHttpClientInstanceForAzureDevOps(azureDevOpsUrlTargetType);
 
         var result = await client.GetAsync(requestUrl);
 
@@ -315,6 +328,99 @@ public abstract class AzureDevOpsCommandBase : AsynchronousCommand
             {
                 throw new InvalidOperationException(
                     $"Problem with server call to {requestUrl}. {result.StatusCode} {result.ReasonPhrase} - {content}");
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return true;
+        }
+    }
+
+    protected async Task<bool> SendPutForBodySingleAttempt(
+        string requestUrl,
+        string bodyJson,
+        bool throwExceptionOnError = true
+    )
+    {
+        if (string.IsNullOrEmpty(requestUrl))
+        {
+            throw new ArgumentException($"{nameof(requestUrl)} is null or empty.", nameof(requestUrl));
+        }
+
+        if (string.IsNullOrEmpty(bodyJson) == true)
+        {
+            throw new ArgumentException($"{nameof(bodyJson)} is null or empty.", nameof(bodyJson));
+        }
+
+        var content = new StringContent(bodyJson, Encoding.UTF8, "application/json");
+
+        using var client = GetHttpClientInstanceForAzureDevOps();
+
+        var request = new HttpRequestMessage(new HttpMethod("PUT"), requestUrl)
+        {
+            Content = content
+        };
+
+        var result = await client.SendAsync(request);
+
+        if (result.IsSuccessStatusCode == false)
+        {
+            var responseContent = await result.Content.ReadAsStringAsync();
+
+            if (throwExceptionOnError == true)
+            {
+                throw new InvalidOperationException(
+                    $"Problem with server call to {requestUrl}. {result.StatusCode} {result.ReasonPhrase} - {responseContent}");
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return true;
+        }
+    }
+
+    protected async Task<bool> SendPutForBodySingleAttempt(
+        HttpClient client,
+        string requestUrl,
+        string bodyJson,
+        bool throwExceptionOnError = true
+    )
+    {
+        if (string.IsNullOrEmpty(requestUrl))
+        {
+            throw new ArgumentException($"{nameof(requestUrl)} is null or empty.", nameof(requestUrl));
+        }
+
+        if (string.IsNullOrEmpty(bodyJson) == true)
+        {
+            throw new ArgumentException($"{nameof(bodyJson)} is null or empty.", nameof(bodyJson));
+        }
+
+        var content = new StringContent(bodyJson, Encoding.UTF8, "application/json");
+
+        var request = new HttpRequestMessage(new HttpMethod("PUT"), requestUrl)
+        {
+            Content = content
+        };
+
+        var result = await client.SendAsync(request);
+
+        if (result.IsSuccessStatusCode == false)
+        {
+            var responseContent = await result.Content.ReadAsStringAsync();
+
+            if (throwExceptionOnError == true)
+            {
+                throw new InvalidOperationException(
+                    $"Problem with server call to {requestUrl}. {result.StatusCode} {result.ReasonPhrase} - {responseContent}");
             }
             else
             {

@@ -158,7 +158,7 @@ public class GetCycleTimeAndThroughputCommand : AzureDevOpsCommandBase
     }
 
     private int _NumberOfDaysOfHistory;
-    private string _TeamProjectName;
+    private string _TeamProjectName = string.Empty;
     private DateTime _StartOfRange;
     private bool _HasTeamNameQuery;
     private string _TeamName;
