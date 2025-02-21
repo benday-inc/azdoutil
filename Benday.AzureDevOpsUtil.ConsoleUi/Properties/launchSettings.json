@@ -176,6 +176,10 @@
       "commandName": "Project",
       "commandLineArgs": "repairreleasedefagentpool /all /config:anico .\\on-prem\\on-prem-release-queue-info.json",
       "workingDirectory": "C:\\code\\agent-pool-info-anico-2"
+    },
+    "get fields": {
+      "commandName": "Project",
+      "commandLineArgs": "getfields /teamproject:testscrum20250221 /workitemtypename:task"      
     }
   }
 }

@@ -367,7 +367,7 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
         }
     }
 
-    private List<string> _notUpdated = new List<string>();
+    private readonly List<string> _notUpdated = new List<string>();
 
     private string UpdateQueueAndVerifyJobAuthorizationScope(
         string buildDefJson, BuildQueueInfo currentQueue, string teamProjectName)

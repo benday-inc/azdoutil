@@ -32,7 +32,7 @@ public class GetWorkItemByIdResponse
                 foreach (var key in Fields.Keys)
                 {
                     if (Fields[key] != null)
-                        _fieldsAsStrings.Add(key, Fields[key]!.ToString());
+                        _fieldsAsStrings.Add(key, Fields[key]?.ToString() ?? string.Empty);
                 }
             }
 

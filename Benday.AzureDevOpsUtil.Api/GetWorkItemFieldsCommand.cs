@@ -1,4 +1,8 @@
-﻿using Benday.AzureDevOpsUtil.Api.Messages;
+﻿using System.Web;
+
+using Benday.AzureDevOpsUtil.Api.DataFormatting;
+
+using Benday.AzureDevOpsUtil.Api.Messages;
 using Benday.CommandsFramework;
 namespace Benday.AzureDevOpsUtil.Api;
 
@@ -40,10 +44,22 @@ public class GetWorkItemFieldsCommand : AzureDevOpsCommandBase
 
         if (IsQuietMode == false && LastResult != null)
         {
+            var formatter = new TableFormatter();
+
+            formatter.AddColumn("Ref Name");
+            formatter.AddColumn("Field Name");
+            formatter.AddColumn("Data Type");
+            formatter.AddColumn("Required");
+            formatter.AddColumn("Default Value");
+
             foreach (var item in LastResult.Fields)
             {
-                WriteLine($"{item.ReferenceName}: Required = '{item.AlwaysRequired}', Default Value = '{item.DefaultValue}'");
+                formatter.AddData(item.ReferenceName, item.Name, item.DataType, item.AlwaysRequired.ToString(), item.DefaultValue);
             }
+
+            var formatted = formatter.FormatTable();
+
+            WriteLine(formatted);
         }
     }
     private void PopulateDataTypes()
@@ -88,9 +104,13 @@ public class GetWorkItemFieldsCommand : AzureDevOpsCommandBase
 
     private async Task GetFieldsForWorkItemType(string teamProjectName, string workItemTypeName)
     {
-        var requestUrl = $"{teamProjectName}/_apis/wit/workitemtypes/{workItemTypeName}/fields?api-version=6.0&$expand=all";
+        var workItemTypeNameEscaped = HttpUtility.UrlPathEncode(workItemTypeName);
 
-        LastResult = await CallEndpointViaGetAndGetResult<WorkItemFieldsResponse>(requestUrl);
+        var requestUrl = $"{teamProjectName}/_apis/wit/workitemtypes/{workItemTypeNameEscaped}/fields?api-version=7.1&$expand=all";
+
+        var result = await CallEndpointViaGetAndGetResult<WorkItemFieldsResponse>(requestUrl);
+
+        LastResult = result;
     }
 
     public WorkItemFieldsResponse? LastResult { get; private set; }

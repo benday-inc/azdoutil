@@ -49,7 +49,7 @@ public static class JsonUtilities
                 throw new InvalidOperationException($"Failed to deserialize json.  {ex.Message}");
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             throw;
         }

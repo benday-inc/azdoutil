@@ -40,9 +40,9 @@ public class ForecastWorkItemDeliveryCommand : AzureDevOpsCommandBase
         return arguments;
     }
 
-    private string _TeamProjectName;
+    private string _TeamProjectName = string.Empty;
     private bool _HasTeamNameQuery;
-    private string _TeamName;
+    private string _TeamName = string.Empty;
     private AreaData? _TeamInfo = null;
 
     private async Task ValidateTeamName()
