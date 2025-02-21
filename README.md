@@ -80,6 +80,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | Builds | [listqueues](#listqueues) | List build queues in a team project or team projects |
 | Builds | [listreleasedefs](#listreleasedefs) | List release definitions |
 | Builds | [repairbuilddefagentpool](#repairbuilddefagentpool) | Repairs the agent pool setting for the build definitions in a team project or team projects. This is helpful after an on-prem to cloud migration. |
+| Builds | [repairreleasedefagentpool](#repairreleasedefagentpool) | Repairs the agent pool setting for the release definitions in a team project or team projects. This is helpful after an on-prem to cloud migration. |
 | Flow Metrics | [agingwork](#agingwork) | Get aging in-progress work items |
 | Flow Metrics | [cycletimeconfidence](#cycletimeconfidence) | Get item cycle time for 50% and 85% levels. This helps you understand how items typically are delivered. |
 | Flow Metrics | [forecastdurationforitemcount](#forecastdurationforitemcount) | Use throughput data to forecast likely number of weeks to get given number of items done using Monte Carlo simulation |
@@ -221,6 +222,18 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | PrintJsonOnPreview | Optional | Boolean | Print modified json in preview mode |
 | preview | Optional | Boolean | Preview only. Do not update build definitions. |
 | originalbuildinfofile | Required | String | Build def JSON file from on-prem server. Assumes that pools have been recreated in the cloud using the same name. |
+## <a name="repairreleasedefagentpool"></a> repairreleasedefagentpool
+**Repairs the agent pool setting for the release definitions in a team project or team projects. This is helpful after an on-prem to cloud migration.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Optional | String | Team project name |
+| all | Optional | Boolean | All releases in all projects in this collection |
+| PrintJsonOnPreview | Optional | Boolean | Print modified json in preview mode |
+| preview | Optional | Boolean | Preview only. Do not update release definitions. |
+| originalreleaseinfofile | Required | String | Release def agent pool references JSON file from on-prem server. Assumes that pools have been recreated in the cloud using the same name. |
 # Flow Metrics
 ## <a name="agingwork"></a> agingwork
 **Get aging in-progress work items**
@@ -510,6 +523,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | config | Optional | String | Configuration name to use |
 | teamproject | Required | String | Team project name that contains the work item type |
 | workitemtypename | Required | String | Name of the work item type |
+| filter | Optional | String | Case insensitive string filter for the results. |
 ## <a name="getiterations"></a> getiterations
 **Gets a list of iterations in an Azure DevOps Team Project.**
 ### Arguments
