@@ -15,10 +15,11 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README-for-nuget.md</PackageReadmeFile>
     <PackageIcon>bdc_mark_128_128.png</PackageIcon>
-    <AssemblyVersion>2.10.0.0</AssemblyVersion>
-    <Version>$(VersionPrefix)2.10.0</Version>
+    <AssemblyVersion>2.11.0.0</AssemblyVersion>
+    <Version>$(VersionPrefix)2.11.0</Version>
     <Description>A collection of useful command line utilities for Azure DevOps</Description>
-    <PackageReleaseNotes>v2.10 - Changes to to GetWorkItemFieldsCommand to fix a bug, improve formatting of data, and add simple text filtering;
+    <PackageReleaseNotes>v2.11 - Minor bug fixes and improvements;
+v2.10 - Changes to to GetWorkItemFieldsCommand to fix a bug, improve formatting of data, and add simple text filtering;
 v2.9.2 - Bug fix for bulk export of agent info for releases;
 v2.9.1 - Bug fix;
 v2.9 - added option to bulk export agent info for all releases in all projects;
@@ -43,7 +44,7 @@ v2.4 - added support for work item type definition comparison
     </None>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Benday.CommandsFramework" Version="4.4.0" />
+    <PackageReference Include="Benday.CommandsFramework" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Benday.AzureDevOpsUtil.Api\Benday.AzureDevOpsUtil.Api.csproj" />

@@ -1,9 +1,7 @@
 ﻿using System.Web;
-
-using Benday.AzureDevOpsUtil.Api.DataFormatting;
-
 using Benday.AzureDevOpsUtil.Api.Messages;
 using Benday.CommandsFramework;
+using Benday.CommandsFramework.DataFormatting;
 namespace Benday.AzureDevOpsUtil.Api;
 
 [Command(

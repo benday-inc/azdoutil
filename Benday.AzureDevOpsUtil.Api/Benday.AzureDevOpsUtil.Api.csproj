@@ -6,9 +6,9 @@
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Benday.CommandsFramework" Version="4.4.0" />
+    <PackageReference Include="Benday.CommandsFramework" Version="4.5.0" />
     <PackageReference Include="Benday.JsonUtilities" Version="5.2.0" />
     <PackageReference Include="Benday.XmlUtilities" Version="5.5.0" />
-    <PackageReference Include="EPPlus" Version="7.6.0" />
+    <PackageReference Include="EPPlus" Version="7.6.1" />
   </ItemGroup>
 </Project>

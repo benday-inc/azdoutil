@@ -18,6 +18,7 @@ public class GetCycleTimeAndThroughputCommand : AzureDevOpsCommandBase
     public GetCycleTimeAndThroughputCommand(
         CommandExecutionInfo info, ITextOutputProvider outputProvider) : base(info, outputProvider)
     {
+        _TeamName = string.Empty;
     }
 
     public override ArgumentCollection GetArguments()
@@ -87,6 +88,11 @@ public class GetCycleTimeAndThroughputCommand : AzureDevOpsCommandBase
     private void GroupData()
     {
         GroupedByWeek = new Dictionary<DateTime, ThroughputIteration>();
+
+        if (Data == null || Data.Items == null)
+        {
+            return;
+        }
 
         foreach (var item in Data.Items)
         {
