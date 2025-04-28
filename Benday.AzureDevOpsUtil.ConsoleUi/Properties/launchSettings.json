@@ -143,21 +143,6 @@
       "commandName": "Project",
       "commandLineArgs": "listbuilddefs /all /json /config:anico"
     },
-    "repair agent pool": {
-      "commandName": "Project",
-      "commandLineArgs": "repairbuilddefagentpool /teamproject:gab-presidents-20180421 /poolinfofile:agent-pools-orig.json",
-      "workingDirectory": "C:\\code\\temp\\build-agent-temp"
-    },
-    "repair agent pool anico preview": {
-      "commandName": "Project",
-      "commandLineArgs": "repairbuilddefagentpool /all /preview /config:anico .\\on-prem\\build-defs.json",
-      "workingDirectory": "C:\\code\\agent-pool-info-anico-2"
-    },
-    "repair agent pool anico (no preview))": {
-      "commandName": "Project",
-      "commandLineArgs": "repairbuilddefagentpool /all /config:anico .\\on-prem\\build-defs.json",
-      "workingDirectory": "C:\\code\\agent-pool-info-anico-2"
-    },
     "export release def": {
       "commandName": "Project",
       "commandLineArgs": "exportreleasedef /teamproject:\"gab-presidents-20180421\" /name:deploy /queueinfo /json",
@@ -167,19 +152,14 @@
       "commandName": "Project",
       "commandLineArgs": "listreleasedefs /all /json /queueinfo"
     },
-    "repair releases preview": {
+    "repair releases preview andef": {
       "commandName": "Project",
-      "commandLineArgs": "repairreleasedefagentpool /all /config:anico .\\on-prem\\on-prem-release-queue-info.json /preview",
-      "workingDirectory": "C:\\code\\agent-pool-info-anico-2"
-    },
-    "repair releases ANICO NO PREVIEW": {
-      "commandName": "Project",
-      "commandLineArgs": "repairreleasedefagentpool /all /config:anico .\\on-prem\\on-prem-release-queue-info.json",
-      "workingDirectory": "C:\\code\\agent-pool-info-anico-2"
+      "commandLineArgs": "repairreleasedefagentpool /all /config:andef /preview ./default-collection-releases-queue-info.json",
+      "workingDirectory": "/Users/benday/Downloads/agent-pool-info-default-collection"
     },
     "get fields": {
       "commandName": "Project",
-      "commandLineArgs": "getfields /teamproject:testscrum20250221 /workitemtypename:task"      
+      "commandLineArgs": "getfields /teamproject:testscrum20250221 /workitemtypename:task"
     },
     "get fields with filter": {
       "commandName": "Project",

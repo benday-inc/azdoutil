@@ -128,6 +128,7 @@ public class ListReleaseDefinitionsCommand : AzureDevOpsCommandBase
         }
         else
         {
+
             List<ReleaseQueueInfo> queueInfo = await DumpQueueInfo(command.LastResult.Projects);
 
             if (queueInfo == null || queueInfo.Count == 0)
@@ -193,7 +194,7 @@ public class ListReleaseDefinitionsCommand : AzureDevOpsCommandBase
                     {
                         continue;
                     }
-                    else 
+                    else
                     {
                         returnValues.Add(queueRefs);
                     }
@@ -296,7 +297,11 @@ public class ListReleaseDefinitionsCommand : AzureDevOpsCommandBase
     {
         foreach (var release in releases)
         {
-            
+            if (release == null || release.ProjectReference == null)
+            {
+                continue;
+            }
+
             var teamProjectName = release.ProjectReference.Name;
 
             var releaseId = release.ReleaseDefinition.Id;

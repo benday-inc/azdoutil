@@ -369,7 +369,7 @@ public class RepairReleaseDefinitionAgentPoolCommand : AzureDevOpsCommandBase
 
         if (previewOnly == true)
         {
-            WriteLine("PREVIEW ONLY: not updating build definition in azure devops");
+            WriteLine("PREVIEW ONLY: not updating release definition in azure devops");
 
             if (Arguments.GetBooleanValue(PRINT_JSON_ON_PREVIEW) == true)
             {
