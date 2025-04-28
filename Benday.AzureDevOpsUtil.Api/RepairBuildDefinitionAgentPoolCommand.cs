@@ -46,12 +46,15 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
 
         arguments.AddBoolean(Constants.ArgumentNamePreviewOnly).WithDescription("Preview only. Do not update build definitions.").AsNotRequired().AllowEmptyValue().WithDefaultValue(false);
 
+        arguments.AddString("buildname")
+            .WithDescription("Build definition name filter. This will only apply if the build name contains this value and only if /all is not specified.")
+            .AsNotRequired()
+            .WithDefaultValue(string.Empty);
+
         arguments.AddFile(Constants.ArgumentNameOriginalBuildInfo)
             .WithDescription("Build def JSON file from on-prem server. Assumes that pools have been recreated in the cloud using the same name.")
             .MustExist()
             .AsRequired().FromPositionalArgument(1);
-
-
 
         return arguments;
     }
@@ -106,6 +109,23 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
             allProjects = false;
         }
 
+        var buildNameFilter = Arguments.GetStringValue("buildname");
+        bool filterByBuildName = false;
+
+        if (allProjects == true)
+        {
+            buildNameFilter = string.Empty;
+            filterByBuildName = false;
+        }
+        else
+        {
+            if (string.IsNullOrWhiteSpace(buildNameFilter) == false)
+            {
+                WriteLine($"Filtering build definitions by name '{buildNameFilter}'");
+                filterByBuildName = true;
+            }
+        }
+
         var agentPoolInfoFilePath = Arguments.GetPathToFile(Constants.ArgumentNameOriginalBuildInfo);
 
         var originalBuildDefInfos = JsonSerializer.Deserialize<List<BuildDefinitionInfo>>(
@@ -125,7 +145,7 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
 
         if (allProjects == false)
         {
-            await RepairForSingleProject(originalBuildDefInfos, currentAgentPoolInfo, _TeamProjectName, previewOnly);
+            await RepairForSingleProject(originalBuildDefInfos, currentAgentPoolInfo, _TeamProjectName, previewOnly, filterByBuildName, buildNameFilter);
         }
         else
         {
@@ -174,7 +194,7 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
     private async Task RepairForSingleProject(
         List<BuildDefinitionInfo> originalBuildDefs,
         GetAgentPoolsResponse agentPoolInfoCurrent,
-        string teamProjectName, bool previewOnly)
+        string teamProjectName, bool previewOnly, bool filterByBuildName = false, string buildNameFilter = "")
     {
         WriteLine($"Getting build definitions for project '{teamProjectName}'...");
 
@@ -200,6 +220,17 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
 
             foreach (var buildDefInfo in results)
             {
+                if (filterByBuildName == true)
+                {
+                    if (buildDefInfo.Name.IndexOf(buildNameFilter, StringComparison.OrdinalIgnoreCase) == -1)
+                    {
+                        // WriteLine($"Skipping build definition '{buildDefInfo.Name}' because it does not match the filter '{buildNameFilter}'");
+                        continue;
+                    }
+                }
+
+                WriteLine($"Processing build definition '{buildDefInfo.Name}'...");
+
                 await RepairAgentPoolForBuildDef(originalBuildDefs, currentQueues, agentPoolInfoCurrent, buildDefInfo, previewOnly);
             }
         }
@@ -378,7 +409,7 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
 
         var jobAuthorizationScope = editor.GetValue("jobAuthorizationScope");
 
-        WriteLine($"Updating build def '{name}' in '{teamProjectName}' queue and pool...");
+        WriteLine($"Updating build def '{name}' in '{teamProjectName}' queue and pool to queue name '{currentQueue.Name}' and pool '{currentQueue.Pool.Name}'...");
 
         editor.SetValue(currentQueue.Pool.Id, "queue", "pool", "id");
         editor.SetValue(currentQueue.Pool.Name, "queue", "pool", "name");
