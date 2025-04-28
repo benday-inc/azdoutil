@@ -154,6 +154,11 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
 
         if (_notUpdated.Count > 0)
         {
+            WriteLine();
+            WriteLine();
+            WriteLine("**************************************************************");
+            WriteLine("** WARNING: Some build definitions were not updated. **");
+            WriteLine("**************************************************************");
             WriteLine("The following build definitions were not updated:");
             foreach (var item in _notUpdated)
             {
@@ -174,7 +179,7 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
 
         await command.ExecuteAsync();
 
-        if (command.LastResult == null || 
+        if (command.LastResult == null ||
             command.LastResult.Projects == null ||
             command.LastResult.Projects.Length == 0)
         {
@@ -248,7 +253,19 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
 
                 WriteLine($"Calling {nameof(RepairAgentPoolForBuildDef)} for build definition {currentCount} of {totalCount} '{buildDefInfo.Name}'...");
 
-                await RepairAgentPoolForBuildDef(originalBuildDefs, currentQueues, agentPoolInfoCurrent, buildDefInfo, previewOnly);
+                try
+                {
+                    await RepairAgentPoolForBuildDef(originalBuildDefs, currentQueues, agentPoolInfoCurrent, buildDefInfo, previewOnly);
+                }
+                catch (Exception ex)
+                {
+                    var message = $"Error processing build definition '{buildDefInfo.Name}' in project '{buildDefInfo.Project.Name}': {ex.Message}";
+
+                    _notUpdated.Add(message);
+
+                    WriteLine(message);
+                }
+           
             }
         }
     }
