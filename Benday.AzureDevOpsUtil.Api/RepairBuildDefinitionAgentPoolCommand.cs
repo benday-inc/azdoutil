@@ -174,7 +174,9 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
 
         await command.ExecuteAsync();
 
-        if (command.LastResult == null)
+        if (command.LastResult == null || 
+            command.LastResult.Projects == null ||
+            command.LastResult.Projects.Length == 0)
         {
             throw new KnownException("No team projects found.");
         }
@@ -182,11 +184,21 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
         {
             var teamProjects = command.LastResult.Projects;
 
+            WriteLine($"Found {teamProjects.Length} team projects.");
+
+            var totalCount = teamProjects.Length;
+            var currentCount = 0;
+
             var results = new List<BuildDefinitionInfo>();
 
             foreach (var teamProject in teamProjects)
             {
+                currentCount++;
+                WriteLine($"Processing project {currentCount} of {totalCount}: {teamProject.Name}");
+
                 await RepairForSingleProject(originalBuildDefs, agentPoolInfoCurrent, teamProject.Name, previewOnly);
+
+                WriteLine();
             }
         }
     }
@@ -203,10 +215,12 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
         if (results == null)
         {
             WriteLine(String.Empty);
-            WriteLine($"No build definitions found for project '{teamProjectName}'");
+            WriteLine($"\tNo build definitions found for project '{teamProjectName}'");
         }
         else
         {
+            WriteLine($"\tFound {results.Count} build definitions for project '{teamProjectName}'...");
+
             var currentQueues = await GetBuildQueues(teamProjectName);
 
             if (currentQueues == null)
@@ -214,12 +228,15 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
                 throw new KnownException("Could not get current build queues from Azure DevOps.");
             }
 
-            WriteLine(String.Empty);
+            WriteLine();
 
-            WriteLine($"Result count for project '{teamProjectName}': {results.Count}");
+            var totalCount = results.Count;
+            var currentCount = 0;
 
             foreach (var buildDefInfo in results)
             {
+                currentCount++;
+
                 if (filterByBuildName == true)
                 {
                     if (buildDefInfo.Name.IndexOf(buildNameFilter, StringComparison.OrdinalIgnoreCase) == -1)
@@ -229,7 +246,7 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
                     }
                 }
 
-                WriteLine($"Processing build definition '{buildDefInfo.Name}'...");
+                WriteLine($"Calling {nameof(RepairAgentPoolForBuildDef)} for build definition {currentCount} of {totalCount} '{buildDefInfo.Name}'...");
 
                 await RepairAgentPoolForBuildDef(originalBuildDefs, currentQueues, agentPoolInfoCurrent, buildDefInfo, previewOnly);
             }
