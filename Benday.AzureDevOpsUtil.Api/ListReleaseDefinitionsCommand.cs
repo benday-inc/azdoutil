@@ -186,18 +186,30 @@ public class ListReleaseDefinitionsCommand : AzureDevOpsCommandBase
             }
             else
             {
-                foreach (var release in releases.Releases)
+                var totalReleases = releases.Releases.Length;
+                var completedReleases = 0;
+
+                var tasks = releases.Releases.Select(async release =>
                 {
                     var queueRefs = await GetQueueReferences(project, release);
 
-                    if (queueRefs == null)
+                    Interlocked.Increment(ref completedReleases);
+                    var percentDone = (completedReleases * 100) / totalReleases;
+                    WriteLine($"Progress: {percentDone}% done");
+
+                    if (queueRefs != null)
                     {
-                        continue;
+                        return queueRefs;
                     }
-                    else
-                    {
-                        returnValues.Add(queueRefs);
-                    }
+
+                    return null;
+                });
+
+                var results = await Task.WhenAll(tasks);
+
+                foreach (var queueRef in results.Where(r => r != null))
+                {
+                    returnValues.Add(queueRef!);
                 }
             }
         }
