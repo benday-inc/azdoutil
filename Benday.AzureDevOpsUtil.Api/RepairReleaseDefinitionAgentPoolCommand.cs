@@ -231,15 +231,23 @@ public class RepairReleaseDefinitionAgentPoolCommand : AzureDevOpsCommandBase
 
             foreach (var releaseDefInfo in results.Releases)
             {
-                await RepairAgentPoolForReleaseDef(
-                    originalReleaseDefs,  
-                    currentQueues, releaseDefInfo, previewOnly, teamProjectName);
+                try
+                {
+                    await RepairAgentPoolForReleaseDef(
+                        originalReleaseDefs,
+                        currentQueues, releaseDefInfo, previewOnly, teamProjectName);
+                }
+                catch (Exception ex)
+                {
+                    var message = $"Error processing release definition '{releaseDefInfo.Name}' in project '{teamProjectName}': {ex.Message}";
+
+                    _notUpdated.Add(message);
+
+                    WriteLine(message);
+                }
             }
         }
     }
-
-
-
 
     private async Task<GetBuildQueuesResponse?> GetBuildQueues(string teamProjectName)
     {
@@ -436,7 +444,22 @@ public class RepairReleaseDefinitionAgentPoolCommand : AzureDevOpsCommandBase
         var command = new ExportReleaseDefinitionCommand(
             execInfo, _OutputProvider);
 
-        await command.ExecuteAsync();
+
+
+        try
+        {
+            await command.ExecuteAsync();
+        }
+        catch (Exception ex)
+        {
+            WriteLine();
+            WriteLine();
+            WriteLine($"Error getting release definition '{releaseDefInfo.Name}' in project '{teamProjectName}': {ex.Message}");
+            WriteLine();
+            WriteLine("Retrying in a few seconds...");
+            await Task.Delay(5000);
+            await command.ExecuteAsync();
+        }
 
         var releaseDefJson = command.LastResultRawJson;
 
