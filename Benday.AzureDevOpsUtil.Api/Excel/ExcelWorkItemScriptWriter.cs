@@ -13,7 +13,7 @@ public class ExcelWorkItemScriptWriter
 {
     public void WriteToExcel(string filename, List<WorkItemScriptAction> actions)
     {
-        ExcelPackage.LicenseContext = LicenseContext.Commercial;
+        ExcelPackage.License.SetNonCommercialPersonal("azdoutil");
 
         using (var excel = new OfficeOpenXml.ExcelPackage())
         {

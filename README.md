@@ -223,6 +223,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | all | Optional | Boolean | All builds in all projects in this collection |
 | PrintJsonOnPreview | Optional | Boolean | Print modified json in preview mode |
 | preview | Optional | Boolean | Preview only. Do not update build definitions. |
+| buildname | Optional | String | Build definition name filter. This will only apply if the build name contains this value and only if /all is not specified. |
 | originalbuildinfofile | Required | String | Build def JSON file from on-prem server. Assumes that pools have been recreated in the cloud using the same name. |
 ## <a name="repairreleasedefagentpool"></a> repairreleasedefagentpool
 **Repairs the agent pool setting for the release definitions in a team project or team projects. This is helpful after an on-prem to cloud migration.**
