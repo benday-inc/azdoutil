@@ -105,6 +105,7 @@ public static class Constants
     public const string ArgumentNameShowLastRunInfo = "showlastruninfo";
     public const string ArgumentNameOutputCsv = "csv";
     public const string ArgumentNameNoCsvHeader = "csv-noheader";
+    public const string ArgumentNameInputFile = "input";
     public const string ArgumentNameComparisonFile1 = "file1";
     public const string ArgumentNameComparisonFile2 = "file2";
     public const string ArgumentNameReverseSourceAndTarget = "flip";
