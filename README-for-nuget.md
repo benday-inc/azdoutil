@@ -76,7 +76,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | AzdoUtil Configuration | removeconfig | Remove an Azure DevOps configuration. For example, which server or account plus auth information. |
 | Builds | exportbuilddef | Export build definition |
 | Builds | exportreleasedef | Export release definition |
-| Builds | importbuilddef | Import build definition |
+| Builds | importbuilddef | Import build definition from JSON file |
 | Builds | listagentpools | List agent pools |
 | Builds | listbuilddefs | List build definitions |
 | Builds | listqueues | List build queues in a team project or team projects |
@@ -171,19 +171,16 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | queueinfo | Optional | Boolean | Only display queue info |
 | json | Optional | Boolean | Export to JSON |
 ## importbuilddef
-**Import build definition**
+**Import build definition from JSON file**
 ### Arguments
 | Argument | Is Optional | Data Type | Description |
 | --- | --- | --- | --- |
 | quiet | Optional | Boolean | Quiet mode |
 | config | Optional | String | Configuration name to use |
 | teamproject | Required | String | Team project name |
-| name | Required | String | Build definition name |
-| xaml | Optional | Boolean | List XAML build definitions |
-| showlastruninfo | Optional | Boolean | Show last build run info |
-| csv | Optional | Boolean | Output results in CSV format |
-| csv-noheader | Optional | Boolean | Do not print the CSV column header info |
-| raw | Optional | Boolean | Output raw build definition |
+| input | Required | String | Path to JSON file containing build definition |
+| cloneid | Optional | Int32 | ID of the definition to clone (optional) |
+| clonerev | Optional | Int32 | Revision of the definition to clone (optional) |
 ## listagentpools
 **List agent pools**
 ### Arguments

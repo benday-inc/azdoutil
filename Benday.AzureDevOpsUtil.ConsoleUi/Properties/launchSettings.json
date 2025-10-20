@@ -1,5 +1,10 @@
 {
   "profiles": {
+    "import-build-def": {
+      "commandName": "Project",
+      "commandLineArgs": "importbuilddef /teamproject:test20251020a ./gated-mainline-import.json",
+      "workingDirectory": "/Users/benday/Downloads/build-and-release-backups-20251017/build-and-release-backups-20251017/builds"
+    },
     "forecast-workitem-delivery": {
       "commandName": "Project",
       "commandLineArgs": "forecastworkitem /id:2489 /numberofdays:120"

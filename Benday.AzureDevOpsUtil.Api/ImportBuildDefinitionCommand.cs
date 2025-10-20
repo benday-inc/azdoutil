@@ -87,7 +87,7 @@ public class ImportBuildDefinitionCommand : AzureDevOpsCommandBase
         // Validate it's valid JSON
         try
         {
-            using var doc = JsonDocument.Parse(json);
+            using JsonDocument doc = JsonDocument.Parse(json);
         }
         catch (JsonException ex)
         {
@@ -230,7 +230,8 @@ public class ImportBuildDefinitionCommand : AzureDevOpsCommandBase
             "links",
             "latestBuild",
             "latestCompletedBuild",
-            "metrics"
+            "metrics",
+            "project" // Remove project info - it will be inferred from the URL
         };
 
         return readOnlyProperties.Contains(propertyName);
