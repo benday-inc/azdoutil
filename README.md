@@ -77,6 +77,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | AzdoUtil Configuration | [removeconfig](#removeconfig) | Remove an Azure DevOps configuration. For example, which server or account plus auth information. |
 | Builds | [exportbuilddef](#exportbuilddef) | Export build definition |
 | Builds | [exportreleasedef](#exportreleasedef) | Export release definition |
+| Builds | [importbuilddef](#importbuilddef) | Import build definition |
 | Builds | [listagentpools](#listagentpools) | List agent pools |
 | Builds | [listbuilddefs](#listbuilddefs) | List build definitions |
 | Builds | [listqueues](#listqueues) | List build queues in a team project or team projects |
@@ -170,6 +171,20 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | name | Required | String | Release definition name |
 | queueinfo | Optional | Boolean | Only display queue info |
 | json | Optional | Boolean | Export to JSON |
+## <a name="importbuilddef"></a> importbuilddef
+**Import build definition**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Required | String | Team project name |
+| name | Required | String | Build definition name |
+| xaml | Optional | Boolean | List XAML build definitions |
+| showlastruninfo | Optional | Boolean | Show last build run info |
+| csv | Optional | Boolean | Output results in CSV format |
+| csv-noheader | Optional | Boolean | Do not print the CSV column header info |
+| raw | Optional | Boolean | Output raw build definition |
 ## <a name="listagentpools"></a> listagentpools
 **List agent pools**
 ### Arguments

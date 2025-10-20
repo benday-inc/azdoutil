@@ -58,9 +58,7 @@ public class ExcelReader
     public List<ExcelRowWrapper> GetRows(string sheetName)
     {
         var returnValue = new List<ExcelRowWrapper>();
-
-        ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.Commercial;
-
+        
         using (var excel = new OfficeOpenXml.ExcelPackage())
         {
             // NOTE: open the file and ignore whether any other process has it open

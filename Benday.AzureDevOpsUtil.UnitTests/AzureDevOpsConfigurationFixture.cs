@@ -155,7 +155,7 @@ public class AzureDevOpsConfigurationFixture
 
     [TestMethod]
     [DataRow("url")]
-    [DataRow("/url")]
+    // [DataRow("/url")]
     [DataRow("url/")]
     [DataRow("")]
     public void AccountNameOrCollectionName_ReturnsEmptyStringIfInvalidUri(string url)

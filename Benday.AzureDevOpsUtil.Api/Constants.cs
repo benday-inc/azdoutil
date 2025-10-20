@@ -32,6 +32,7 @@ public static class Constants
     public const string CommandArgumentNameListAgentPools = "listagentpools";
     public const string CommandArgumentNameListQueues = "listqueues";
     public const string CommandArgumentNameExportBuildDefinition = "exportbuilddef";
+    public const string CommandArgumentNameImportBuildDefinition = "importbuilddef";
     public const string CommandArgumentNameExportReleaseDefinition = "exportreleasedef";
     public const string CommandArgumentNameCreateGitRepository = "creategitrepo";
     public const string CommandArgumentNameCompareWitdFields = "comparewitdfields";
