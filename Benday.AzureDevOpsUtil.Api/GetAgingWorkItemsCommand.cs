@@ -107,6 +107,16 @@ public class GetAgingWorkItemsCommand : AzureDevOpsCommandBase
     {
         var teamProjectNameUrlEncoded = HttpUtility.UrlEncode(_TeamProjectName);
 
+        var analyticsUrl = Configuration.AnalyticsUrl;
+
+        if (analyticsUrl.EndsWith("/"))
+        {
+            // Remove trailing slash
+            analyticsUrl = Configuration.AnalyticsUrl[..^1];
+        }
+
+        WriteLine($"Using analytics URL: {analyticsUrl}");
+
         string requestUrl;
 
         if (_HasTeamNameQuery == true)
@@ -120,8 +130,9 @@ public class GetAgingWorkItemsCommand : AzureDevOpsCommandBase
              GET https://azdo2022.benday.com/DefaultCollection/20230601e/_odata/v4.0-preview/WorkItems?$filter=WorkItemType 
             eq 'Product Backlog Item' and StateCategory eq 'InProgress'&$select=Title,WorkItemType,AreaSK,InProgressDate,WorkItemId,ClosedDate,StateCategory&$orderby=InProgressDate desc
              */
-            WriteLine($"Getting data for team '{_TeamName}'...");
-            requestUrl = $"{Configuration.AnalyticsUrl}/{teamProjectNameUrlEncoded}/_odata/v1.0/WorkItems?" +
+            WriteLine($"Getting data for team '{_TeamName}'...");            
+
+            requestUrl = $"{analyticsUrl}/{teamProjectNameUrlEncoded}/_odata/v1.0/WorkItems?" +
                 "$select=Title,WorkItemType,AreaSK,InProgressDate,WorkItemId,StateCategory&" +
                 "$filter=" +
                 HttpUtility.UrlEncode($"WorkItemType eq 'Product Backlog Item' and StateCategory eq 'InProgress' and " +
@@ -130,7 +141,7 @@ public class GetAgingWorkItemsCommand : AzureDevOpsCommandBase
         else
         {
             WriteLine($"Getting data for team project '{_TeamProjectName}'...");
-            requestUrl = $"{Configuration.AnalyticsUrl}/{teamProjectNameUrlEncoded}/_odata/v1.0/WorkItems?" +
+            requestUrl = $"{analyticsUrl}/{teamProjectNameUrlEncoded}/_odata/v1.0/WorkItems?" +
                 "$select=Title,WorkItemType,AreaSK,InProgressDate,WorkItemId,StateCategory&" +
                 "$filter=" +
                 HttpUtility.UrlEncode($"WorkItemType eq 'Product Backlog Item' and StateCategory eq 'InProgress'");
