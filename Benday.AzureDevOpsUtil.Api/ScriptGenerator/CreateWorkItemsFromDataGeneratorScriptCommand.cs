@@ -75,6 +75,7 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
     private bool _createProjectIfNotExists = false;
     private List<WorkItemScriptAction>? _actions;
     private string _teamProjectName = string.Empty;
+    private string _processTemplateName = string.Empty;
 
     private bool _addSessionTag = false;
 
@@ -129,21 +130,21 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
             throw new KnownException($"When running in script only mode, a value for '{Constants.CommandArg_SaveScriptFileTo}' is required.");
         }
 
-        var processTemplateName = Arguments.GetStringValue(Constants.CommandArg_ProcessTemplateName);
+        _processTemplateName = Arguments.GetStringValue(Constants.CommandArg_ProcessTemplateName);
 
         bool useScrumWithBacklogRefinement;
 
-        if (processTemplateName.Equals("Scrum", StringComparison.CurrentCultureIgnoreCase) == true)
+        if (_processTemplateName.Equals("Scrum", StringComparison.CurrentCultureIgnoreCase) == true)
         {
             useScrumWithBacklogRefinement = false;
         }
-        else if (processTemplateName.Equals("Scrum with Backlog Refinement", StringComparison.CurrentCultureIgnoreCase) == true)
+        else if (_processTemplateName.Equals("Scrum with Backlog Refinement", StringComparison.CurrentCultureIgnoreCase) == true)
         {
             useScrumWithBacklogRefinement = true;
         }
         else
         {
-            throw new KnownException($"Process template '{processTemplateName}' not supported. Work item script generation only supported for 'Scrum' or 'Scrum with Backlog Refinement'.");
+            throw new KnownException($"Process template '{_processTemplateName}' not supported. Work item script generation only supported for 'Scrum' or 'Scrum with Backlog Refinement'.");
         }
 
         var sprints = new List<WorkItemScriptSprint>();
@@ -408,7 +409,7 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
         AddActionWorkItemIdMap(action, savedWorkItemInfo);
     }
 
-    private static string GetFullRefname(WorkItemScriptRow row)
+    private string GetFullRefname(WorkItemScriptRow row)
     {
         if (row.Refname == "Title")
         {
@@ -431,6 +432,20 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
         else if (row.Refname == "RemainingWork")
         {
             return "Microsoft.VSTS.Scheduling.RemainingWork";
+        }
+        else if (StringUtility.IsEqualsCaseInsensitive("BacklogPriority", row.Refname))
+        {
+            // Scrum and Scrum with Backlog Refinement use BacklogPriority
+            // Agile and others use StackRank
+            if (_processTemplateName.Equals("Scrum", StringComparison.CurrentCultureIgnoreCase) ||
+                _processTemplateName.Equals("Scrum with Backlog Refinement", StringComparison.CurrentCultureIgnoreCase))
+            {
+                return "Microsoft.VSTS.Common.BacklogPriority";
+            }
+            else
+            {
+                return "Microsoft.VSTS.Common.StackRank";
+            }
         }
         else
         {

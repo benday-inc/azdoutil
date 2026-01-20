@@ -17,7 +17,7 @@
     <PackageIcon>bdc_mark_128_128.png</PackageIcon>
     <!-- Version can be overridden from command line with -p:TheVersion=X.Y.Z -->
     <!-- Default to dev version for local builds -->
-    <TheVersion Condition="'$(TheVersion)' == ''">2.16-dev</TheVersion>
+    <TheVersion Condition="'$(TheVersion)' == ''">999.99</TheVersion>
     <!-- AssemblyVersion must be numeric only (no -dev suffix) -->
     <AssemblyVersion>2.16.999.0</AssemblyVersion>
     <!-- Version can have -dev suffix for NuGet package -->

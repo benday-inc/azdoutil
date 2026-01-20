@@ -37,4 +37,5 @@ public class WorkItemScriptWorkItem
     }
     public bool IsDone { get; set; }
     public string Effort { get; set; } = "0";
+    public int BacklogPriority { get; set; } = 0;
 }

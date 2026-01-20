@@ -2,6 +2,7 @@
 using System.Text;
 
 namespace Benday.AzureDevOpsUtil.Api.ScriptGenerator;
+
 public class WorkItemScriptGenerator
 {
     private const int SPRINT_DURATION = 14;
@@ -24,6 +25,7 @@ public class WorkItemScriptGenerator
     private readonly bool _useScrumWithBacklogRefinement;
     private int _createdWorkItemNumber = 100;
     private int _createdActionNumber = 100;
+    private int _pbiCreationSequence = 0;
 
     public WorkItemScriptGenerator(bool useScrumWithBacklogRefinement)
     {
@@ -564,6 +566,7 @@ public class WorkItemScriptGenerator
 
         // Console.WriteLine($"Sprint {sprint.SprintNumber}, Sprint Planning: Choosing {numberOfItemsToSelect} PBIs");
 
+        int sequenceInSprint = 0;
         for (int i = 0; i < numberOfItemsToSelect; i++)
         {
             var item = this.ProductBacklogItemsReadyForSprint.RandomItem();
@@ -588,6 +591,11 @@ public class WorkItemScriptGenerator
 
                 action.SetValue("IterationPath", $"Sprint {sprint.SprintNumber}");
                 action.SetValue("Effort", FibonacciValues.Random().ToString());
+
+                // Assign sprint-based priority: (SprintNumber * 1000) + (SequenceInSprint * 10)
+                sequenceInSprint++;
+                item.BacklogPriority = (sprint.SprintNumber * 1000) + (sequenceInSprint * 10);
+                action.SetValue("BacklogPriority", item.BacklogPriority.ToString());
 
                 Actions.Add(action);
             }
@@ -652,6 +660,11 @@ public class WorkItemScriptGenerator
         item.Description = $"Created by action id '{actionId}'; Work item script id '{item.Id}'";
         item.State = "New";
 
+        // Assign initial priority based on creation order
+        // Start at 10000 and increment by 10 for each PBI
+        item.BacklogPriority = 10000 + (_pbiCreationSequence * 10);
+        _pbiCreationSequence++;
+
         // always create the PBIs 1 week ahead of sprint
         // this avoids date problems in azdo
         returnValue.Definition.ActionDay =
@@ -661,6 +674,9 @@ public class WorkItemScriptGenerator
 
         returnValue.SetValue("System.Description",
             item.Description);
+
+        returnValue.SetValue("BacklogPriority",
+            item.BacklogPriority.ToString());
 
         return returnValue;
     }

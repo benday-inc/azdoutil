@@ -324,7 +324,7 @@ namespace Benday.AzureDevOpsUtil.UnitTests
         [TestMethod]
         public void ConvertFieldFromAllowedValuesToSuggestedValues()
         {
-            var refname = "Microsoft.VSTS.Common.Priority";
+            var refname = "Microsoft.VSTS.Common.BacklogPriority";
 
             var fieldElement = SystemUnderTest.GetFieldByRefname(refname);
 
