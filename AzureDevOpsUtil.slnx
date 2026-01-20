@@ -1,0 +1,21 @@
+<Solution>
+  <Folder Name="/scratchpad/">
+    <File Path="scratchpad/odata-calls.rest" />
+    <File Path="scratchpad/rest-calls.rest" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="install.ps1" />
+    <File Path="install.sh" />
+    <File Path="misc/readme-categories-github.md" />
+    <File Path="misc/readme-categories-nuget.md" />
+    <File Path="misc/readme-header.md" />
+    <File Path="README-for-nuget.md" />
+    <File Path="README.md" />
+    <File Path="uninstall.ps1" />
+    <File Path="uninstall.sh" />
+  </Folder>
+  <Project Path="Benday.AzureDevOpsUtil.Api/Benday.AzureDevOpsUtil.Api.csproj" />
+  <Project Path="Benday.AzureDevOpsUtil.ConsoleUi/Benday.AzureDevOpsUtil.ConsoleUi.csproj" />
+  <Project Path="Benday.AzureDevOpsUtil.UnitTests/Benday.AzureDevOpsUtil.UnitTests.csproj" />
+</Solution>

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+    <TargetFrameworks>net10.0;net9.0;net8.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
@@ -10,16 +10,19 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Authors>benday</Authors>
     <PackageProjectUrl>https://github.com/benday-inc/azdoutil</PackageProjectUrl>
-    <Copyright>2025</Copyright>
+    <Copyright>2026</Copyright>
     <RepositoryUrl>https://github.com/benday-inc/azdoutil.git</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README-for-nuget.md</PackageReadmeFile>
     <PackageIcon>bdc_mark_128_128.png</PackageIcon>
-    <TheVersion>2.15</TheVersion>
+    <TheVersion>2.16</TheVersion>
     <AssemblyVersion>$(TheVersion).0</AssemblyVersion>
     <Version>$(TheVersion)</Version>
     <Description>A collection of useful command line utilities for Azure DevOps</Description>
-    <PackageReleaseNotes>v2.13 - Re-adding missing import json build def command;
+    <PackageReleaseNotes>
+v2.15 - Adding support for .NET 10;
+v2.14 - Added import json release definition command;
+v2.13 - Re-adding missing import json build def command;
 v2.12 - Fixing null reference exception in listreleasedefs; Update package versions; Fix EPPlus licensing change;
 v2.11 - Minor bug fixes and improvements;
 v2.10 - Changes to to GetWorkItemFieldsCommand to fix a bug, improve formatting of data, and add simple text filtering;
@@ -35,6 +38,7 @@ v2.4 - added support for work item type definition comparison
     <Title>Azure DevOps Utilities</Title>
     <PackageTags>azure devops; git; tfvc; work items;</PackageTags>
    
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\bdc_mark_128_128.png">
