@@ -15,8 +15,12 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README-for-nuget.md</PackageReadmeFile>
     <PackageIcon>bdc_mark_128_128.png</PackageIcon>
-    <TheVersion>2.16</TheVersion>
-    <AssemblyVersion>$(TheVersion).0</AssemblyVersion>
+    <!-- Version can be overridden from command line with -p:TheVersion=X.Y.Z -->
+    <!-- Default to dev version for local builds -->
+    <TheVersion Condition="'$(TheVersion)' == ''">2.16-dev</TheVersion>
+    <!-- AssemblyVersion must be numeric only (no -dev suffix) -->
+    <AssemblyVersion>2.16.999.0</AssemblyVersion>
+    <!-- Version can have -dev suffix for NuGet package -->
     <Version>$(TheVersion)</Version>
     <Description>A collection of useful command line utilities for Azure DevOps</Description>
     <PackageReleaseNotes>
