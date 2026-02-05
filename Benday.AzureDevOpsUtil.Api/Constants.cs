@@ -153,6 +153,9 @@ public static class Constants
     public const string ArgumentNameFilter = "filter";
     public const string CommandArgumentNameOverride = "override";
 
+    public const string CommandName_AnalyzeRepo = "analyzerepo";
+    public const string CommandName_AnalyzeAllRepos = "analyzeallrepos";
+
 
 
 
