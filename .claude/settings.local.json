@@ -3,7 +3,11 @@
     "allow": [
       "Bash(git reset:*)",
       "Bash(dotnet pack:*)",
-      "Bash(dotnet test)"
+      "Bash(dotnet test)",
+      "Bash(dotnet build:*)",
+      "Bash(dotnet tool run ilspycmd:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(gh api:*)"
     ],
     "deny": [],
     "ask": []

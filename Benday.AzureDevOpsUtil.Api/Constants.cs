@@ -25,6 +25,7 @@ public static class Constants
     public const string CommandArgumentNameRemoveConfig = "removeconfig";
     public const string CommandArgumentNameListConfig = "listconfig";
     public const string CommandArgumentName_ListGitRepos = "listgitrepos";
+    public const string CommandArgumentName_ListAllGitRepos = "listallgitrepos";
     public const string CommandArgumentNameListBuildDefinitions = "listbuilddefs";
     public const string CommandArgumentNameRepairBuildDefAgentPool = "repairbuilddefagentpool";
     public const string CommandArgumentNameRepairReleaseDefAgentPool = "repairreleasedefagentpool";
@@ -103,6 +104,7 @@ public static class Constants
     public const string ArgumentNamePercent = "percent";
     public const string ArgumentNameTeamDescription = "description";
     public const string ArgumentNameShowLastRunInfo = "showlastruninfo";
+    public const string ArgumentNameShowLastCommitInfo = "showlastcommit";
     public const string ArgumentNameOutputCsv = "csv";
     public const string ArgumentNameNoCsvHeader = "csv-noheader";
     public const string ArgumentNameInputFile = "input";
