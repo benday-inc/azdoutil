@@ -15,11 +15,12 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README-for-nuget.md</PackageReadmeFile>
     <PackageIcon>bdc_mark_128_128.png</PackageIcon>
-    <TheVersion>2.17.0</TheVersion>
+    <TheVersion>2.18.0</TheVersion>
     <AssemblyVersion>$(TheVersion).0</AssemblyVersion>
     <Version>$(TheVersion)</Version>
     <Description>A collection of useful command line utilities for Azure DevOps</Description>
     <PackageReleaseNotes>
+v2.18 - Added support for 'gui' command to launch the GUI version of the tool; 
 v2.17 - Adding command to get list of all repos in a project with optional csv output and optional last commit info;
 v2.16 - Work item test data generator now populates either BacklogPriority or StackRank for PBIs and User Stories;
 v2.15 - Adding support for .NET 10;

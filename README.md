@@ -69,6 +69,9 @@ If you want to run a command against an Azure DevOps instance that is NOT your d
 ### Managing Configurations
 To add new configuration or modify an existing configuration, use the `azdoutil addconfig` command. You can list your configurations using the `azdoutil listconfig` command. To delete a configuration, use the `azdoutil removeconfig` command.
 
+## GUI Option
+> **Prefer a graphical interface?** Run `azdoutil gui` to launch the azdoutil GUI — a point-and-click interface for all the same functionality without the command line.
+
 ## Commands
 | Category | Command Name | Description |
 | --- | --- | --- |
