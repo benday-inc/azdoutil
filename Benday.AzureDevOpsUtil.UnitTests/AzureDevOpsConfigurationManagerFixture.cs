@@ -46,7 +46,6 @@ public class AzureDevOpsConfigurationManagerFixture
     }
 
     [TestMethod]
-    [ExpectedException(typeof(KnownException))]
     public void AddConfig_AzureDevOpsServerUrl_FailsIfNoTeamProjectCollection()
     {
         // arrange
@@ -65,14 +64,11 @@ public class AzureDevOpsConfigurationManagerFixture
 
         Utilities.AssertFileDoesNotExist(SystemUnderTest.PathToConfigurationFile);
 
-        // act
-        SystemUnderTest.Save(config);
-
-        // assert        
+        // act / assert
+        Assert.ThrowsExactly<KnownException>(() => SystemUnderTest.Save(config));
     }
 
     [TestMethod]
-    [ExpectedException(typeof(KnownException))]
     public void AddConfig_AzureDevOpsServiceUrl_FailsIfNoAccountName()
     {
         // arrange
@@ -91,10 +87,8 @@ public class AzureDevOpsConfigurationManagerFixture
 
         Utilities.AssertFileDoesNotExist(SystemUnderTest.PathToConfigurationFile);
 
-        // act
-        SystemUnderTest.Save(config);
-
-        // assert        
+        // act / assert
+        Assert.ThrowsExactly<KnownException>(() => SystemUnderTest.Save(config));
     }
 
     [TestMethod]

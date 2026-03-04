@@ -132,7 +132,6 @@ public class AddUpdateConfigurationCommandFixture
     }
 
     [TestMethod]
-    [ExpectedException(typeof(KnownException))]
     public void AddNamedConfiguration_CannotSetPatAndWindowsAuth()
     {
         // arrange
@@ -153,12 +152,11 @@ public class AddUpdateConfigurationCommandFixture
 
         _SystemUnderTest = new AddUpdateConfigurationCommand(executionInfo, OutputProvider);
 
-        // act
-        _SystemUnderTest.Execute();
+        // act / assert
+        Assert.ThrowsExactly<KnownException>(() => _SystemUnderTest.Execute());
     }
 
     [TestMethod]
-    [ExpectedException(typeof(KnownException))]
     public void AddNamedConfiguration_MustSetPatOrWindowsAuth()
     {
         // arrange
@@ -177,8 +175,8 @@ public class AddUpdateConfigurationCommandFixture
 
         _SystemUnderTest = new AddUpdateConfigurationCommand(executionInfo, OutputProvider);
 
-        // act
-        _SystemUnderTest.Execute();
+        // act / assert
+        Assert.ThrowsExactly<KnownException>(() => _SystemUnderTest.Execute());
     }
 
     [TestMethod]

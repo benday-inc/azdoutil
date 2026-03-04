@@ -268,7 +268,7 @@ namespace Benday.AzureDevOpsUtil.UnitTests
 
             Assert.AreEqual<string>("STATE", actual.Name.LocalName, "Expected element to be named STATE.");
 
-            Assert.AreEqual<string>(XmlUtility.GetAttributeValue(actual, "value"), "Done", "Expected the value attribute to be Done.");
+            Assert.AreEqual<string>("Done", XmlUtility.GetAttributeValue(actual, "value"), "Expected the value attribute to be Done.");
 
             var readonlyElements = actual.Descendants("READONLY");
 
@@ -280,14 +280,14 @@ namespace Benday.AzureDevOpsUtil.UnitTests
             var readonlyElement1 = readonlyElements.ToArray()[1];
 
             Assert.IsNotNull(readonlyElement0.Parent, "Parent node was null.");
-            Assert.AreEqual<string>(readonlyElement0.Parent.Name.LocalName, "FIELD", "Expected node should be a field.");
+            Assert.AreEqual<string>("FIELD", readonlyElement0.Parent.Name.LocalName, "Expected node should be a field.");
             Assert.AreEqual<string>(
                 "Microsoft.VSTS.Common.BusinessValue",
                 XmlUtility.GetAttributeValue(readonlyElement0.Parent, "refname"),
                 "Field element with readonly didn't have the expected refname attribute.");
 
             Assert.IsNotNull(readonlyElement1.Parent, "Parent node was null.");
-            Assert.AreEqual<string>(readonlyElement1.Parent.Name.LocalName, "FIELD", "Expected node should be a field.");
+            Assert.AreEqual<string>("FIELD", readonlyElement1.Parent.Name.LocalName, "Expected node should be a field.");
             Assert.AreEqual<string>(
                 "Microsoft.VSTS.Scheduling.Effort",
                 XmlUtility.GetAttributeValue(readonlyElement1.Parent, "refname"),

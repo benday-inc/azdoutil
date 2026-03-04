@@ -57,7 +57,7 @@ namespace Benday.AzureDevOpsUtil.UnitTests
                 "count was wrong");
         }
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("Approved", "Committed", true)]
         [DataRow("Done", "Approved", true)]
         [DataRow("", "New", true)]

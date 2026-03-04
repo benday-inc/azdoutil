@@ -50,24 +50,21 @@ namespace Benday.AzureDevOpsUtil.UnitTests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void GetIndexForPercentForecast_ItemCountMustBePositiveNumber()
         {
-            Api.Utilities.GetIndexForPercentForecast(-1, 85);
+            Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Api.Utilities.GetIndexForPercentForecast(-1, 85));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void GetIndexForPercentForecast_PercentMustBePositiveNumber()
         {
-            Api.Utilities.GetIndexForPercentForecast(100, -1);
+            Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Api.Utilities.GetIndexForPercentForecast(100, -1));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void GetIndexForPercentForecast_PercentMaxValueIs100()
         {
-            Api.Utilities.GetIndexForPercentForecast(100, 101);
+            Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Api.Utilities.GetIndexForPercentForecast(100, 101));
         }
 
         [TestMethod]
