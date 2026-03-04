@@ -4,7 +4,7 @@ A collection of useful Azure DevOps utilities.
 Written by Benjamin Day  
 Pluralsight Author | Microsoft MVP | Scrum.org Professional Scrum Trainer  
 https://www.benday.com  
-https://www.slidespeaker.ai  
+https://www.honestcheetah.com  
 info@benday.com  
 YouTube: https://www.youtube.com/@_benday  
 
