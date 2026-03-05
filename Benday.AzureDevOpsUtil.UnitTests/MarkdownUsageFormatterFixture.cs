@@ -92,7 +92,7 @@ public class MarkdownUsageFormatterFixture
     public void GenerateReadmeFiles()
     {
         // arrange
-        var assembly = typeof(CreateScrumBacklogRefinementProcessTemplateCommand).Assembly;
+        var assembly = typeof(CreateBacklogRefinementProcessTemplateCommand).Assembly;
 
         var usages = new CommandAttributeUtility(CreateDefaultProgramOptions()).GetAllCommandUsages(assembly);
 
