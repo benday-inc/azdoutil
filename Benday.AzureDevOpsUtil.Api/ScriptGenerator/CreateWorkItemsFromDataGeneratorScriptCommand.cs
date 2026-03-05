@@ -31,32 +31,39 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
             .AllowEmptyValue()
             .WithDescription("Skip script steps that occur in the future");
 
-
         arguments.AddInt32(Constants.CommandArg_SprintCount)
-            .WithDescription("Number of sprints to generate");
+            .WithDescription("Number of sprints to generate")
+            .WithDefaultValue(4);
+
         arguments.AddString(Constants.CommandArg_TeamProjectName)
-            .WithDescription("Name of the team project");
+            .WithDescription("Name of the team project")
+            .WithDefaultValue($"TestProject-{DateTime.Now.Ticks}")
+            .AsNotRequired();
+
         arguments.AddString(Constants.CommandArg_ProcessTemplateName)
-            .WithDescription("Process template name");
+            .WithAllowedValues("Scrum", "Scrum with Backlog Refinement")
+            .WithDescription("Process template name")
+            .WithDefaultValue("Scrum");
+
         arguments.AddBoolean(Constants.CommandArg_CreateProjectIfNotExists)
-            .AsRequired()
-            .AllowEmptyValue(false)
+            .AsNotRequired()
+            .AllowEmptyValue()
             .WithDescription("Creates the team project if it doesn't exist");
 
         arguments.AddInt32(Constants.CommandArg_TeamCount)
             .AsNotRequired()
-            .AllowEmptyValue(false)
+            .AllowEmptyValue()
             .WithDescription("Creates data for multiple teams. This option is only available when creating a new project.");
 
         arguments.AddBoolean(Constants.CommandArg_AllPbisGoToDone)
             .AsNotRequired()
-            .AllowEmptyValue(true)
+            .AllowEmptyValue()
             .WithDescription("All PBIs in a sprint makes it to done");
 
         arguments.AddBoolean(Constants.CommandArg_AddSessionTag)
             .AsNotRequired()
-            .AllowEmptyValue(true)
-            .WithDescription("Add a session tag to work items");
+            .AllowEmptyValue()
+            .WithDescription("Add a session tag to work items for debugging purposes");
 
         arguments.AddString(Constants.CommandArg_SaveScriptFileTo)
             .WithDescription("Save generated script file to disk in this directory. Note the filename will be auto-generated.")
@@ -64,7 +71,7 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
 
         arguments.AddBoolean(Constants.CommandArg_ScriptOnly)
           .AsNotRequired()
-          .AllowEmptyValue(true)
+          .AllowEmptyValue()
           .WithDescription($"Creates the excel export script. Requires an arg value for '{Constants.CommandArg_SaveScriptFileTo}'");
 
         return arguments;
@@ -583,10 +590,10 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
             Constants.CommandName_GetProject,
             true);
 
-        execInfo.RemoveArgumentValue(Constants.CommandArg_TeamProjectName);
-        execInfo.AddArgumentValue(Constants.ArgumentNameTeamProjectName,
-            Arguments[Constants.CommandArg_TeamProjectName].Value);
-
+        execInfo.RemoveAllArgumentsExcept(
+            preserveCommonArguments: true,
+            Constants.ArgumentNameTeamProjectName);
+                
         var command =
             new GetTeamProjectCommand(execInfo, _OutputProvider);
 
@@ -597,15 +604,13 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
     {
         var execInfo = ExecutionInfo.GetCloneOfArguments(
             Constants.CommandName_CreateProject,
-            true);
+            true);    
 
-        execInfo.Arguments.Remove(Constants.CommandArg_TeamProjectName);
-        execInfo.Arguments.Add(Constants.ArgumentNameTeamProjectName,
-            Arguments[Constants.CommandArg_TeamProjectName].Value);
-
-        execInfo.Arguments.TryAdd(Constants.CommandArg_ProcessTemplateName,
-                Arguments[Constants.CommandArg_ProcessTemplateName].Value);
-
+        execInfo.RemoveAllArgumentsExcept(
+            preserveCommonArguments: true,
+            Constants.ArgumentNameTeamProjectName,
+            Constants.CommandArg_ProcessTemplateName);
+        
         var command =
             new CreateTeamProjectCommand(execInfo, _OutputProvider);
 

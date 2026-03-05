@@ -20,7 +20,8 @@ public abstract class AzureDevOpsCommandBase : AsynchronousCommand
 
     protected void AddCommonArguments(ArgumentCollection arguments)
     {
-        arguments.AddBoolean(Constants.ArgumentNameQuietMode)
+        arguments
+            .AddBoolean(Constants.ArgumentNameQuietMode)
             .AsNotRequired()
             .AllowEmptyValue()
             .WithDescription("Quiet mode");

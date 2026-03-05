@@ -3,8 +3,59 @@
 using Benday.CommandsFramework;
 
 namespace Benday.AzureDevOpsUtil.Api;
+
 public static class ExtensionMethods
 {
+    /// <summary>
+    /// Remove all arguments from the CommandExecutionInfo except for the common arguments (quiet mode and configuration name) and any additional arguments specified in the argumentNamesToKeep parameter.
+    /// </summary>
+    /// <param name="execInfo"></param>
+    /// <param name="preserveCommonArguments"></param>
+    /// <param name="argumentNamesToKeep"></param>
+    /// <exception cref="ArgumentNullException"></exception>
+    public static void RemoveAllArgumentsExcept(
+        this CommandExecutionInfo execInfo,
+        bool preserveCommonArguments,
+        params string[] argumentNamesToKeep)
+    {
+        if (execInfo is null || execInfo.Arguments is null)
+        {
+            throw new ArgumentNullException(nameof(execInfo));
+        }
+
+        var commonArguments = new List<string>()
+        {
+            Constants.ArgumentNameQuietMode, 
+            Constants.ArgumentNameConfigurationName 
+        };
+
+        var keysToRemove = new List<string>();
+
+        foreach (var key in keysToRemove)
+        {
+            if (preserveCommonArguments == true && 
+                commonArguments.Contains(key, 
+                StringComparer.CurrentCultureIgnoreCase))
+            {
+                continue;
+            }
+            else if (argumentNamesToKeep != null && 
+                argumentNamesToKeep.Contains(key, StringComparer.CurrentCultureIgnoreCase))
+            {
+                continue;
+            }
+            else
+            {
+                keysToRemove.Add(key);
+            }
+        }
+
+        foreach (var key in keysToRemove)
+        {
+            execInfo.RemoveArgumentValue(key);
+        }
+    }
+
     public static CommandExecutionInfo GetCloneOfArguments(
         this CommandExecutionInfo execInfo, string commandName, bool quietMode)
     {
