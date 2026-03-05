@@ -1,3 +1,4 @@
+using Benday.AzureDevOpsUtil.Api;
 using Benday.CommandsFramework;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -7,20 +8,17 @@ namespace Benday.AzureDevOpsUtil.UnitTests;
 public class ExtensionMethodsTests
 {
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void RemoveAllArgumentsExcept_ThrowsArgumentNullException_WhenExecInfoIsNull()
     {
         // Arrange
         CommandExecutionInfo? execInfo = null;
 
-        // Act
-        execInfo!.RemoveAllArgumentsExcept(false);
-
-        // Assert - ExpectedException
+        // Act & Assert
+        Assert.Throws<ArgumentNullException>(() =>
+            execInfo!.RemoveAllArgumentsExcept(false));
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void RemoveAllArgumentsExcept_ThrowsArgumentNullException_WhenArgumentsIsNull()
     {
         // Arrange
@@ -29,10 +27,9 @@ public class ExtensionMethodsTests
             Arguments = null
         };
 
-        // Act
-        execInfo.RemoveAllArgumentsExcept(false);
-
-        // Assert - ExpectedException
+        // Act & Assert
+        Assert.Throws<ArgumentNullException>(() =>
+            execInfo.RemoveAllArgumentsExcept(false));
     }
 
     [TestMethod]

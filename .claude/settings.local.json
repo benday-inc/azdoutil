@@ -8,7 +8,9 @@
       "Bash(dotnet tool run ilspycmd:*)",
       "WebFetch(domain:github.com)",
       "Bash(gh api:*)",
-      "Bash(dotnet test:*)"
+      "Bash(dotnet test:*)",
+      "Bash(dotnet --version:*)",
+      "WebSearch"
     ],
     "deny": [],
     "ask": []

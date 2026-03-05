@@ -31,15 +31,15 @@ public static class ExtensionMethods
 
         var keysToRemove = new List<string>();
 
-        foreach (var key in keysToRemove)
+        foreach (var key in execInfo.Arguments.Keys)
         {
-            if (preserveCommonArguments == true && 
-                commonArguments.Contains(key, 
+            if (preserveCommonArguments == true &&
+                commonArguments.Contains(key,
                 StringComparer.CurrentCultureIgnoreCase))
             {
                 continue;
             }
-            else if (argumentNamesToKeep != null && 
+            else if (argumentNamesToKeep != null &&
                 argumentNamesToKeep.Contains(key, StringComparer.CurrentCultureIgnoreCase))
             {
                 continue;
