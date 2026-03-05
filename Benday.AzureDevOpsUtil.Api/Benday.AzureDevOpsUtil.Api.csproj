@@ -8,7 +8,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Benday.CommandsFramework" Version="4.*" />
-    <PackageReference Include="Benday.JsonUtilities" Version="5.*" />
+    <PackageReference Include="Benday.Common" Version="9.12.0" />
     <PackageReference Include="Benday.XmlUtilities" Version="5.*" />
     <PackageReference Include="EPPlus" Version="8.*" />
   </ItemGroup>

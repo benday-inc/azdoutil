@@ -1,5 +1,9 @@
-﻿using Benday.AzureDevOpsUtil.Api.Messages;
+﻿using System.Text.Json;
+using System.Text.Json.Nodes;
+
+using Benday.AzureDevOpsUtil.Api.Messages;
 using Benday.CommandsFramework;
+using Benday.Common.Json;
 
 namespace Benday.AzureDevOpsUtil.Api.Commands.ProjectAdministration;
 
@@ -45,6 +49,9 @@ public class GetTeamProjectCommand : AzureDevOpsCommandBase
             }
             else
             {
+                await GetProjectCategories(project);
+
+
                 WriteLine($"Name: {project.Name}");
                 WriteLine($"Id: {project.Id}");
                 WriteLine($"Url: {project.Url}");
@@ -73,8 +80,60 @@ public class GetTeamProjectCommand : AzureDevOpsCommandBase
                     WriteLine($"Git Enabled: {project.Capabilities.VersionControl.GitEnabled}");
                     WriteLine($"TFVC Enabled: {project.Capabilities.VersionControl.TfvcEnabled}");
                 }
+
+                if (project.Categories == null || project.Categories.Count == 0)
+                {
+                    WriteLine($"Categories: (n/a)");
+                }
+                else
+                {
+                    WriteLine($"Categories:");
+                    foreach (var category in project.Categories)
+                    {
+                        WriteLine($"  {category.Key}: {category.Value}");
+                    }
+                }
             }
         }
+    }
+
+    private async Task GetProjectCategories(TeamProjectInfo project)
+    {
+        var requestUrl = $"{project.Id}/_apis/wit/workitemtypecategories?api-version=7.1";
+        
+        var result = await GetStringAsync(requestUrl, false, false);
+
+        if (result == null)
+        {
+            WriteLine(
+                $"Unable to get project properties for project '{project.Name}' (id: {project.Id}).");
+            return;
+        }
+        else
+        {
+            var doc = JsonDocument.Parse(result);
+
+            if (doc == null)
+            {
+                WriteLine(
+                    $"Unable to parse categories for project '{project.Name}' (id: {project.Id}).");
+                return;
+            }
+
+            var element = doc.RootElement;
+
+            var categories = element.GetProperty("value").EnumerateArray();
+                        
+            foreach (var category in categories) {
+                var categoryName =
+                    category.SafeGetString("referenceName");
+                var categoryWorkItemType = category.SafeGetString("defaultWorkItemType", "name");
+
+                project.Categories[categoryName] = categoryWorkItemType;
+            }
+        }
+
+
     }
 
     private async Task<TeamProjectInfo?> GetExistingTeamProject(string teamProjectName)

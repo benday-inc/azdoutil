@@ -20,10 +20,6 @@
     "no-args": {
       "commandName": "Project"
     },
-    "get-project": {
-      "commandName": "Project",
-      "commandLineArgs": "getproject /teamproject:\"Metrics and Dashboards Research\""
-    },
     "list-process-templates": {
       "commandName": "Project",
       "commandLineArgs": "listprocesstemplates"
@@ -173,6 +169,14 @@
     "createfromgenerator with create project": {
       "commandName": "Project",
       "commandLineArgs": "createfromgenerator /numberofsprints:4 /processname:Scrum /createproject"
+    },
+    "getproject": {
+      "commandName": "Project",
+      "commandLineArgs": "getproject /teamproject:\"TestProject-639083033195412671\""
+    },
+    "listprocesstemplates": {
+      "commandName": "Project",
+      "commandLineArgs": "listprocesstemplates"
     }
   }
 }

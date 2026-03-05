@@ -55,6 +55,7 @@ v2.4 - added support for work item type definition comparison
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Benday.CommandsFramework" Version="4.*" />
+    <PackageReference Include="Benday.Common" Version="9.12.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Benday.AzureDevOpsUtil.Api\Benday.AzureDevOpsUtil.Api.csproj" />

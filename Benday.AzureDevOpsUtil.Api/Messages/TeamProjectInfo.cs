@@ -29,5 +29,7 @@ public class TeamProjectInfo
 
     [JsonPropertyName("defaultTeam")]
     public DefaultTeamInfo? DefaultTeam { get; set; }
+
+    public Dictionary<string, string> Categories { get; set; } = new();
 }
 
