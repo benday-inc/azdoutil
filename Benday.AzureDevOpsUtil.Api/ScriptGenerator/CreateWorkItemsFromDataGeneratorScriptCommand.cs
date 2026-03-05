@@ -48,6 +48,11 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
             .AllowEmptyValue(false)
             .WithDescription("Creates data for multiple teams. This option is only available when creating a new project.");
 
+        arguments.AddBoolean(Constants.CommandArg_SharedTeamBacklog)
+            .AsNotRequired()
+            .AllowEmptyValue(true)
+            .WithDescription("When true, multiple teams work from a shared product backlog at the root area path. Requires teamcount > 1.");
+
         arguments.AddBoolean(Constants.CommandArg_AllPbisGoToDone)
             .AsNotRequired()
             .AllowEmptyValue(true)
@@ -232,10 +237,20 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
             else if (_createProjectIfNotExists == true && Arguments.HasValue(Constants.CommandArg_TeamCount) == true &&
                 Arguments.GetInt32Value(Constants.CommandArg_TeamCount) > 2)
             {
-                WriteLine("Populating data for multiple teams.");
+                var useSharedBacklog = Arguments.GetBooleanValue(Constants.CommandArg_SharedTeamBacklog);
 
-                await PopulateForMultipleSprints(sprints, _startDate, outputPathAndFileName, useScrumWithBacklogRefinement, markAllPbisAsDone);
+                if (useSharedBacklog)
+                {
+                    WriteLine("Populating data for multiple teams with shared backlog.");
 
+                    await PopulateForMultipleTeamsWithSharedBacklog(sprints, _startDate, outputPathAndFileName, useScrumWithBacklogRefinement, markAllPbisAsDone);
+                }
+                else
+                {
+                    WriteLine("Populating data for multiple teams.");
+
+                    await PopulateForMultipleSprints(sprints, _startDate, outputPathAndFileName, useScrumWithBacklogRefinement, markAllPbisAsDone);
+                }
             }
             else
             {
@@ -283,6 +298,243 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
 
 
         WriteLine($"Done.");
+    }
+
+    private async Task PopulateForMultipleTeamsWithSharedBacklog(
+        List<WorkItemScriptSprint> sprints,
+        DateTime startDate,
+        string? outputPathAndFileName,
+        bool useScrumWithBacklogRefinement,
+        bool markAllPbisAsDone)
+    {
+        var teamCount = Arguments.GetInt32Value(Constants.CommandArg_TeamCount);
+
+        WriteLine($"Generating shared backlog for {teamCount} teams...");
+
+        var projectInfo = await EnsureProjectExists();
+
+        if (projectInfo == null)
+        {
+            throw new InvalidOperationException($"Failed to create project '{_teamProjectName}'.");
+        }
+
+        await PopulateIterations(sprints, startDate);
+
+        // Generate a large shared backlog at the root area path
+        // Size it for all teams: estimate based on average PBIs needed per team per sprint
+        var avgPbisPerTeamPerSprint = 4; // SprintPbiCount from default config
+        var safetyMultiplier = 1.5; // Extra PBIs to account for variations
+        var totalPbisNeeded = (int)(teamCount * sprints.Count * avgPbisPerTeamPerSprint * safetyMultiplier);
+
+        WriteLine($"Creating shared backlog of {totalPbisNeeded} PBIs at root area path...");
+
+        // Create a temporary sprint config just for generating the shared backlog
+        var backlogSprint = new WorkItemScriptSprint()
+        {
+            AverageNumberOfTasksPerPbi = 0, // No tasks yet - teams create them during sprint planning
+            NewPbiCount = totalPbisNeeded,
+            RefinedPbiCountMeeting1 = 0,
+            RefinedPbiCountMeeting2 = 0,
+            SprintNumber = 1,
+            SprintPbiCount = 0,
+            SprintPbisToDoneCount = 0,
+            DailyHoursPerTeamMember = 6,
+            TeamMemberCount = 7,
+            StartDate = startDate,
+            EndDate = startDate
+        };
+
+        var sharedBacklogGenerator = new WorkItemScriptGenerator(useScrumWithBacklogRefinement);
+
+        // Generate the backlog PBIs using the generator
+        // This creates PBIs in "New" state with no area path assignment
+        for (int i = 0; i < totalPbisNeeded; i++)
+        {
+            int workItemNumber = (i + 1) * 100;
+            var pbi = new WorkItemScriptWorkItem
+            {
+                Id = $"pbi-{workItemNumber}",
+                Title = sharedBacklogGenerator.GetRandomTitle(),
+                WorkItemType = "PBI",
+                State = "New",
+                Iteration = string.Empty
+            };
+
+            sharedBacklogGenerator.ProductBacklogItems.Add(pbi.Id, pbi);
+
+            // Create action to create this PBI
+            var action = new WorkItemScriptAction();
+            action.ActionId = (workItemNumber * 10).ToString();
+            action.Definition.Operation = "Create";
+            action.Definition.Description = "Create PBI for shared backlog";
+            action.Definition.WorkItemId = pbi.Id;
+            action.Definition.WorkItemType = "PBI";
+            action.Definition.ActionDay = -14; // Create before first sprint
+            action.Definition.Refname = "Title";
+            action.Definition.FieldValue = pbi.Title;
+
+            action.SetValue("System.Description", $"Shared backlog PBI created for multi-team planning");
+
+            sharedBacklogGenerator.Actions.Add(action);
+        }
+
+        // Create the backlog work items in Azure DevOps at root area path
+        PopulateActions(sharedBacklogGenerator);
+
+        WriteLine($"Creating {sharedBacklogGenerator.Actions.Count} shared backlog items in Azure DevOps...");
+        await RunScript();
+        WriteLine($"Shared backlog created with {totalPbisNeeded} PBIs.");
+
+        // Save the work item ID mappings for the shared backlog
+        foreach (var kvp in _workItemIdMaps)
+        {
+            _sharedBacklogWorkItemIdMaps[kvp.Key] = kvp.Value;
+        }
+
+        WriteLine($"Mapped {_sharedBacklogWorkItemIdMaps.Count} shared backlog work item IDs.");
+
+        // Track which PBIs have been claimed by teams
+        var claimedPbiIds = new HashSet<string>();
+
+        // Now simulate each team working through the sprints
+        for (var teamIndex = 0; teamIndex < teamCount; teamIndex++)
+        {
+            var teamName = $"Team {teamIndex + 1}";
+            var teamAreaPath = $"{projectInfo.Name}\\{teamName}";
+
+            WriteLine($"Simulating work for {teamName}...");
+
+            for (var sprintIndex = 0; sprintIndex < sprints.Count; sprintIndex++)
+            {
+                var sprint = sprints[sprintIndex];
+
+                WriteLine($"{teamName} - Sprint {sprint.SprintNumber} planning...");
+
+                // Clear actions for this team's sprint
+                _workItemIdMaps.Clear();
+
+                var sprintGenerator = new WorkItemScriptGenerator(useScrumWithBacklogRefinement);
+
+                // Find unclaimed PBIs for this team to select during sprint planning
+                var availablePbis = sharedBacklogGenerator.ProductBacklogItems.Values
+                    .Where(pbi => !claimedPbiIds.Contains(pbi.Id))
+                    .ToList();
+
+                if (availablePbis.Count < sprint.SprintPbiCount)
+                {
+                    WriteLine($"Warning: Only {availablePbis.Count} PBIs available for {teamName} Sprint {sprint.SprintNumber}, needed {sprint.SprintPbiCount}");
+                }
+
+                // Simulate sprint planning - team claims PBIs
+                var selectedPbis = availablePbis
+                    .Take(sprint.SprintPbiCount)
+                    .ToList();
+
+                foreach (var pbi in selectedPbis)
+                {
+                    claimedPbiIds.Add(pbi.Id);
+                }
+
+                // Generate sprint simulation with the selected PBIs
+                await SimulateTeamSprint(
+                    sprint,
+                    selectedPbis,
+                    teamAreaPath,
+                    useScrumWithBacklogRefinement,
+                    markAllPbisAsDone);
+
+                WriteLine($"{teamName} - Sprint {sprint.SprintNumber} complete.");
+            }
+
+            WriteLine($"{teamName} - All sprints complete.");
+        }
+
+        if (outputPathAndFileName != null)
+        {
+            WriteLine($"Script written to '{outputPathAndFileName}'");
+        }
+
+        WriteLine($"Done.");
+    }
+
+    private async Task SimulateTeamSprint(
+        WorkItemScriptSprint sprint,
+        List<WorkItemScriptWorkItem> selectedPbis,
+        string teamAreaPath,
+        bool useScrumWithBacklogRefinement,
+        bool markAllPbisAsDone)
+    {
+        // Create actions to assign PBIs to team and sprint
+        _actions = new List<WorkItemScriptAction>();
+
+        // Restore the shared backlog mappings so we can update the PBIs
+        foreach (var kvp in _sharedBacklogWorkItemIdMaps)
+        {
+            if (!_workItemIdMaps.ContainsKey(kvp.Key))
+            {
+                _workItemIdMaps[kvp.Key] = kvp.Value;
+            }
+        }
+
+        foreach (var pbi in selectedPbis)
+        {
+            // Check if this PBI exists in our shared backlog mappings
+            if (!_sharedBacklogWorkItemIdMaps.ContainsKey(pbi.Id))
+            {
+                WriteLine($"Warning: PBI {pbi.Id} not found in shared backlog mappings. Skipping.");
+                continue;
+            }
+
+            var action = new WorkItemScriptAction();
+            action.ActionId = Guid.NewGuid().ToString();
+            action.Definition.Operation = "Update";
+            action.Definition.Description = $"Assign PBI to {teamAreaPath} for Sprint {sprint.SprintNumber}";
+            action.Definition.WorkItemId = pbi.Id;
+            action.Definition.WorkItemType = "Product Backlog Item";
+            action.Definition.ActionDay = ((sprint.SprintNumber - 1) * 14);
+
+            action.SetValue("System.AreaPath", teamAreaPath);
+            action.SetValue("System.IterationPath", $"{_teamProjectName}\\Sprint {sprint.SprintNumber}");
+            action.SetValue("System.State", "Committed");
+
+            // Estimate if not already estimated
+            if (string.IsNullOrEmpty(pbi.Effort))
+            {
+                var fibValues = new List<string> { "1", "2", "3", "5", "8", "13", "21" };
+                var rnd = new Random();
+                pbi.Effort = fibValues[rnd.Next(fibValues.Count)];
+            }
+            action.SetValue("Microsoft.VSTS.Scheduling.Effort", pbi.Effort);
+
+            _actions.Add(action);
+
+            // Create tasks for this PBI
+            for (int i = 0; i < sprint.AverageNumberOfTasksPerPbi; i++)
+            {
+                var taskAction = new WorkItemScriptAction();
+                taskAction.ActionId = Guid.NewGuid().ToString();
+                taskAction.Definition.Operation = "Create";
+                taskAction.Definition.Description = $"Create task for PBI {pbi.Id}";
+                taskAction.Definition.WorkItemId = $"task-{Guid.NewGuid()}";
+                taskAction.Definition.WorkItemType = "Task";
+                taskAction.Definition.ActionDay = ((sprint.SprintNumber - 1) * 14);
+
+                var hourValues = new List<int> { 1, 2, 3, 4, 5, 6, 8, 12 };
+                var rnd = new Random();
+                var remainingWork = hourValues[rnd.Next(hourValues.Count)];
+
+                taskAction.SetValue("System.Title", $"Task for {pbi.Title}");
+                taskAction.SetValue("System.AreaPath", teamAreaPath);
+                taskAction.SetValue("System.IterationPath", $"{_teamProjectName}\\Sprint {sprint.SprintNumber}");
+                taskAction.SetValue("Microsoft.VSTS.Scheduling.RemainingWork", remainingWork.ToString());
+                taskAction.SetValue("PARENT", pbi.Id);
+
+                _actions.Add(taskAction);
+            }
+        }
+
+        // Run the actions to update Azure DevOps
+        await RunScript();
     }
 
     private void PopulateActions(WorkItemScriptGenerator generator)
@@ -526,6 +778,7 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
     }
 
     private readonly Dictionary<string, ModifyWorkItemResponse> _workItemIdMaps = new();
+    private readonly Dictionary<string, ModifyWorkItemResponse> _sharedBacklogWorkItemIdMaps = new();
 
     private void AddActionWorkItemIdMap(WorkItemScriptAction action, ModifyWorkItemResponse savedWorkItemInfo)
     {
