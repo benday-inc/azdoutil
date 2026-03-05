@@ -593,7 +593,12 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
         execInfo.RemoveAllArgumentsExcept(
             preserveCommonArguments: true,
             Constants.ArgumentNameTeamProjectName);
-                
+
+        var teamProjectName = Arguments.GetStringValue(
+            Constants.CommandArg_TeamProjectName);
+
+        execInfo.AddArgumentValue(Constants.ArgumentNameTeamProjectName, teamProjectName);
+
         var command =
             new GetTeamProjectCommand(execInfo, _OutputProvider);
 
@@ -610,6 +615,11 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
             preserveCommonArguments: true,
             Constants.ArgumentNameTeamProjectName,
             Constants.CommandArg_ProcessTemplateName);
+
+        var teamProjectName = Arguments.GetStringValue(
+            Constants.CommandArg_TeamProjectName);
+
+        execInfo.AddArgumentValue(Constants.ArgumentNameTeamProjectName, teamProjectName);
         
         var command =
             new CreateTeamProjectCommand(execInfo, _OutputProvider);
@@ -625,6 +635,13 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
             var execInfo = ExecutionInfo.GetCloneOfArguments(
                 Constants.CommandName_SetIteration,
                 true);
+
+            execInfo.RemoveAllArgumentsExcept(true, Constants.ArgumentNameTeamProjectName);
+
+            var teamProjectName = Arguments.GetStringValue(
+            Constants.CommandArg_TeamProjectName);
+
+            execInfo.AddArgumentValue(Constants.ArgumentNameTeamProjectName, teamProjectName);
 
             var sprintStartDate = startDate.AddDays(
                 ((item.SprintNumber - 1) * 14)

@@ -168,7 +168,11 @@
     },
     "get fields with filter": {
       "commandName": "Project",
-      "commandLineArgs": "getfields /teamproject:testscrum20250221 /workitemtypename:task /filter:vsts"      
+      "commandLineArgs": "getfields /teamproject:testscrum20250221 /workitemtypename:task /filter:vsts"
+    },
+    "createfromgenerator with create project": {
+      "commandName": "Project",
+      "commandLineArgs": "createfromgenerator /numberofsprints:4 /processname:Scrum /createproject"
     }
   }
 }

@@ -66,6 +66,8 @@ public class CreateTeamProjectCommand : AzureDevOpsCommandBase
             Constants.CommandName_ListProjects,
             true);
 
+        execInfo.RemoveAllArgumentsExcept(true);
+
         var command = new ListTeamProjectsCommand(execInfo, _OutputProvider);
 
         await command.ExecuteAsync();
@@ -87,6 +89,7 @@ public class CreateTeamProjectCommand : AzureDevOpsCommandBase
     private async Task<ProcessTemplateDetailInfo?> GetProcessTemplate(string processTemplateName)
     {
         var args = ExecutionInfo.GetCloneOfArguments(Constants.CommandName_ListProjects, true);
+        args.RemoveAllArgumentsExcept(true);
         var command = new ListProcessTemplatesCommand(args, _OutputProvider);
 
         await command.ExecuteAsync();
