@@ -192,9 +192,9 @@ public class WorkItemScriptGenerator
 
             var item = new WorkItemScriptWorkItem
             {
-                Id = $"pbi-{_createdWorkItemNumber}",
+                Id = $"{ProcessTemplateInfo.RequirementWorkItemTypeAbbreviationName}-{_createdWorkItemNumber}",
                 Title = GetRandomTitle(),
-                WorkItemType = "PBI",
+                WorkItemType = ProcessTemplateInfo.RequirementWorkItemTypeFullName,
                 State = "New",
                 Iteration = string.Empty
             };
@@ -221,7 +221,7 @@ public class WorkItemScriptGenerator
         else if (lotteryNumber == 1)
         {
             // had a great sprint...surprise...everything goes to done
-            MoveUndonePbisToDone(sprint, "won the pbi lottery;");
+            MoveUndonePbisToDone(sprint, $"won the {ProcessTemplateInfo.RequirementWorkItemTypeAbbreviationName} lottery;");
         }
         else
         {
@@ -264,7 +264,7 @@ public class WorkItemScriptGenerator
 
                 action.ActionId = GetNextActionNumber().ToString();
                 action.Definition.Operation = ACTION_UPDATE;
-                action.Definition.Description = "Set PBI status to Needs Refinement";
+                action.Definition.Description = $"Set {ProcessTemplateInfo.RequirementWorkItemTypeAbbreviationName} status to Needs Refinement";
                 action.Definition.WorkItemId = item.Id;
                 action.Definition.WorkItemType = item.WorkItemType;
                 action.Definition.ActionDay =
@@ -305,7 +305,7 @@ public class WorkItemScriptGenerator
 
                 action.ActionId = GetNextActionNumber().ToString();
                 action.Definition.Operation = ACTION_UPDATE;
-                action.Definition.Description = "PBI Got Refined and is ready for sprint";
+                action.Definition.Description = $"{ProcessTemplateInfo.RequirementWorkItemTypeAbbreviationName} Got Refined and is ready for sprint";
                 action.Definition.WorkItemId = item.Id;
                 action.Definition.WorkItemType = item.WorkItemType;
                 action.Definition.ActionDay =
@@ -333,7 +333,7 @@ public class WorkItemScriptGenerator
         {
             action.Definition.Description = "Task Done";
             action.Definition.Refname = FIELD_NAME_STATE;
-            action.Definition.FieldValue = STATE_DONE;
+            action.Definition.FieldValue = ProcessTemplateInfo.TaskDoneStateName;
 
             // don't set remaining work when marking as 'Done'
             // to avoid an error
@@ -366,7 +366,7 @@ public class WorkItemScriptGenerator
 
                 action.ActionId = GetNextActionNumber().ToString();
                 action.Definition.Operation = "Update";
-                action.Definition.Description = "PBI got to done because {reason}";
+                action.Definition.Description = $"{ProcessTemplateInfo.RequirementWorkItemTypeAbbreviationName} got to done because {reason}";
                 action.Definition.WorkItemId = pbi.Id;
                 action.Definition.WorkItemType = pbi.WorkItemType;
 
@@ -375,7 +375,7 @@ public class WorkItemScriptGenerator
                     ((sprint.SprintNumber - 1) * SPRINT_DURATION) + 13;
 
                 action.Definition.Refname = FIELD_NAME_STATE;
-                action.Definition.FieldValue = STATE_DONE;
+                action.Definition.FieldValue = ProcessTemplateInfo.RequirementDoneStateName;
 
                 action.SetValue("System.Description", pbi.Description);
 
@@ -394,7 +394,7 @@ public class WorkItemScriptGenerator
 
                 action.ActionId = GetNextActionNumber().ToString();
                 action.Definition.Operation = ACTION_UPDATE;
-                action.Definition.Description = "PBI not done in sprint";
+                action.Definition.Description = $"{ProcessTemplateInfo.RequirementWorkItemTypeAbbreviationName} not done in sprint";
                 action.Definition.WorkItemId = pbi.Id;
                 action.Definition.WorkItemType = pbi.WorkItemType;
 
@@ -422,13 +422,13 @@ public class WorkItemScriptGenerator
 
         action.ActionId = GetNextActionNumber().ToString();
         action.Definition.Operation = ACTION_UPDATE;
-        action.Definition.Description = "PBI Done because work is complete";
+        action.Definition.Description = $"{ProcessTemplateInfo.RequirementWorkItemTypeAbbreviationName} Done because work is complete";
         action.Definition.WorkItemId = pbi.Id;
         action.Definition.WorkItemType = pbi.WorkItemType;
         action.Definition.ActionDay =
             ((sprint.SprintNumber - 1) * SPRINT_DURATION) + sprintDayNumber;
         action.Definition.Refname = FIELD_NAME_STATE;
-        action.Definition.FieldValue = STATE_DONE;
+        action.Definition.FieldValue = ProcessTemplateInfo.RequirementDoneStateName;
 
         pbi.Description = $"{pbi.Description} All work completed on sprint day #{sprintDayNumber};";
 
@@ -497,9 +497,6 @@ public class WorkItemScriptGenerator
                         break;
                     }
                 }
-
-                // Console.WriteLine($"Sprint {sprint.SprintNumber}: pbi {pbi.Id} -- remaining burndown: {todaysBurndownAmount}");
-
             }
         }
     }
@@ -556,7 +553,7 @@ public class WorkItemScriptGenerator
 
                 action.ActionId = GetNextActionNumber().ToString();
                 action.Definition.Operation = ACTION_UPDATE;
-                action.Definition.Description = $"PBI selected for sprint {sprint.SprintNumber}";
+                action.Definition.Description = $"{ProcessTemplateInfo.RequirementWorkItemTypeAbbreviationName} selected for sprint {sprint.SprintNumber}";
                 action.Definition.WorkItemId = item.Id;
                 action.Definition.WorkItemType = item.WorkItemType;
                 action.Definition.ActionDay =
@@ -600,7 +597,7 @@ public class WorkItemScriptGenerator
 
                 action.ActionId = GetNextActionNumber().ToString();
                 action.Definition.Operation = "Create";
-                action.Definition.Description = "Add task for PBI";
+                action.Definition.Description = $"Add task for {ProcessTemplateInfo.RequirementWorkItemTypeAbbreviationName}";
                 action.Definition.WorkItemId = task.Id;
                 action.Definition.WorkItemType = task.WorkItemType;
                 action.Definition.ActionDay =
@@ -629,7 +626,7 @@ public class WorkItemScriptGenerator
 
         returnValue.ActionId = actionId.ToString();
         returnValue.Definition.Operation = "Create";
-        returnValue.Definition.Description = "Create PBI";
+        returnValue.Definition.Description = $"Create {ProcessTemplateInfo.RequirementWorkItemTypeAbbreviationName}";
         returnValue.Definition.WorkItemId = item.Id;
         returnValue.Definition.WorkItemType = item.WorkItemType;
 
@@ -665,9 +662,9 @@ public class WorkItemScriptGenerator
 
             var item = new WorkItemScriptWorkItem
             {
-                Id = $"pbi-{_createdWorkItemNumber}",
+                Id = $"{ProcessTemplateInfo.RequirementWorkItemTypeAbbreviationName}-{_createdWorkItemNumber}",
                 Title = GetRandomTitle(),
-                WorkItemType = "PBI",
+                WorkItemType = ProcessTemplateInfo.RequirementWorkItemTypeFullName,
                 State = "New",
                 Iteration = string.Empty
             };

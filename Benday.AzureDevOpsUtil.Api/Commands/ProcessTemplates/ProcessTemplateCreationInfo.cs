@@ -14,11 +14,13 @@ public class ProcessTemplateCreationInfo
     public string RequirementWorkItemTypeFullName { get; set; } = string.Empty;
     public string RequirementWorkItemTypeAbbreviationName { get; set; } = string.Empty;
 
-    public string DoneStateName { get; set; } = string.Empty;
+    public string RequirementDoneStateName { get; set; } = string.Empty;
     public string InProgressStateName { get; set; } = string.Empty;
     public string ReadyForSprintStateName { get; set; } = string.Empty;
     public string RefinementStateName { get; set; } = string.Empty;
     public string AcceptedOnSprintBacklogStateName { get; set; } = string.Empty;
+    public string TaskDoneStateName { get; set; } = "Done";
+
 
     public string GetWorkItemTypeForAction(WorkItemScriptAction action)
     {

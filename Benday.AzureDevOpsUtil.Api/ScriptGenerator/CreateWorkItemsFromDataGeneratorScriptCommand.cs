@@ -152,7 +152,7 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
             processTemplateInfo.RequirementWorkItemTypeFullName = "Product Backlog Item";
             processTemplateInfo.RequirementWorkItemTypeAbbreviationName = "PBI";
             processTemplateInfo.InProgressStateName = "Committed";
-            processTemplateInfo.DoneStateName = "Done";
+            processTemplateInfo.RequirementDoneStateName = "Done";
             processTemplateInfo.RefinementStateName = "Approved";
             processTemplateInfo.ReadyForSprintStateName = "Approved";
             processTemplateInfo.AcceptedOnSprintBacklogStateName = "Committed";
@@ -164,7 +164,7 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
             processTemplateInfo.RequirementWorkItemTypeFullName = "Product Backlog Item";
             processTemplateInfo.RequirementWorkItemTypeAbbreviationName = "PBI";
             processTemplateInfo.InProgressStateName = "Committed";
-            processTemplateInfo.DoneStateName = "Done";
+            processTemplateInfo.RequirementDoneStateName = "Done";
             processTemplateInfo.RefinementStateName = "Needs Refinement";
             processTemplateInfo.ReadyForSprintStateName = "Ready for Sprint";
             processTemplateInfo.AcceptedOnSprintBacklogStateName = "Committed";
@@ -177,7 +177,7 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
             processTemplateInfo.RequirementWorkItemTypeFullName= "User Story";
             processTemplateInfo.RequirementWorkItemTypeAbbreviationName = "story";
             processTemplateInfo.InProgressStateName = "Active";
-            processTemplateInfo.DoneStateName = "Closed";
+            processTemplateInfo.RequirementDoneStateName = "Closed";
             processTemplateInfo.RefinementStateName = "New";
             processTemplateInfo.ReadyForSprintStateName = "New";
             processTemplateInfo.AcceptedOnSprintBacklogStateName = "Active";
@@ -189,7 +189,7 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
             processTemplateInfo.RequirementWorkItemTypeFullName = "User Story";
             processTemplateInfo.RequirementWorkItemTypeAbbreviationName = "story";
             processTemplateInfo.InProgressStateName = "Active";
-            processTemplateInfo.DoneStateName = "Closed";
+            processTemplateInfo.RequirementDoneStateName = "Closed";
             processTemplateInfo.RefinementStateName = "Needs Refinement";
             processTemplateInfo.ReadyForSprintStateName = "Ready for Sprint";
             processTemplateInfo.AcceptedOnSprintBacklogStateName = "Active";
