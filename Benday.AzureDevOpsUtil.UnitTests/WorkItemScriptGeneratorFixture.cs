@@ -1,4 +1,5 @@
-﻿using Benday.AzureDevOpsUtil.Api.Excel;
+﻿using Benday.AzureDevOpsUtil.Api.Commands.ProcessTemplates;
+using Benday.AzureDevOpsUtil.Api.Excel;
 using Benday.AzureDevOpsUtil.Api.ScriptGenerator;
 
 namespace Benday.AzureDevOpsUtil.UnitTests;
@@ -19,12 +20,18 @@ public class WorkItemScriptGeneratorFixture
         {
             if (_systemUnderTest == null)
             {
-                _systemUnderTest = new WorkItemScriptGenerator(true);
+                _systemUnderTest = new WorkItemScriptGenerator(TemplateInfo);
             }
 
             return _systemUnderTest;
         }
     }
+
+    private ProcessTemplateCreationInfo TemplateInfo
+    {
+        get;
+        set;
+    } = new();
 
     [TestMethod]
     public void GetRandomTitles()

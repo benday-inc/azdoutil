@@ -1,11 +1,11 @@
 ﻿using System.Runtime.InteropServices;
 
+using Benday.AzureDevOpsUtil.Api.Commands.ProcessTemplates;
 using Benday.AzureDevOpsUtil.Api.Commands.ProjectAdministration;
+using Benday.AzureDevOpsUtil.Api.Commands.WorkItems;
 using Benday.AzureDevOpsUtil.Api.Excel;
 using Benday.AzureDevOpsUtil.Api.Messages;
 using Benday.CommandsFramework;
-
-using Benday.AzureDevOpsUtil.Api.Commands.WorkItems;
 namespace Benday.AzureDevOpsUtil.Api.ScriptGenerator;
 
 [Command(
@@ -41,7 +41,11 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
             .AsNotRequired();
 
         arguments.AddString(Constants.CommandArg_ProcessTemplateName)
-            .WithAllowedValues("Scrum", "Scrum with Backlog Refinement")
+            .WithAllowedValues(
+                "Scrum", 
+                "Scrum with Backlog Refinement", 
+                "Agile", 
+                "Agile with Backlog Refinement")
             .WithDescription("Process template name")
             .WithDefaultValue("Scrum");
 
@@ -139,19 +143,60 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
 
         _processTemplateName = Arguments.GetStringValue(Constants.CommandArg_ProcessTemplateName);
 
-        bool useScrumWithBacklogRefinement;
+        var processTemplateInfo = new ProcessTemplateCreationInfo();
 
         if (_processTemplateName.Equals("Scrum", StringComparison.CurrentCultureIgnoreCase) == true)
         {
-            useScrumWithBacklogRefinement = false;
+            processTemplateInfo.TemplateName = "Scrum";
+            processTemplateInfo.UseRefinement = false;
+            processTemplateInfo.RequirementWorkItemTypeFullName = "Product Backlog Item";
+            processTemplateInfo.RequirementWorkItemTypeAbbreviationName = "PBI";
+            processTemplateInfo.InProgressStateName = "Committed";
+            processTemplateInfo.DoneStateName = "Done";
+            processTemplateInfo.RefinementStateName = "Approved";
+            processTemplateInfo.ReadyForSprintStateName = "Approved";
+            processTemplateInfo.AcceptedOnSprintBacklogStateName = "Committed";
         }
         else if (_processTemplateName.Equals("Scrum with Backlog Refinement", StringComparison.CurrentCultureIgnoreCase) == true)
         {
-            useScrumWithBacklogRefinement = true;
+            processTemplateInfo.TemplateName = "Scrum";
+            processTemplateInfo.UseRefinement = true;
+            processTemplateInfo.RequirementWorkItemTypeFullName = "Product Backlog Item";
+            processTemplateInfo.RequirementWorkItemTypeAbbreviationName = "PBI";
+            processTemplateInfo.InProgressStateName = "Committed";
+            processTemplateInfo.DoneStateName = "Done";
+            processTemplateInfo.RefinementStateName = "Needs Refinement";
+            processTemplateInfo.ReadyForSprintStateName = "Ready for Sprint";
+            processTemplateInfo.AcceptedOnSprintBacklogStateName = "Committed";
+
+        }
+        else if (_processTemplateName.Equals("Agile", StringComparison.CurrentCultureIgnoreCase) == true)
+        {
+            processTemplateInfo.TemplateName = "Agile";
+            processTemplateInfo.UseRefinement = false;
+            processTemplateInfo.RequirementWorkItemTypeFullName= "User Story";
+            processTemplateInfo.RequirementWorkItemTypeAbbreviationName = "story";
+            processTemplateInfo.InProgressStateName = "Active";
+            processTemplateInfo.DoneStateName = "Closed";
+            processTemplateInfo.RefinementStateName = "New";
+            processTemplateInfo.ReadyForSprintStateName = "New";
+            processTemplateInfo.AcceptedOnSprintBacklogStateName = "Active";
+        }
+        else if (_processTemplateName.Equals("Agile with Backlog Refinement", StringComparison.CurrentCultureIgnoreCase) == true)
+        {
+            processTemplateInfo.TemplateName = "Agile with Backlog Refinement";
+            processTemplateInfo.UseRefinement = true;
+            processTemplateInfo.RequirementWorkItemTypeFullName = "User Story";
+            processTemplateInfo.RequirementWorkItemTypeAbbreviationName = "story";
+            processTemplateInfo.InProgressStateName = "Active";
+            processTemplateInfo.DoneStateName = "Closed";
+            processTemplateInfo.RefinementStateName = "Needs Refinement";
+            processTemplateInfo.ReadyForSprintStateName = "Ready for Sprint";
+            processTemplateInfo.AcceptedOnSprintBacklogStateName = "Active";
         }
         else
         {
-            throw new KnownException($"Process template '{_processTemplateName}' not supported. Work item script generation only supported for 'Scrum' or 'Scrum with Backlog Refinement'.");
+            throw new KnownException($"Process template '{_processTemplateName}' not supported.");
         }
 
         var sprints = new List<WorkItemScriptSprint>();
@@ -181,7 +226,7 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
         _addSessionTag = Arguments.GetBooleanValue(
             Constants.CommandArg_AddSessionTag);
 
-        var generator = new WorkItemScriptGenerator(useScrumWithBacklogRefinement);
+        var generator = new WorkItemScriptGenerator(processTemplateInfo);
 
         generator.GenerateScript(sprints, markAllPbisAsDone);
 
@@ -227,7 +272,7 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
 
                 await EnsureProjectExists();
                 await PopulateIterations(sprints, _startDate);
-                await RunScript();
+                await RunScript(processTemplateInfo);
 
                 if (outputPathAndFileName != null)
                 {
@@ -241,7 +286,9 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
             {
                 WriteLine("Populating data for multiple teams.");
 
-                await PopulateForMultipleSprints(sprints, _startDate, outputPathAndFileName, useScrumWithBacklogRefinement, markAllPbisAsDone);
+                await PopulateForMultipleSprints(
+                    sprints, _startDate, outputPathAndFileName,
+                    processTemplateInfo, markAllPbisAsDone);
 
             }
             else
@@ -251,7 +298,9 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
 
         }
     }
-    private async Task PopulateForMultipleSprints(List<WorkItemScriptSprint> sprints, DateTime startDate, string? outputPathAndFileName, bool useScrumWithBacklogRefinement, bool markAllPbisAsDone)
+    private async Task PopulateForMultipleSprints(
+        List<WorkItemScriptSprint> sprints, DateTime startDate, string? outputPathAndFileName,
+        ProcessTemplateCreationInfo processTemplateInfo, bool markAllPbisAsDone)
     {
         var teamCount = Arguments.GetInt32Value(Constants.CommandArg_TeamCount);
 
@@ -270,7 +319,7 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
 
             _workItemIdMaps.Clear();
 
-            var generator = new WorkItemScriptGenerator(useScrumWithBacklogRefinement);
+            var generator = new WorkItemScriptGenerator(processTemplateInfo);
 
             generator.GenerateScript(sprints, markAllPbisAsDone);
 
@@ -278,7 +327,7 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
 
             _skipFutureDates = Arguments.GetBooleanValue(Constants.CommandArg_SkipFutureDates);
 
-            await RunScript();
+            await RunScript(processTemplateInfo);
 
             if (outputPathAndFileName != null)
             {
@@ -327,7 +376,7 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
         }
     }
 
-    private async Task RunScript()
+    private async Task RunScript(ProcessTemplateCreationInfo info)
     {
         if (_actions is null)
         {
@@ -346,11 +395,11 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
             {
                 if (IsEqualCaseInsensitive(action.Definition.Operation, "Create") == true)
                 {
-                    await CreatePbi(action);
+                    await CreatePbi(action, info);
                 }
                 else if (IsEqualCaseInsensitive(action.Definition.Operation, "Update") == true)
                 {
-                    await UpdatePbi(action);
+                    await UpdatePbi(action, info);
                 }
             }
             catch (Exception)
@@ -366,21 +415,21 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
         return string.Equals(value1, value2, StringComparison.CurrentCultureIgnoreCase);
     }
 
-    private async Task CreatePbi(WorkItemScriptAction action)
+    private async Task CreatePbi(WorkItemScriptAction action, ProcessTemplateCreationInfo info)
     {
-        await CreateWorkItem(action, true);
+        await CreateWorkItem(action, true, info);
     }
 
-    private async Task UpdatePbi(WorkItemScriptAction action)
+    private async Task UpdatePbi(WorkItemScriptAction action, ProcessTemplateCreationInfo info)
     {
         await ModifyWorkItem(action, true);
     }
 
-    private async Task CreateWorkItem(WorkItemScriptAction action, bool bypassRules)
+    private async Task CreateWorkItem(WorkItemScriptAction action, bool bypassRules, ProcessTemplateCreationInfo info)
     {
         // WriteLine($"Action #{action.ActionId} - Create PBI - {action.Definition.Description} - {action.Rows.Count} steps");
 
-        var workItemTypeName = action.Definition.WorkItemType;
+        var workItemTypeName = info.GetWorkItemTypeForAction(action);
         var workItemTypeNameHtmlEncoded = workItemTypeName.Replace(" ", "%20");
 
         var actionDate = action.GetActionDate(_startDate);

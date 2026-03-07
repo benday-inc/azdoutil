@@ -39,7 +39,7 @@ public class CreateWorkItemInfoFromDataGeneratorCommand : AzureDevOpsCommandBase
         WriteLine("Running in titles only mode. Skipping write to Azure DevOps.");
         WriteLine();
 
-        var generator = new WorkItemScriptGenerator(false);
+        var generator = new WorkItemScriptGenerator(new());
 
         var numberOfTitles = 40;
 

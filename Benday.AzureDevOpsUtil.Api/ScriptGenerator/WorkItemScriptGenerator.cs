@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Text;
 
+using Benday.AzureDevOpsUtil.Api.Commands.ProcessTemplates;
+
 namespace Benday.AzureDevOpsUtil.Api.ScriptGenerator;
 
 public class WorkItemScriptGenerator
@@ -22,17 +24,17 @@ public class WorkItemScriptGenerator
     private readonly List<string> _actionWords;
     private readonly List<string> _endingWords;
     private readonly List<string> _randomWords;
-    private readonly bool _useScrumWithBacklogRefinement;
+    // private readonly bool _useScrumWithBacklogRefinement;
     private int _createdWorkItemNumber = 100;
     private int _createdActionNumber = 100;
     private int _pbiCreationSequence = 0;
 
-    public WorkItemScriptGenerator(bool useScrumWithBacklogRefinement)
+    public WorkItemScriptGenerator(ProcessTemplateCreationInfo processTemplateInfo)
     {
+        ProcessTemplateInfo = processTemplateInfo;
         _actionWords = GetActionWords();
         _randomWords = GetRandomWords();
-        _endingWords = GetEndingWords();
-        _useScrumWithBacklogRefinement = useScrumWithBacklogRefinement;
+        _endingWords = GetEndingWords();        
     }
 
     public string GetRandomTitle()
@@ -165,6 +167,8 @@ public class WorkItemScriptGenerator
     public List<WorkItemScriptWorkItem> ProductBacklogItemsDone { get; set; } = new();
     public List<WorkItemScriptAction> Actions { get; set; } = new();
 
+    public ProcessTemplateCreationInfo ProcessTemplateInfo { get; }
+
     private void Move(WorkItemScriptWorkItem moveThis,
         List<WorkItemScriptWorkItem> fromList,
         List<WorkItemScriptWorkItem> toList)
@@ -173,34 +177,6 @@ public class WorkItemScriptGenerator
         toList.Add(moveThis);
     }
 
-    private string GetNeedsRefinementStateValue()
-    {
-        if (_useScrumWithBacklogRefinement == true)
-        {
-            return "Needs Refinement";
-        }
-        else
-        {
-            return "Approved";
-        }
-    }
-
-    private string GetReadyForSprintStateValue()
-    {
-        if (_useScrumWithBacklogRefinement == true)
-        {
-            return "Ready for Sprint";
-        }
-        else
-        {
-            return "Approved";
-        }
-    }
-
-    private string GetAcceptedOnToSprintBacklogStateValue()
-    {
-        return "Committed";
-    }
 
     public void GenerateScript(WorkItemScriptSprint sprint,
         bool markAllSprintPbisAsDone = false)
@@ -294,7 +270,7 @@ public class WorkItemScriptGenerator
                 action.Definition.ActionDay =
                     ((sprint.SprintNumber - 1) * SPRINT_DURATION) + 3 + createDateOffset;
                 action.Definition.Refname = FIELD_NAME_STATE;
-                action.Definition.FieldValue = GetNeedsRefinementStateValue();
+                action.Definition.FieldValue = ProcessTemplateInfo.RefinementStateName;
 
                 Actions.Add(action);
             }
@@ -335,7 +311,7 @@ public class WorkItemScriptGenerator
                 action.Definition.ActionDay =
                     ((sprint.SprintNumber - 1) * SPRINT_DURATION) + 10 + createDateOffset;
                 action.Definition.Refname = FIELD_NAME_STATE;
-                action.Definition.FieldValue = GetReadyForSprintStateValue();
+                action.Definition.FieldValue = ProcessTemplateInfo.ReadyForSprintStateName;
 
                 item.Effort = FibonacciValues.Random();
                 action.SetValue("Effort", item.Effort);
@@ -427,7 +403,7 @@ public class WorkItemScriptGenerator
                     ((sprint.SprintNumber - 1) * SPRINT_DURATION) + 13;
 
                 action.Definition.Refname = FIELD_NAME_STATE;
-                action.Definition.FieldValue = GetReadyForSprintStateValue();
+                action.Definition.FieldValue = ProcessTemplateInfo.ReadyForSprintStateName;
 
                 pbi.Effort = FibonacciValues.Random();
 
@@ -586,8 +562,8 @@ public class WorkItemScriptGenerator
                 action.Definition.ActionDay =
                     ((sprint.SprintNumber - 1) * SPRINT_DURATION);
                 action.Definition.Refname = FIELD_NAME_STATE;
-                item.State = GetAcceptedOnToSprintBacklogStateValue();
-                action.Definition.FieldValue = GetAcceptedOnToSprintBacklogStateValue();
+                item.State = ProcessTemplateInfo.AcceptedOnSprintBacklogStateName;
+                action.Definition.FieldValue = ProcessTemplateInfo.AcceptedOnSprintBacklogStateName;
 
                 action.SetValue("IterationPath", $"Sprint {sprint.SprintNumber}");
                 action.SetValue("Effort", FibonacciValues.Random().ToString());

@@ -134,6 +134,11 @@ public class CreateBacklogRefinementProcessTemplateCommand : AzureDevOpsCommandB
         // create the work item states
         string newInheritedWorkItemRefName = newInheritedWorkItem.RefName;
 
+        if (isAgile)
+        {
+            await CreateNewWorkItemState(newInheritedProcessId, newInheritedWorkItemRefName, "Approved");
+        }
+
         await CreateNewWorkItemState(newInheritedProcessId, newInheritedWorkItemRefName, "Needs Refinement");
         await CreateNewWorkItemState(newInheritedProcessId, newInheritedWorkItemRefName, "Ready for Sprint");
 
@@ -168,7 +173,7 @@ public class CreateBacklogRefinementProcessTemplateCommand : AzureDevOpsCommandB
         var templateNameToUse = isAgile ? Constants.ProcessTemplateName_AgileWithBacklogRefinement : Constants.ProcessTemplateName_ScrumWithBacklogRefinement;
         var referenceNameToUse = isAgile ? Constants.ProcessTemplateRefName_AgileWithBacklogRefinement : Constants.ProcessTemplateRefName_ScrumWithBacklogRefinement;
 
-        var requestUrlCreateNewProcess = $"_apis/work/processes?api-version=7.0";
+        var requestUrlCreateNewProcess = $"_apis/work/processes?api-version=7.1";
 
         var newProcessRequest = new CreateInheritedProcessRequest()
         {
@@ -178,8 +183,14 @@ public class CreateBacklogRefinementProcessTemplateCommand : AzureDevOpsCommandB
             Description = match.Description
         };
 
-        var newInheritedProcess = await SendPostForBodyAndGetTypedResponseSingleAttempt<ProcessTemplateDetailInfo, CreateInheritedProcessRequest>(
-            requestUrlCreateNewProcess, newProcessRequest);
+        WriteLine($"Creating new process template {templateNameToUse} that inherits from {match.Name}...");
+        WriteLine($"   Reference name to use: {referenceNameToUse}");
+        WriteLine(); 
+        WriteLine(); 
+
+        var newInheritedProcess = 
+            await SendPostForBodyAndGetTypedResponseSingleAttempt<ProcessTemplateDetailInfo, CreateInheritedProcessRequest>(
+                requestUrlCreateNewProcess, newProcessRequest);
         return newInheritedProcess;
     }
 }

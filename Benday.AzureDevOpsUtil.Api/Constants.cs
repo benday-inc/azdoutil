@@ -127,7 +127,7 @@ public static class Constants
     public const string ProcessTemplateName_ScrumWithBacklogRefinement = "Scrum with Backlog Refinement";
     public const string ProcessTemplateRefName_ScrumWithBacklogRefinement = "Inherited.ScrumWithBacklogRefinement";
     public const string ProcessTemplateName_AgileWithBacklogRefinement = "Agile with Backlog Refinement";
-    public const string ProcessTemplateRefName_AgileWithBacklogRefinement = "Inherited.AgileWithBacklogRefinement";
+    public const string ProcessTemplateRefName_AgileWithBacklogRefinement = "Inherited.AgileBacklogRefinement";
     public const string ProcessTemplateName_Scrum = "Scrum";
     public const string ProcessTemplateName_Agile = "Agile";
 

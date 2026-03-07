@@ -1,5 +1,8 @@
-﻿namespace Benday.AzureDevOpsUtil.Api.ScriptGenerator;
+﻿using System.Diagnostics;
 
+namespace Benday.AzureDevOpsUtil.Api.ScriptGenerator;
+
+[DebuggerDisplay($"{{{nameof(GetDebuggerDisplay)}(),nq}}")]
 public class WorkItemScriptAction
 {
     public List<WorkItemScriptRow> Rows { get; set; } = new();
@@ -37,4 +40,11 @@ public class WorkItemScriptAction
     }
 
     public bool Skip { get; set; } = false;
+
+    private string GetDebuggerDisplay()
+    {
+        var displayValue = $"ActionId: {this.ActionId}; Op: {this.Definition.Operation}; Wit: {this.Definition.WorkItemType};";
+
+        return displayValue;
+    }
 }

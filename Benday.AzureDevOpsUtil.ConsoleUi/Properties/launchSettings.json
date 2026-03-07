@@ -168,7 +168,7 @@
     },
     "createfromgenerator with create project": {
       "commandName": "Project",
-      "commandLineArgs": "createfromgenerator /numberofsprints:4 /processname:Scrum /createproject"
+      "commandLineArgs": "createfromgenerator /processname:\"Agile with Backlog Refinement\" /createproject"
     },
     "getproject": {
       "commandName": "Project",
@@ -177,6 +177,10 @@
     "listprocesstemplates": {
       "commandName": "Project",
       "commandLineArgs": "listprocesstemplates"
+    },
+    "addrefinementprocess agile": {
+      "commandName": "Project",
+      "commandLineArgs": "addrefinementprocess /agile"
     }
   }
 }

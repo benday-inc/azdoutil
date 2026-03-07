@@ -21,6 +21,7 @@ class Program
         options.ApplicationName = "Azure DevOps Utilities";
         options.Website = "https://www.benday.com";
         options.DisplayUsageOptions.ShowCategories = true;
+        options.StrictArgumentValidation = false;
 
         var program = new DefaultProgram(options, assembly);
 
