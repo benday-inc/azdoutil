@@ -44,6 +44,11 @@ public class AgentInfo
     [JsonPropertyName("accessPoint")]
     public string AccessPoint { get; set; } = string.Empty;
 
+    [JsonPropertyName("userCapabilities")]
+    public Dictionary<string, string> UserCapabilities { get; set; } = new();
+
+    [JsonPropertyName("systemCapabilities")]
+    public Dictionary<string, string> SystemCapabilities { get; set; } = new();
 }
 
 

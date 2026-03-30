@@ -173,6 +173,25 @@ public class ListAgentPoolsCommand : AzureDevOpsCommandBase
                     "MaxParallelism",
                     agent.MaxParallelism);
                 WriteLine("Agent.Version", agent.Version);
+
+                if (agent.UserCapabilities.Count > 0)
+                {
+                    WriteLine("\tUser Capabilities:");
+                    foreach (var cap in agent.UserCapabilities)
+                    {
+                        WriteLine($"\t\t{cap.Key}: {cap.Value}");
+                    }
+                }
+
+                if (agent.SystemCapabilities.Count > 0)
+                {
+                    WriteLine("\tSystem Capabilities:");
+                    foreach (var cap in agent.SystemCapabilities)
+                    {
+                        WriteLine($"\t\t{cap.Key}: {cap.Value}");
+                    }
+                }
+
                 WriteLine();
             }
         }
@@ -181,7 +200,7 @@ public class ListAgentPoolsCommand : AzureDevOpsCommandBase
     private async Task<GetAgentsByPoolIdResponse?> GetAgentsInPool(int poolId)
     {
         string requestUrl;
-        requestUrl = $"_apis/distributedtask/pools/{poolId}/agents?api-version=7.1-preview.1";
+        requestUrl = $"_apis/distributedtask/pools/{poolId}/agents?includeCapabilities=true&api-version=7.1-preview.1";
 
         var result = await CallEndpointViaGetAndGetResult<GetAgentsByPoolIdResponse>(requestUrl);
 
