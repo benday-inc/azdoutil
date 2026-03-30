@@ -10,6 +10,7 @@
     <File Path="misc/readme-categories-github.md" />
     <File Path="misc/readme-categories-nuget.md" />
     <File Path="misc/readme-header.md" />
+    <File Path="publish-standalone.ps1" />
     <File Path="README-for-nuget.md" />
     <File Path="README.md" />
     <File Path="uninstall.ps1" />
