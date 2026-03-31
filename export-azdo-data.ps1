@@ -1,7 +1,7 @@
 <#
 .SYNOPSIS
-    Exports Azure DevOps build definitions, release definitions, and agent pool
-    info to JSON files organized by TPC and team project.
+    Exports Azure DevOps build definitions, release definitions, task groups,
+    and agent pool info to JSON files organized by TPC and team project.
 
 .DESCRIPTION
     Workaround script that uses direct REST API calls with a PAT when
@@ -405,6 +405,61 @@ foreach ($collection in $collections) {
         }
         else {
             Write-Host "    No release definitions found."
+        }
+
+        # --------------------------------------------------
+        # Task Groups
+        # --------------------------------------------------
+        Write-Host "  Exporting task groups..."
+
+        $taskGroupsUrl = "$collectionBaseUrl/$encodedProjectName/_apis/distributedtask/taskgroups?api-version=7.1-preview.1"
+        $taskGroupsResponse = Invoke-AzdoApi -Uri $taskGroupsUrl -IgnoreErrors
+
+        if (-not $taskGroupsResponse) {
+            $taskGroupsUrl = "$collectionBaseUrl/$encodedProjectName/_apis/distributedtask/taskgroups?api-version=5.0-preview.1"
+            $taskGroupsResponse = Invoke-AzdoApi -Uri $taskGroupsUrl -IgnoreErrors
+        }
+
+        if (-not $taskGroupsResponse) {
+            $taskGroupsUrl = "$collectionBaseUrl/$encodedProjectName/_apis/distributedtask/taskgroups?api-version=4.0-preview.1"
+            $taskGroupsResponse = Invoke-AzdoApi -Uri $taskGroupsUrl -IgnoreErrors
+        }
+
+        if ($taskGroupsResponse -and $taskGroupsResponse.value -and $taskGroupsResponse.count -gt 0) {
+            $taskGroups = $taskGroupsResponse.value
+            Write-Host "    Found $($taskGroups.Count) task group(s)"
+
+            $taskGroupsDir = Join-Path $projectOutputDir "task-groups"
+
+            # Save the summary list
+            Save-JsonToFile -Path (Join-Path $taskGroupsDir "_task-groups-list.json") -Content $taskGroupsResponse
+
+            # Export each task group individually
+            foreach ($taskGroup in $taskGroups) {
+                $tgId = $taskGroup.id
+                $tgName = $taskGroup.name
+                $safeTgName = Get-SafeFileName $tgName
+
+                Write-Host "    Exporting task group: $tgName (Id: $tgId)"
+
+                $tgDetailUrl = "$collectionBaseUrl/$encodedProjectName/_apis/distributedtask/taskgroups/$($tgId)?api-version=7.1-preview.1"
+                $tgDetailJson = Invoke-AzdoApiRaw -Uri $tgDetailUrl -IgnoreErrors
+
+                if (-not $tgDetailJson) {
+                    $tgDetailUrl = "$collectionBaseUrl/$encodedProjectName/_apis/distributedtask/taskgroups/$($tgId)?api-version=5.0-preview.1"
+                    $tgDetailJson = Invoke-AzdoApiRaw -Uri $tgDetailUrl -IgnoreErrors
+                }
+
+                if ($tgDetailJson) {
+                    Save-JsonToFile -Path (Join-Path $taskGroupsDir "$safeTgName.json") -Content $tgDetailJson
+                }
+                else {
+                    Write-Warning "      Could not export task group: $tgName"
+                }
+            }
+        }
+        else {
+            Write-Host "    No task groups found."
         }
     }
 }
