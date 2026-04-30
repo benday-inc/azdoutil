@@ -10,7 +10,8 @@
       "Bash(gh api:*)",
       "Bash(dotnet test:*)",
       "Bash(dotnet --version:*)",
-      "WebSearch"
+      "WebSearch",
+      "mcp__claude_ai_Microsoft_Learn__microsoft_docs_search"
     ],
     "deny": [],
     "ask": []
