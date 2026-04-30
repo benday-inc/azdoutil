@@ -160,6 +160,13 @@ public static class Constants
     public const string CommandName_AnalyzeRepo = "analyzerepo";
     public const string CommandName_AnalyzeAllRepos = "analyzeallrepos";
 
+    public const string CommandName_ListTaskGroups = "listtaskgroups";
+    public const string CommandName_FindTaskGroupUsages = "findtaskgroupusages";
+    public const string CommandName_InlineTaskGroup = "inlinetaskgroup";
+
+    public const string ArgumentNameTaskGroupId = "taskgroupid";
+    public const string ArgumentNameDryRun = "dryrun";
+
 
 
 
