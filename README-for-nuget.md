@@ -68,6 +68,27 @@ If you want to run a command against an Azure DevOps instance that is NOT your d
 ### Managing Configurations
 To add new configuration or modify an existing configuration, use the `azdoutil addconfig` command. You can list your configurations using the `azdoutil listconfig` command. To delete a configuration, use the `azdoutil removeconfig` command.
 
+## MCP Server (AI assistant integration)
+azdoutil can run as a [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server so an AI assistant (GitHub Copilot, Claude, etc.) can answer delivery questions in plain language — "how long does stuff usually take?", "when will these 10 items be done?", "what's stuck?" — by calling azdoutil's flow metrics calculations directly.
+
+Run the server with `azdoutil mcp-server`. It communicates over **stdio**, stays alive until the client disconnects, and reuses your existing azdoutil configurations. Configure it in your AI client like this:
+
+```json
+{
+  "servers": {
+    "azdoutil": {
+      "command": "azdoutil",
+      "args": ["mcp-server"],
+      "env": {
+        "AZDO_CONFIG_NAME": "myconfig"
+      }
+    }
+  }
+}
+```
+
+The `AZDO_CONFIG_NAME` environment variable selects the default stored configuration; each tool also accepts an optional `configName` parameter. Tools: `get_typical_delivery_window`, `get_throughput`, `forecast_completion_date`, `forecast_items_in_timeframe`, `get_aging_work`, and `get_project_summary`. The MCP server is purely additive — all existing CLI commands are unaffected.
+
 ## Commands
 | Category | Command Name | Description |
 | --- | --- | --- |

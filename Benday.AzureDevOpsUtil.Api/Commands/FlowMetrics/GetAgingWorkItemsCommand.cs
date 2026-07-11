@@ -4,8 +4,6 @@ using System.Web;
 using Benday.AzureDevOpsUtil.Api.Messages;
 using Benday.CommandsFramework;
 
-using static System.Runtime.InteropServices.JavaScript.JSType;
-
 namespace Benday.AzureDevOpsUtil.Api.Commands.FlowMetrics;
 
 [Command(
@@ -115,7 +113,10 @@ public class GetAgingWorkItemsCommand : AzureDevOpsCommandBase
             analyticsUrl = Configuration.AnalyticsUrl[..^1];
         }
 
-        WriteLine($"Using analytics URL: {analyticsUrl}");
+        if (IsQuietMode == false)
+        {
+            WriteLine($"Using analytics URL: {analyticsUrl}");
+        }
 
         string requestUrl;
 
@@ -130,7 +131,10 @@ public class GetAgingWorkItemsCommand : AzureDevOpsCommandBase
              GET https://azdo2022.benday.com/DefaultCollection/20230601e/_odata/v4.0-preview/WorkItems?$filter=WorkItemType 
             eq 'Product Backlog Item' and StateCategory eq 'InProgress'&$select=Title,WorkItemType,AreaSK,InProgressDate,WorkItemId,ClosedDate,StateCategory&$orderby=InProgressDate desc
              */
-            WriteLine($"Getting data for team '{_TeamName}'...");            
+            if (IsQuietMode == false)
+            {
+                WriteLine($"Getting data for team '{_TeamName}'...");
+            }
 
             requestUrl = $"{analyticsUrl}/{teamProjectNameUrlEncoded}/_odata/v1.0/WorkItems?" +
                 "$select=Title,WorkItemType,AreaSK,InProgressDate,WorkItemId,StateCategory&" +
@@ -140,7 +144,11 @@ public class GetAgingWorkItemsCommand : AzureDevOpsCommandBase
         }
         else
         {
-            WriteLine($"Getting data for team project '{_TeamProjectName}'...");
+            if (IsQuietMode == false)
+            {
+                WriteLine($"Getting data for team project '{_TeamProjectName}'...");
+            }
+
             requestUrl = $"{analyticsUrl}/{teamProjectNameUrlEncoded}/_odata/v1.0/WorkItems?" +
                 "$select=Title,WorkItemType,AreaSK,InProgressDate,WorkItemId,StateCategory&" +
                 "$filter=" +

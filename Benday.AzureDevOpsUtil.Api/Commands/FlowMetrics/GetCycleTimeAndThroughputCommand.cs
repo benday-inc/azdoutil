@@ -1,10 +1,8 @@
-﻿using System.Globalization;
-using System.Web;
+﻿using System.Web;
 
+using Benday.AzureDevOpsUtil.Api.FlowMetrics;
 using Benday.AzureDevOpsUtil.Api.Messages;
 using Benday.CommandsFramework;
-
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Benday.AzureDevOpsUtil.Api.Commands.FlowMetrics;
 
@@ -59,13 +57,9 @@ public class GetCycleTimeAndThroughputCommand : AzureDevOpsCommandBase
 
         await GetData();
 
-        if (Data == null || Data.Items == null)
+        if (Data != null && Data.Items != null)
         {
-
-        }
-        else
-        {
-            GroupData();
+            GroupedByWeek = ThroughputWeekGrouper.GroupByWeek(Data.Items);
         }
 
         if (IsQuietMode == false)
@@ -82,21 +76,6 @@ public class GetCycleTimeAndThroughputCommand : AzureDevOpsCommandBase
 
                 WriteThroughputByWeek();
             }
-        }
-    }
-
-    private void GroupData()
-    {
-        GroupedByWeek = new Dictionary<DateTime, ThroughputIteration>();
-
-        if (Data == null || Data.Items == null)
-        {
-            return;
-        }
-
-        foreach (var item in Data.Items)
-        {
-            AddToWeek(item);
         }
     }
 
@@ -117,8 +96,6 @@ public class GetCycleTimeAndThroughputCommand : AzureDevOpsCommandBase
 
     private void WriteThroughputForWeek(ThroughputIteration throughputIteration)
     {
-        var longestString = "mm/dd/yyyy".Length;
-
         string dateString = throughputIteration.StartOfWeek.ToShortDateString();
 
         WriteLine($"Week of {dateString}:");
@@ -126,41 +103,6 @@ public class GetCycleTimeAndThroughputCommand : AzureDevOpsCommandBase
         WriteLine($"\tAvg Cycle Time: {throughputIteration.AverageCycleTime} day(s)");
 
         WriteLine(string.Empty);
-    }
-
-    private void AddToWeek(WorkItemCycleTimeData item)
-    {
-        var dateValueString = item.CompletedDateSK.ToString();
-
-        var completedDate = DateTime.ParseExact(dateValueString, "yyyyMMdd",
-                CultureInfo.InvariantCulture);
-
-        var weekOfYear = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(
-            completedDate, CalendarWeekRule.FirstDay, DayOfWeek.Monday);
-
-        var firstDayOfWeek = GetMondayOfWeek(completedDate);
-
-        AddToWeek(firstDayOfWeek, weekOfYear, item, completedDate);
-    }
-
-    public static DateTime GetMondayOfWeek(DateTime fromDate)
-    {
-        int diff = (7 + (fromDate.DayOfWeek - DayOfWeek.Monday)) % 7;
-
-        return fromDate.AddDays(-1 * diff).Date;
-    }
-
-    private void AddToWeek(DateTime startOfWeek, int weekOfYear, WorkItemCycleTimeData item, DateTime completedDate)
-    {
-        if (GroupedByWeek.ContainsKey(startOfWeek) == false)
-        {
-            GroupedByWeek.Add(startOfWeek,
-                new ThroughputIteration(weekOfYear, startOfWeek));
-        }
-
-        var iteration = GroupedByWeek[startOfWeek];
-
-        iteration.Add(item);
     }
 
     private int _NumberOfDaysOfHistory;

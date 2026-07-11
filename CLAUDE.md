@@ -85,6 +85,28 @@ Commands don't call Azure DevOps REST APIs directly. Instead, the base class pro
 
 DTOs for Azure DevOps API are in `Benday.AzureDevOpsUtil.Api.Messages` namespace.
 
+### Flow Metrics Calculation Services
+
+Flow metrics calculations live in `Benday.AzureDevOpsUtil.Api/FlowMetrics/` as console-free, reusable services so they can be called both from the CLI commands and from the MCP server:
+
+- **`MonteCarloForecaster`** - pure Monte Carlo simulation (weeks-for-item-count and items-in-weeks), returning distribution objects with confidence lookups. Accepts an injectable sampler for deterministic tests.
+- **`CycleTimeCalculator`** - cycle time percentile math and the typical delivery window (50th/85th/95th).
+- **`ThroughputWeekGrouper`** - groups completed items into throughput-by-week buckets.
+- **`AzureDevOpsAnalyticsClient`** - console-free authenticated access to the Analytics OData endpoints, reusing `AzureDevOpsConfiguration`.
+- **`FlowMetricsService`** - orchestrates the above into structured result DTOs (`FlowMetricsResults.cs`). This is the programmatic entry point used by the MCP tools.
+
+The Flow Metrics CLI commands in `Commands/FlowMetrics/` are thin adapters that call these services and format the output, so the CLI and MCP paths produce identical numbers.
+
+### MCP Server
+
+`azdoutil mcp-server` starts a [Model Context Protocol](https://modelcontextprotocol.io) server over **stdio** (using `Microsoft.Extensions.Hosting` + the `ModelContextProtocol` SDK) that exposes the flow metrics calculations to an AI assistant.
+
+- The command is `McpServerCommand` (`Commands/Mcp/`), a normal CommandsFramework command that stays alive by awaiting `host.RunAsync()`.
+- Tools are defined in `McpTools/DeliveryIntelligenceTools.cs` (`[McpServerToolType]`). Each tool is a thin adapter over `FlowMetricsService`; tool descriptions use outcome language (delivery window, "what's stuck") because the description is what the LLM reads.
+- **stdout is the JSON-RPC transport, so nothing may be written to stdout** in the server path; logging is routed to stderr.
+- Configuration name is resolved per tool call, then from the `AZDO_CONFIG_NAME` environment variable, then the default configuration. Missing configurations produce an error listing the available ones.
+- The server is purely additive; existing CLI commands are unaffected.
+
 ### ScriptGenerator System
 
 The `ScriptGenerator/` directory contains a sophisticated work item simulation engine that generates realistic sprint data:

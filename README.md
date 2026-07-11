@@ -72,6 +72,46 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 ## GUI Option
 > **Prefer a graphical interface?** Run `azdoutil gui` to launch the azdoutil GUI — a point-and-click interface for all the same functionality without the command line.
 
+## MCP Server (AI assistant integration)
+azdoutil can run as a [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server so an AI assistant (GitHub Copilot, Claude, etc.) can answer delivery questions in plain language — "how long does stuff usually take?", "when will these 10 items be done?", "what's stuck?" — by calling azdoutil's flow metrics calculations directly.
+
+Run the server with:
+
+`azdoutil mcp-server`
+
+The server communicates over **stdio** and stays alive until the client disconnects. It reuses your existing azdoutil configurations (the same ones you create with `addconfig`), so there is no separate authentication to set up.
+
+### Configuring the server in your AI client
+Add azdoutil to your client's MCP server configuration. For example:
+
+```json
+{
+  "servers": {
+    "azdoutil": {
+      "command": "azdoutil",
+      "args": ["mcp-server"],
+      "env": {
+        "AZDO_CONFIG_NAME": "myconfig"
+      }
+    }
+  }
+}
+```
+
+The `AZDO_CONFIG_NAME` environment variable selects which stored configuration to use by default. Each tool also accepts an optional `configName` parameter that overrides it. If a configuration can't be found, the server returns an error that lists the configurations you do have.
+
+### Available tools
+| Tool | What it answers |
+| --- | --- |
+| `get_typical_delivery_window` | "How long does stuff usually take?" — cycle time percentiles (50th/85th/95th). |
+| `get_throughput` | "How much are we getting done?" — throughput and cycle time over a date range. |
+| `forecast_completion_date` | "When will these N items be done?" — Monte Carlo forecast of weeks needed. |
+| `forecast_items_in_timeframe` | "How much can we get done in N weeks?" — Monte Carlo forecast of item counts. |
+| `get_aging_work` | "What's stuck?" — in-progress items aging beyond the typical delivery window. |
+| `get_project_summary` | "How's the project going?" — combined throughput, delivery window, and aging headlines. |
+
+> **Note:** the MCP server is purely additive — every existing CLI command continues to work exactly as before.
+
 ## Commands
 | Category | Command Name | Description |
 | --- | --- | --- |
@@ -94,6 +134,7 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | Flow Metrics | [forecastworkitem](#forecastworkitem) | Use throughput data to forecast when a work item is likely to be done based on the current backlog priority using Monte Carlo simulation |
 | Flow Metrics | [suggest-sle](#suggest-sle) | Calculate a suggested service level expectation (SLE) based on cycle time |
 | Flow Metrics | [throughputcycletime](#throughputcycletime) | Get cycle time and throughput data for a team project for a date range |
+| MCP Server | [mcp-server](#mcp-server) | Start a Model Context Protocol (MCP) server over stdio that exposes the flow metrics tools to an AI assistant. The process stays alive until the MCP client disconnects. |
 | Miscellaneous | [connectiondata](#connectiondata) | Get information about a connection to Azure DevOps. |
 | Process Templates | [addrefinementprocess](#addrefinementprocess) | Creates backlog refinement process template as described at https://www.benday.com/2022/09/29/streamlining-backlog-refinement-with-azure-devops/ |
 | Process Templates | [changeprocess](#changeprocess) | Change the process for a Team Project |
@@ -325,6 +366,11 @@ To add new configuration or modify an existing configuration, use the `azdoutil 
 | numberofdays | Required | Int32 | Number of days of history to compute |
 | teamproject | Required | String | Team project name |
 | teamname | Optional | String | Team name |
+# MCP Server
+## <a name="mcp-server"></a> mcp-server
+**Start a Model Context Protocol (MCP) server over stdio that exposes the flow metrics tools to an AI assistant. The process stays alive until the MCP client disconnects.**
+
+This command takes no command-line arguments. Connection details come from your stored azdoutil configuration; the active configuration is selected per tool call or via the `AZDO_CONFIG_NAME` environment variable. See the [MCP Server](#mcp-server-ai-assistant-integration) section above for setup and the list of available tools.
 # Miscellaneous
 ## <a name="connectiondata"></a> connectiondata
 **Get information about a connection to Azure DevOps.**
