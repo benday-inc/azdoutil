@@ -34,12 +34,19 @@ public class FlowMetricsService
                 .Select(x => x.Name)
                 .ToArray();
 
-            var availableMessage = available.Length == 0
-                ? "There are no configurations. Add one with the 'addconfig' command."
-                : $"Available configurations: {string.Join(", ", available)}.";
+            if (available.Length == 0)
+            {
+                throw new KnownException(
+                    "azdoutil has no configurations yet. Ask the user to add one by running this " +
+                    "in a terminal: azdoutil addconfig /url:<your Azure DevOps URL> " +
+                    "/pat:<personal access token> (then restart the MCP server). " +
+                    "You can also call the list_configurations tool to check what is available.");
+            }
 
             throw new KnownException(
-                $"Could not find a configuration named '{name}'. {availableMessage}");
+                $"Could not find a configuration named '{name}'. " +
+                $"Available configurations: {string.Join(", ", available)}. " +
+                "Pass one of these as configName, or set the AZDO_CONFIG_NAME environment variable.");
         }
 
         return config;

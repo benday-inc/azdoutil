@@ -45,9 +45,21 @@ public class McpServerCommand : AsynchronousCommand
         builder.Services.AddSingleton<FlowMetricsService>();
 
         builder.Services
-            .AddMcpServer()
+            .AddMcpServer(options =>
+            {
+                // Sent to the client at startup and surfaced to the model to
+                // help it route delivery/flow-metrics questions to these tools.
+                options.ServerInstructions =
+                    "This server answers questions about Azure DevOps delivery using flow metrics. " +
+                    "Use its tools when someone asks how long work usually takes (delivery window / " +
+                    "cycle time), how much the team gets done (throughput / velocity), when a number " +
+                    "of items will be finished or how much fits in a timeframe (Monte Carlo forecasts), " +
+                    "or what is stuck or aging. Call list_configurations first if you are unsure which " +
+                    "Azure DevOps connection to use or if a tool reports a missing configuration.";
+            })
             .WithStdioServerTransport()
-            .WithTools<DeliveryIntelligenceTools>();
+            .WithTools<DeliveryIntelligenceTools>()
+            .WithTools<ConfigurationTools>();
 
         var host = builder.Build();
 

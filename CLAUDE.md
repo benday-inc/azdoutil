@@ -101,11 +101,16 @@ The Flow Metrics CLI commands in `Commands/FlowMetrics/` are thin adapters that 
 
 `azdoutil mcp-server` starts a [Model Context Protocol](https://modelcontextprotocol.io) server over **stdio** (using `Microsoft.Extensions.Hosting` + the `ModelContextProtocol` SDK) that exposes the flow metrics calculations to an AI assistant.
 
-- The command is `McpServerCommand` (`Commands/Mcp/`), a normal CommandsFramework command that stays alive by awaiting `host.RunAsync()`.
-- Tools are defined in `McpTools/DeliveryIntelligenceTools.cs` (`[McpServerToolType]`). Each tool is a thin adapter over `FlowMetricsService`; tool descriptions use outcome language (delivery window, "what's stuck") because the description is what the LLM reads.
+- The command is `McpServerCommand` (`Commands/Mcp/`), a normal CommandsFramework command that stays alive by awaiting `host.RunAsync()`. It also sets `McpServerOptions.ServerInstructions` (sent at startup) to help clients route delivery/flow-metrics questions to these tools.
+- Delivery tools are in `McpTools/DeliveryIntelligenceTools.cs` (`[McpServerToolType]`), each a thin adapter over `FlowMetricsService`; tool descriptions use outcome language (delivery window, "what's stuck") because the description is what the LLM reads. `KnownException`s are rethrown as `McpException` so the friendly message reaches the client.
+- `McpTools/ConfigurationTools.cs` adds `list_configurations` so an assistant can see which Azure DevOps connections exist (never returns tokens) and get a friendly "run addconfig" message when none exist.
 - **stdout is the JSON-RPC transport, so nothing may be written to stdout** in the server path; logging is routed to stderr.
 - Configuration name is resolved per tool call, then from the `AZDO_CONFIG_NAME` environment variable, then the default configuration. Missing configurations produce an error listing the available ones.
 - The server is purely additive; existing CLI commands are unaffected.
+
+### MCP client setup command
+
+`azdoutil mcp-config` (`Commands/Mcp/McpConfigCommand.cs`) shows or manages the MCP server registration for an AI client. With no options it prints ready-to-paste configuration for Claude Code, Claude Desktop, VS Code, Visual Studio 2022/2026, and Cursor; `/install` and `/uninstall` register/remove the server at **user (per-machine) scope** via `claude mcp add`/`remove` or `code --add-mcp`. The pure string/argument builders live in `McpTools/McpClientSetup.cs` (unit tested); the command only handles argument parsing and cross-platform process execution.
 
 ### ScriptGenerator System
 

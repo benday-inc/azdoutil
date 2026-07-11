@@ -22,10 +22,10 @@ public class FlowMetricsServiceFixture
         var ex = await Assert.ThrowsExactlyAsync<KnownException>(() =>
             service.GetTypicalDeliveryWindowAsync("missing", "MyProject"));
 
-        Assert.IsTrue(ex.Message.Contains("missing"),
-            $"Message should name the missing configuration. Actual: '{ex.Message}'");
         Assert.IsTrue(ex.Message.Contains("no configurations", StringComparison.OrdinalIgnoreCase),
             $"Message should note there are no configurations. Actual: '{ex.Message}'");
+        Assert.IsTrue(ex.Message.Contains("addconfig"),
+            $"Message should tell the user how to add a configuration. Actual: '{ex.Message}'");
     }
 
     [TestMethod]

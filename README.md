@@ -79,26 +79,74 @@ Run the server with:
 
 `azdoutil mcp-server`
 
-The server communicates over **stdio** and stays alive until the client disconnects. It reuses your existing azdoutil configurations (the same ones you create with `addconfig`), so there is no separate authentication to set up.
+The server communicates over **stdio** and stays alive until the client disconnects. It runs **per-machine** because `azdoutil` is already installed as a global .NET tool, and it reuses your existing azdoutil configurations (the same ones you create with `addconfig`), so there is no separate authentication to set up.
 
-### Configuring the server in your AI client
-Add azdoutil to your client's MCP server configuration. For example:
+### Which configuration does it use?
+The server picks the Azure DevOps connection at runtime:
 
+1. the `configName` parameter on an individual tool call, if the assistant supplies one; otherwise
+2. the `AZDO_CONFIG_NAME` environment variable set in the client config; otherwise
+3. your default (`(default)`) configuration.
+
+If a configuration can't be found, the server returns an error that lists the configurations you do have. You can also ask the assistant to call the `list_configurations` tool to see what's available, and if you haven't added a configuration yet it will tell you to run `azdoutil addconfig`.
+
+### Quickest setup
+Run `azdoutil mcp-config` to print ready-to-paste configuration for every supported client, or let azdoutil register the server for you at user (per-machine) scope:
+
+```bash
+azdoutil mcp-config /install                       # Claude Code, default configuration
+azdoutil mcp-config /install /config:myconfig      # Claude Code, using "myconfig"
+azdoutil mcp-config /install /client:vscode /config:myconfig
+azdoutil mcp-config /uninstall                     # remove from Claude Code
+azdoutil mcp-config /config:myconfig               # just print instructions, change nothing
+```
+
+### Configuring each client manually
+All entries below assume the `azdoutil` global tool is on your `PATH`. Drop the `env` block to use the default configuration.
+
+**Claude Code (CLI)** — registers at user scope so it works in every project:
+```bash
+claude mcp add azdoutil -s user -e AZDO_CONFIG_NAME=myconfig -- azdoutil mcp-server
+```
+
+**Claude Desktop (GUI)** — open **Settings → Developer → Edit Config** and add under `mcpServers` (restart Claude Desktop afterward). The file lives at `%APPDATA%\Claude\claude_desktop_config.json` (Windows) or `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS):
 ```json
 {
-  "servers": {
+  "mcpServers": {
     "azdoutil": {
       "command": "azdoutil",
       "args": ["mcp-server"],
-      "env": {
-        "AZDO_CONFIG_NAME": "myconfig"
-      }
+      "env": { "AZDO_CONFIG_NAME": "myconfig" }
     }
   }
 }
 ```
 
-The `AZDO_CONFIG_NAME` environment variable selects which stored configuration to use by default. Each tool also accepts an optional `configName` parameter that overrides it. If a configuration can't be found, the server returns an error that lists the configurations you do have.
+**VS Code (GitHub Copilot)** — run the **MCP: Open User Configuration** command (for all workspaces) or create `.vscode/mcp.json` (for one workspace) and add under `servers`, then open Copilot Chat in **Agent** mode:
+```json
+{
+  "servers": {
+    "azdoutil": {
+      "type": "stdio",
+      "command": "azdoutil",
+      "args": ["mcp-server"],
+      "env": { "AZDO_CONFIG_NAME": "myconfig" }
+    }
+  }
+}
+```
+
+**Visual Studio 2022 (17.14+) / Visual Studio 2026 (GitHub Copilot)** — create `%USERPROFILE%\.mcp.json` (all solutions) or `<solutiondir>\.mcp.json` (one solution) with the same `servers` entry as VS Code above, then open Copilot Chat, choose **Agent**, and enable the azdoutil tools.
+
+**Cursor** — add the same entry as Claude Desktop (under `mcpServers`) to `~/.cursor/mcp.json`.
+
+### Getting the assistant to actually use the tools ("routing")
+You don't manually route a question to an MCP server — the assistant chooses tools based on their **descriptions**, which is why azdoutil's tools are named and described in outcome language (`get_aging_work`, "what's stuck?"). The server also sends startup **instructions** telling the client when to reach for these tools. To make routing reliable:
+
+- **Ask in plain language that matches a tool's job**: "How long do work items usually take in *ProjectX*?", "When will these 12 items be done?", "What's stuck in *ProjectX* right now?" The assistant maps these to `get_typical_delivery_window`, `forecast_completion_date`, and `get_aging_work`.
+- **Name the tool or server when you want to be explicit**: "Use the azdoutil `get_project_summary` tool for *ProjectX*." In VS Code / Visual Studio Agent mode you can also select the tools with the tools (wrench) icon; in Claude Code run `/mcp` to see the server and its tools.
+- **Bias routing per project** by adding a line to your `CLAUDE.md` / project instructions, e.g. *"For Azure DevOps delivery questions (cycle time, throughput, forecasts, aging work), use the azdoutil MCP tools."*
+- **Tell it which connection** if you have several configs: "…using the `myconfig` configuration", or set `AZDO_CONFIG_NAME` so it doesn't have to ask.
 
 ### Available tools
 | Tool | What it answers |
@@ -109,6 +157,7 @@ The `AZDO_CONFIG_NAME` environment variable selects which stored configuration t
 | `forecast_items_in_timeframe` | "How much can we get done in N weeks?" — Monte Carlo forecast of item counts. |
 | `get_aging_work` | "What's stuck?" — in-progress items aging beyond the typical delivery window. |
 | `get_project_summary` | "How's the project going?" — combined throughput, delivery window, and aging headlines. |
+| `list_configurations` | "What are you connected to?" — the Azure DevOps configurations azdoutil knows about (never returns tokens). |
 
 > **Note:** the MCP server is purely additive — every existing CLI command continues to work exactly as before.
 
@@ -134,6 +183,7 @@ The `AZDO_CONFIG_NAME` environment variable selects which stored configuration t
 | Flow Metrics | [forecastworkitem](#forecastworkitem) | Use throughput data to forecast when a work item is likely to be done based on the current backlog priority using Monte Carlo simulation |
 | Flow Metrics | [suggest-sle](#suggest-sle) | Calculate a suggested service level expectation (SLE) based on cycle time |
 | Flow Metrics | [throughputcycletime](#throughputcycletime) | Get cycle time and throughput data for a team project for a date range |
+| MCP Server | [mcp-config](#mcp-config) | Show or manage the MCP server registration for an AI client (Claude Code, VS Code). Prints ready-to-paste config, or installs/uninstalls at user scope. |
 | MCP Server | [mcp-server](#mcp-server) | Start a Model Context Protocol (MCP) server over stdio that exposes the flow metrics tools to an AI assistant. The process stays alive until the MCP client disconnects. |
 | Miscellaneous | [connectiondata](#connectiondata) | Get information about a connection to Azure DevOps. |
 | Process Templates | [addrefinementprocess](#addrefinementprocess) | Creates backlog refinement process template as described at https://www.benday.com/2022/09/29/streamlining-backlog-refinement-with-azure-devops/ |
@@ -367,6 +417,24 @@ The `AZDO_CONFIG_NAME` environment variable selects which stored configuration t
 | teamproject | Required | String | Team project name |
 | teamname | Optional | String | Team name |
 # MCP Server
+## <a name="mcp-config"></a> mcp-config
+**Show or manage the MCP server registration for an AI client. With no options it prints ready-to-paste configuration; with /install or /uninstall it registers or removes the server at user scope (per-machine) for Claude Code or VS Code.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| install | Optional | Boolean | Register the MCP server with a client at user (per-machine) scope |
+| uninstall | Optional | Boolean | Remove the MCP server registration from a client |
+| client | Optional | String | Target client: claude-code (default) or vscode |
+| config | Optional | String | azdoutil configuration the server should use by default (sets AZDO_CONFIG_NAME) |
+
+Examples:
+```
+azdoutil mcp-config                                  # print setup for every supported client
+azdoutil mcp-config /install /config:myconfig        # register with Claude Code (user scope)
+azdoutil mcp-config /install /client:vscode          # register with VS Code
+azdoutil mcp-config /uninstall                       # remove from Claude Code
+```
+
 ## <a name="mcp-server"></a> mcp-server
 **Start a Model Context Protocol (MCP) server over stdio that exposes the flow metrics tools to an AI assistant. The process stays alive until the MCP client disconnects.**
 

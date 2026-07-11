@@ -77,6 +77,10 @@ public static class Constants
     public const string CommandArgumentNameSuggestServiceLevelExpectation = "suggest-sle";
     public const string CommandArgumentNameCycleTimeConfidenceRangesCommand = "cycletimeconfidence";
     public const string CommandArgumentNameMcpServer = "mcp-server";
+    public const string CommandArgumentNameMcpConfig = "mcp-config";
+    public const string ArgumentNameMcpInstall = "install";
+    public const string ArgumentNameMcpUninstall = "uninstall";
+    public const string ArgumentNameMcpClient = "client";
 
     public const string CommandArgumentNameGetForecastDurationForItemCount = "forecastdurationforitemcount";
 
