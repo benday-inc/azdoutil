@@ -159,7 +159,22 @@ You don't manually route a question to an MCP server — the assistant chooses t
 | `get_project_summary` | "How's the project going?" — combined throughput, delivery window, and aging headlines. |
 | `list_configurations` | "What are you connected to?" — the Azure DevOps configurations azdoutil knows about (never returns tokens). |
 
-> **Note:** the MCP server is purely additive — every existing CLI command continues to work exactly as before.
+These **read-only context tools** help the assistant discover the right project/team/query names (e.g. to feed the flow-metrics tools) without needing a second MCP server:
+
+| Tool | What it answers |
+| --- | --- |
+| `list_team_projects` | "What projects are there?" — team projects in the org/collection. |
+| `get_project_info` | Details for one project (id, URL, state, process). |
+| `list_teams` | Teams in a project (find the exact team name for team-scoped flow metrics). |
+| `list_process_templates` | Process templates available in the org (Scrum, Agile, Basic, inherited). |
+| `get_work_item_types` | Work item types in a project (PBI, Bug, Task, …). |
+| `get_work_item_type_states` | Workflow states for a work item type (New → Done). |
+| `list_work_item_queries` | Saved work item queries in a project. |
+| `run_work_item_query` | Run a saved query by name and return the matching items. |
+| `list_git_repositories` | Git repositories in a project. |
+| `analyze_repository` | Build-readiness analysis of a repo (languages/build files) without cloning it. |
+
+> **Note:** the MCP server is purely additive — every existing CLI command continues to work exactly as before. The tools above are all read-only; commands that create or change Azure DevOps state are intentionally not exposed as MCP tools yet.
 
 ## Commands
 | Category | Command Name | Description |

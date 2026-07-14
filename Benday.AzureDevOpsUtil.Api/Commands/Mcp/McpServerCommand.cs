@@ -59,7 +59,8 @@ public class McpServerCommand : AsynchronousCommand
             })
             .WithStdioServerTransport()
             .WithTools<DeliveryIntelligenceTools>()
-            .WithTools<ConfigurationTools>();
+            .WithTools<ConfigurationTools>()
+            .WithTools<AzureDevOpsContextTools>();
 
         var host = builder.Build();
 
