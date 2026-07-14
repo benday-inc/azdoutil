@@ -54,13 +54,18 @@ public class McpServerCommand : AsynchronousCommand
                     "Use its tools when someone asks how long work usually takes (delivery window / " +
                     "cycle time), how much the team gets done (throughput / velocity), when a number " +
                     "of items will be finished or how much fits in a timeframe (Monte Carlo forecasts), " +
-                    "or what is stuck or aging. Call list_configurations first if you are unsure which " +
-                    "Azure DevOps connection to use or if a tool reports a missing configuration.";
+                    "or what is stuck or aging. It also exposes read-only context tools (projects, " +
+                    "teams, work item types/states, queries, repositories). Call list_configurations " +
+                    "first if you are unsure which Azure DevOps connection to use or if a tool reports " +
+                    "a missing configuration. If the user asks for an Azure DevOps task that no tool " +
+                    "here covers, call discover_cli_commands to find the matching azdoutil command-line " +
+                    "command and suggest it instead of saying it can't be done.";
             })
             .WithStdioServerTransport()
             .WithTools<DeliveryIntelligenceTools>()
             .WithTools<ConfigurationTools>()
-            .WithTools<AzureDevOpsContextTools>();
+            .WithTools<AzureDevOpsContextTools>()
+            .WithTools<CliDiscoveryTools>();
 
         var host = builder.Build();
 

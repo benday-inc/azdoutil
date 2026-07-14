@@ -174,7 +174,13 @@ These **read-only context tools** help the assistant discover the right project/
 | `list_git_repositories` | Git repositories in a project. |
 | `analyze_repository` | Build-readiness analysis of a repo (languages/build files) without cloning it. |
 
-> **Note:** the MCP server is purely additive — every existing CLI command continues to work exactly as before. The tools above are all read-only; commands that create or change Azure DevOps state are intentionally not exposed as MCP tools yet.
+And a discovery tool so the assistant can fall back to the command line for anything not (yet) exposed as a tool:
+
+| Tool | What it does |
+| --- | --- |
+| `discover_cli_commands` | Searches the full azdoutil command catalog and returns matching commands with their arguments and an example command line. When you ask for an Azure DevOps task that has no dedicated tool, the assistant can use this to tell you the exact `azdoutil …` command to run — and because it knows which commands are already tools, it won't send you to the CLI unnecessarily. The catalog is generated from the same command metadata as `azdoutil --json`, so it always matches the installed version. |
+
+> **Note:** the MCP server is purely additive — every existing CLI command continues to work exactly as before. The action tools above are all read-only; commands that create or change Azure DevOps state are intentionally not exposed as MCP tools yet, but `discover_cli_commands` still surfaces them so you can run them from the command line.
 
 ## Commands
 | Category | Command Name | Description |
