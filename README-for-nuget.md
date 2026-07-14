@@ -68,6 +68,29 @@ If you want to run a command against an Azure DevOps instance that is NOT your d
 ### Managing Configurations
 To add new configuration or modify an existing configuration, use the `azdoutil addconfig` command. You can list your configurations using the `azdoutil listconfig` command. To delete a configuration, use the `azdoutil removeconfig` command.
 
+## MCP Server (AI assistant integration)
+azdoutil can run as a [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server so an AI assistant (GitHub Copilot, Claude, etc.) can answer delivery questions in plain language — "how long does stuff usually take?", "when will these 10 items be done?", "what's stuck?" — by calling azdoutil's flow metrics calculations directly.
+
+Run the server with `azdoutil mcp-server`. It communicates over **stdio**, runs per-machine (azdoutil is a global tool), stays alive until the client disconnects, and reuses your existing azdoutil configurations.
+
+**Quickest setup:** run `azdoutil mcp-config` to print ready-to-paste configuration for every supported client, or let azdoutil register it for you at user scope:
+
+```bash
+azdoutil mcp-config /install /config:myconfig               # Claude Code
+azdoutil mcp-config /install /client:vscode /config:myconfig # VS Code
+azdoutil mcp-config /uninstall                              # remove from Claude Code
+```
+
+Supported clients and where their user-scope config lives:
+
+- **Claude Code (CLI):** `claude mcp add azdoutil -s user -e AZDO_CONFIG_NAME=myconfig -- azdoutil mcp-server`
+- **Claude Desktop (GUI):** `claude_desktop_config.json` (Settings → Developer → Edit Config), under `mcpServers`.
+- **VS Code (GitHub Copilot):** run **MCP: Open User Configuration**, add under `servers` with `"type": "stdio"`; then use Copilot **Agent** mode.
+- **Visual Studio 2022 (17.14+) / 2026 (GitHub Copilot):** `%USERPROFILE%\.mcp.json` under `servers`.
+- **Cursor:** `~/.cursor/mcp.json` under `mcpServers`.
+
+The `AZDO_CONFIG_NAME` environment variable selects the default configuration; each tool also accepts an optional `configName` parameter. Flow-metrics tools: `get_typical_delivery_window`, `get_throughput`, `forecast_completion_date`, `forecast_items_in_timeframe`, `get_aging_work`, `get_project_summary`. Read-only context tools: `list_configurations`, `list_team_projects`, `get_project_info`, `list_teams`, `list_process_templates`, `get_work_item_types`, `get_work_item_type_states`, `list_work_item_queries`, `run_work_item_query`, `list_git_repositories`, `analyze_repository`. A `discover_cli_commands` tool lets the assistant search the full command catalog and suggest the exact `azdoutil …` command line for tasks that aren't exposed as dedicated tools. The MCP server is purely additive — all existing CLI commands are unaffected.
+
 ## Commands
 | Category | Command Name | Description |
 | --- | --- | --- |

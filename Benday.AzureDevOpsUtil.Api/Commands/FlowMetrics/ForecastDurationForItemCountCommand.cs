@@ -1,7 +1,4 @@
-﻿using System.Globalization;
-using System.Web;
-
-using Benday.AzureDevOpsUtil.Api.Messages;
+﻿using Benday.AzureDevOpsUtil.Api.FlowMetrics;
 using Benday.CommandsFramework;
 
 namespace Benday.AzureDevOpsUtil.Api.Commands.FlowMetrics;
@@ -109,25 +106,24 @@ public class ForecastDurationForItemCountCommand : AzureDevOpsCommandBase
         WriteLine(forecastDescription);
         WriteLine(string.Empty);
 
-        var distribution = GetDistribution();
+        if (_distribution == null)
+        {
+            throw new InvalidOperationException(
+                $"{nameof(CreateForecast)} must run before {nameof(DisplayForecast)}.");
+        }
 
-        var throughput50PercentChance = GetIterationCount(distribution,
+        var throughput50PercentChance = _distribution.GetWeeksAtSimulationThreshold(
             Constants.ForecastNumberOfSimulationsFiftyPercent);
 
-        var throughput80PercentChance = GetIterationCount(distribution,
+        var throughput80PercentChance = _distribution.GetWeeksAtSimulationThreshold(
             Constants.ForecastNumberOfSimulationsEightyPercent);
 
-        var throughput90PercentChance = GetIterationCount(distribution,
+        var throughput90PercentChance = _distribution.GetWeeksAtSimulationThreshold(
             Constants.ForecastNumberOfSimulationsNinetyPercent);
 
-        var throughput100PercentChance = GetIterationCount(distribution,
+        var throughput100PercentChance = _distribution.GetWeeksAtSimulationThreshold(
             Constants.ForecastNumberOfSimulationsHundredPercent);
 
-        var sortedKeys = distribution.Keys.OrderBy(x => x);
-
-        var maxOccurrences = distribution.Values.Max();
-
-        // WriteLine($"Max occurrences: {maxOccurrences}");
         WriteLine($"50% sure it can be done in {throughput50PercentChance} week(s)");
         WriteLine($"80% sure it can be done in {throughput80PercentChance} week(s)");
         WriteLine($"90% sure it can be done in {throughput90PercentChance} week(s)");
@@ -135,80 +131,14 @@ public class ForecastDurationForItemCountCommand : AzureDevOpsCommandBase
         WriteLine(string.Empty);
     }
 
-    private int GetIterationCount(Dictionary<int, int> distribution, 
-        int getThroughputAtSimulationCount)
-    {
-        var sortedKeys = distribution.Keys.OrderBy(x => x);
-
-        int total = 0;
-
-        foreach (var key in sortedKeys)
-        {
-            var value = distribution[key];
-
-            total+= value;
-
-            if (total >= getThroughputAtSimulationCount)
-            {
-                return key;
-            }
-        }
-
-        throw new InvalidOperationException($"Something went wrong. Never found a simulation count >= {getThroughputAtSimulationCount}.");
-    }
-
-    private Dictionary<int, int> GetDistribution()
-    {
-        // key = weeks to complete item count
-        // value = number of times this thruput happened
-
-        var distribution = new Dictionary<int, int>();
-
-        foreach (var group in _forecasts)
-        {
-            int numberOfWeeks = group.Forecasts.Count;
-
-            if (distribution.ContainsKey(numberOfWeeks) == false)
-            {
-                distribution.Add(numberOfWeeks, 1);
-            }
-            else
-            {
-                distribution[numberOfWeeks] += 1;
-            }
-        }
-
-        return distribution;
-    }
-
     private void CreateForecast()
     {
-        using var rnd = new CryptoRandomNumberGenerator();
+        var weeklyThroughputs = DataGroupedByWeek.Values
+            .Select(x => x.Items.Count)
+            .ToList();
 
-        var numberOfHistoryWeeks = DataGroupedByWeek.Count;
-
-        var iterationKeys = DataGroupedByWeek.Keys.ToArray();
-
-        int iterationIndex;
-
-        ForecastGroup forecastGroup;
-
-        for (int i = 0; i < Constants.ForecastNumberOfSimulations; i++)
-        {
-            forecastGroup = new ForecastGroup();
-
-            do
-            {
-                iterationIndex = rnd.GetNumberInRange(0, numberOfHistoryWeeks - 1);
-
-                var iteration = DataGroupedByWeek[iterationKeys[iterationIndex]];
-
-                forecastGroup.Add(new IterationForecast(
-                    iteration.Items.Count));
-            } while (forecastGroup.TotalThroughput < _NumberOfItemsToForecast);
-            
-            _forecasts.Add(forecastGroup);
-        }
+        _distribution = MonteCarloForecaster.SimulateWeeksForItemCount(
+            weeklyThroughputs, _NumberOfItemsToForecast);
     }
 
     private int _NumberOfItemsToForecast;
@@ -216,5 +146,5 @@ public class ForecastDurationForItemCountCommand : AzureDevOpsCommandBase
     private string _TeamProjectName = string.Empty;
 
     public Dictionary<DateTime, ThroughputIteration> DataGroupedByWeek { get; private set; } = new();
-    private readonly List<ForecastGroup> _forecasts = new();
+    private WeeksForItemCountDistribution? _distribution;
 }

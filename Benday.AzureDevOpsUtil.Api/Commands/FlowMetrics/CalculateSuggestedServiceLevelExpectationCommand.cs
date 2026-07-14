@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-using System.Web;
-
+﻿using Benday.AzureDevOpsUtil.Api.FlowMetrics;
 using Benday.AzureDevOpsUtil.Api.Messages;
 using Benday.CommandsFramework;
 
@@ -99,21 +97,7 @@ public class CalculateSuggestedServiceLevelExpectationCommand : AzureDevOpsComma
                 $"Due to percentage rounding, the actual reported SLE may be slightly off.");
         }
 
-        var indexForPercentForecast =
-            Utilities.GetIndexForPercentForecast(dataItemCount, percent);
-
-        if (indexForPercentForecast < 0)
-        {
-            throw new KnownException($"Could not calculate an SLE for {dataItemCount} items and {percent}.");
-        }
-        else
-        {
-            var cycleTimes = _Data.Items.OrderBy(x => x.CycleTimeDays)
-                .Select(x => x.CycleTimeDays)
-                .ToArray();
-
-            return Math.Round(cycleTimes[indexForPercentForecast], 2);
-        }
+        return CycleTimeCalculator.GetCycleTimeAtPercentile(_Data.Items, percent);
     }
 
     private int _NumberOfWeeksOfForecast;

@@ -12,4 +12,8 @@ if ($reinstall -eq $true)
 
 dotnet build
 
-dotnet tool install --global --add-source .\Benday.AzureDevOpsUtil.ConsoleUi\bin\Debug azdoutil
+$pathToDebugFolder = Join-Path $PSScriptRoot 'Benday.AzureDevOpsUtil.ConsoleUi\bin\Debug'
+
+Write-Host "Installing cms from $pathToDebugFolder"
+
+dotnet tool install --global --add-source "$pathToDebugFolder" azdoutil

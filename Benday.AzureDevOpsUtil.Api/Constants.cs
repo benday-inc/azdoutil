@@ -9,6 +9,7 @@ public static class Constants
     public const string Category_AzdoUtilConfig = "AzdoUtil Configuration";
     public const string Category_Builds = "Builds";
     public const string Category_FlowMetrics = "Flow Metrics";
+    public const string Category_Mcp = "MCP Server";
     public const string Category_Misc = "Miscellaneous";
     public const string Category_ProcessTemplates = "Process Templates";
     public const string Category_ProjectAdmin = "Project Administration";
@@ -75,6 +76,11 @@ public static class Constants
     public const string CommandArgumentNameGetForecastItemCountInWeeks = "forecastitemsinweeks";
     public const string CommandArgumentNameSuggestServiceLevelExpectation = "suggest-sle";
     public const string CommandArgumentNameCycleTimeConfidenceRangesCommand = "cycletimeconfidence";
+    public const string CommandArgumentNameMcpServer = "mcp-server";
+    public const string CommandArgumentNameMcpConfig = "mcp-config";
+    public const string ArgumentNameMcpInstall = "install";
+    public const string ArgumentNameMcpUninstall = "uninstall";
+    public const string ArgumentNameMcpClient = "client";
 
     public const string CommandArgumentNameGetForecastDurationForItemCount = "forecastdurationforitemcount";
 
