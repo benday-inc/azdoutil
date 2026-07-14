@@ -2,9 +2,9 @@
 A collection of useful Azure DevOps utilities.
 
 Written by Benjamin Day  
-Pluralsight Author | Microsoft MVP | Scrum.org Professional Scrum Trainer  
+Pluralsight Author | Microsoft MVP  
 https://www.benday.com  
-https://www.slidespeaker.ai  
+https://www.honestcheetah.com  
 info@benday.com  
 YouTube: https://www.youtube.com/@_benday  
 
@@ -68,29 +68,6 @@ If you want to run a command against an Azure DevOps instance that is NOT your d
 ### Managing Configurations
 To add new configuration or modify an existing configuration, use the `azdoutil addconfig` command. You can list your configurations using the `azdoutil listconfig` command. To delete a configuration, use the `azdoutil removeconfig` command.
 
-## MCP Server (AI assistant integration)
-azdoutil can run as a [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server so an AI assistant (GitHub Copilot, Claude, etc.) can answer delivery questions in plain language — "how long does stuff usually take?", "when will these 10 items be done?", "what's stuck?" — by calling azdoutil's flow metrics calculations directly.
-
-Run the server with `azdoutil mcp-server`. It communicates over **stdio**, runs per-machine (azdoutil is a global tool), stays alive until the client disconnects, and reuses your existing azdoutil configurations.
-
-**Quickest setup:** run `azdoutil mcp-config` to print ready-to-paste configuration for every supported client, or let azdoutil register it for you at user scope:
-
-```bash
-azdoutil mcp-config /install /config:myconfig               # Claude Code
-azdoutil mcp-config /install /client:vscode /config:myconfig # VS Code
-azdoutil mcp-config /uninstall                              # remove from Claude Code
-```
-
-Supported clients and where their user-scope config lives:
-
-- **Claude Code (CLI):** `claude mcp add azdoutil -s user -e AZDO_CONFIG_NAME=myconfig -- azdoutil mcp-server`
-- **Claude Desktop (GUI):** `claude_desktop_config.json` (Settings → Developer → Edit Config), under `mcpServers`.
-- **VS Code (GitHub Copilot):** run **MCP: Open User Configuration**, add under `servers` with `"type": "stdio"`; then use Copilot **Agent** mode.
-- **Visual Studio 2022 (17.14+) / 2026 (GitHub Copilot):** `%USERPROFILE%\.mcp.json` under `servers`.
-- **Cursor:** `~/.cursor/mcp.json` under `mcpServers`.
-
-The `AZDO_CONFIG_NAME` environment variable selects the default configuration; each tool also accepts an optional `configName` parameter. Flow-metrics tools: `get_typical_delivery_window`, `get_throughput`, `forecast_completion_date`, `forecast_items_in_timeframe`, `get_aging_work`, `get_project_summary`. Read-only context tools: `list_configurations`, `list_team_projects`, `get_project_info`, `list_teams`, `list_process_templates`, `get_work_item_types`, `get_work_item_type_states`, `list_work_item_queries`, `run_work_item_query`, `list_git_repositories`, `analyze_repository`. A `discover_cli_commands` tool lets the assistant search the full command catalog and suggest the exact `azdoutil …` command line for tasks that aren't exposed as dedicated tools. The MCP server is purely additive — all existing CLI commands are unaffected.
-
 ## Commands
 | Category | Command Name | Description |
 | --- | --- | --- |
@@ -99,11 +76,15 @@ The `AZDO_CONFIG_NAME` environment variable selects the default configuration; e
 | AzdoUtil Configuration | removeconfig | Remove an Azure DevOps configuration. For example, which server or account plus auth information. |
 | Builds | exportbuilddef | Export build definition |
 | Builds | exportreleasedef | Export release definition |
+| Builds | findtaskgroupusages | Find build definitions that reference task groups in a team project. |
 | Builds | importbuilddef | Import build definition from JSON file |
+| Builds | importreleasedef | Import release definition from JSON file |
+| Builds | inlinetaskgroup | Inline a task group's steps into a build definition and disable the original task group reference. |
 | Builds | listagentpools | List agent pools |
 | Builds | listbuilddefs | List build definitions |
 | Builds | listqueues | List build queues in a team project or team projects |
 | Builds | listreleasedefs | List release definitions |
+| Builds | listtaskgroups | List task groups in a team project. |
 | Builds | repairbuilddefagentpool | Repairs the agent pool setting for the build definitions in a team project or team projects. This is helpful after an on-prem to cloud migration. |
 | Builds | repairreleasedefagentpool | Repairs the agent pool setting for the release definitions in a team project or team projects. This is helpful after an on-prem to cloud migration. |
 | Flow Metrics | agingwork | Get aging in-progress work items |
@@ -113,6 +94,8 @@ The `AZDO_CONFIG_NAME` environment variable selects the default configuration; e
 | Flow Metrics | forecastworkitem | Use throughput data to forecast when a work item is likely to be done based on the current backlog priority using Monte Carlo simulation |
 | Flow Metrics | suggest-sle | Calculate a suggested service level expectation (SLE) based on cycle time |
 | Flow Metrics | throughputcycletime | Get cycle time and throughput data for a team project for a date range |
+| MCP Server | mcp-config | Show or manage the MCP server registration for an AI client. With no options it prints ready-to-paste configuration; with /install or /uninstall it registers or removes the server at user scope (per-machine) for Claude Code or VS Code. |
+| MCP Server | mcp-server | Start a Model Context Protocol (MCP) server over stdio that exposes the flow metrics tools to an AI assistant. The process stays alive until the MCP client disconnects. |
 | Miscellaneous | connectiondata | Get information about a connection to Azure DevOps. |
 | Process Templates | addrefinementprocess | Creates backlog refinement process template as described at https://www.benday.com/2022/09/29/streamlining-backlog-refinement-with-azure-devops/ |
 | Process Templates | changeprocess | Change the process for a Team Project |
@@ -126,7 +109,10 @@ The `AZDO_CONFIG_NAME` environment variable selects the default configuration; e
 | Test Data | createfromexcel | Create work items using Excel script |
 | Test Data | createfromgenerator | Create work items using random data generator |
 | Test Data | createrandomtitles | Create fake work item titles using random data generator without creating any work items. |
+| Version Control | analyzeallrepos | Analyzes all Git repositories for build readiness without cloning. |
+| Version Control | analyzerepo | Analyzes a Git repository for build readiness without cloning. |
 | Version Control | creategitrepo | Creates a Git repository in an Azure DevOps Team Project. |
+| Version Control | listallgitrepos | Gets list of Git repositories from all Azure DevOps Team Projects. |
 | Version Control | listgitrepos | Gets list of Git repositories from an Azure DevOps Team Project. |
 | Version Control | tfvc-to-git | Converts a Team Foundation Version Control (TFVC) folder to a Git repository. |
 | Work Items | comparewitdfields | Compare work item fields between two work item type definition files. |
@@ -193,6 +179,16 @@ The `AZDO_CONFIG_NAME` environment variable selects the default configuration; e
 | name | Required | String | Release definition name |
 | queueinfo | Optional | Boolean | Only display queue info |
 | json | Optional | Boolean | Export to JSON |
+## findtaskgroupusages
+**Find build definitions that reference task groups in a team project.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Required | String | Team project name |
+| taskgroupid | Optional | String | Optional. Filter to only references of this task group id. |
+| json | Optional | Boolean | Output results as JSON |
 ## importbuilddef
 **Import build definition from JSON file**
 ### Arguments
@@ -204,6 +200,29 @@ The `AZDO_CONFIG_NAME` environment variable selects the default configuration; e
 | input | Required | String | Path to JSON file containing build definition |
 | cloneid | Optional | Int32 | ID of the definition to clone (optional) |
 | clonerev | Optional | Int32 | Revision of the definition to clone (optional) |
+## importreleasedef
+**Import release definition from JSON file**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Required | String | Team project name |
+| input | Required | String | Path to JSON file containing release definition |
+| cloneid | Optional | Int32 | ID of the definition to clone (optional) |
+| clonerev | Optional | Int32 | Revision of the definition to clone (optional) |
+## inlinetaskgroup
+**Inline a task group's steps into a build definition and disable the original task group reference.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Required | String | Team project name |
+| name | Required | String | Build definition name |
+| taskgroupid | Optional | String | Optional. Inline only this task group id. Default inlines all task groups in the definition. |
+| dryrun | Optional | Boolean | Write before/after JSON files locally instead of updating the build definition on the server. |
+| exporttopath | Optional | String | Directory for dry-run output files. Default is the current working directory. |
 ## listagentpools
 **List agent pools**
 ### Arguments
@@ -246,6 +265,16 @@ The `AZDO_CONFIG_NAME` environment variable selects the default configuration; e
 | all | Optional | Boolean | All releases in all projects in this collection |
 | json | Optional | Boolean | Export to JSON |
 | queueinfo | Optional | Boolean | Only display queue info |
+## listtaskgroups
+**List task groups in a team project.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Required | String | Team project name |
+| nameonly | Optional | Boolean | Only display the task group name |
+| json | Optional | Boolean | Output results as JSON |
 ## repairbuilddefagentpool
 **Repairs the agent pool setting for the build definitions in a team project or team projects. This is helpful after an on-prem to cloud migration.**
 ### Arguments
@@ -344,6 +373,21 @@ The `AZDO_CONFIG_NAME` environment variable selects the default configuration; e
 | numberofdays | Required | Int32 | Number of days of history to compute |
 | teamproject | Required | String | Team project name |
 | teamname | Optional | String | Team name |
+# MCP Server
+## mcp-config
+**Show or manage the MCP server registration for an AI client. With no options it prints ready-to-paste configuration; with /install or /uninstall it registers or removes the server at user scope (per-machine) for Claude Code or VS Code.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| install | Optional | Boolean | Register the MCP server with a client at user (per-machine) scope |
+| uninstall | Optional | Boolean | Remove the MCP server registration from a client |
+| client | Optional | String | Target client: claude-code (default) or vscode |
+| config | Optional | String | azdoutil configuration the server should use by default (sets AZDO_CONFIG_NAME) |
+## mcp-server
+**Start a Model Context Protocol (MCP) server over stdio that exposes the flow metrics tools to an AI assistant. The process stays alive until the MCP client disconnects.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
 # Miscellaneous
 ## connectiondata
 **Get information about a connection to Azure DevOps.**
@@ -360,6 +404,7 @@ The `AZDO_CONFIG_NAME` environment variable selects the default configuration; e
 | --- | --- | --- | --- |
 | quiet | Optional | Boolean | Quiet mode |
 | config | Optional | String | Configuration name to use |
+| agile | Optional | Boolean | Whether to create an agile backlog refinement process template instead of scrum. |
 ## changeprocess
 **Change the process for a Team Project**
 ### Arguments
@@ -451,12 +496,12 @@ The `AZDO_CONFIG_NAME` environment variable selects the default configuration; e
 | config | Optional | String | Configuration name to use |
 | skipfuturedates | Optional | Boolean | Skip script steps that occur in the future |
 | numberofsprints | Required | Int32 | Number of sprints to generate |
-| teamproject | Required | String | Name of the team project |
+| teamproject | Optional | String | Name of the team project |
 | processname | Required | String | Process template name |
-| createproject | Required | Boolean | Creates the team project if it doesn't exist |
+| createproject | Optional | Boolean | Creates the team project if it doesn't exist |
 | teamcount | Optional | Int32 | Creates data for multiple teams. This option is only available when creating a new project. |
 | alldone | Optional | Boolean | All PBIs in a sprint makes it to done |
-| addsessiontag | Optional | Boolean | Add a session tag to work items |
+| addsessiontag | Optional | Boolean | Add a session tag to work items for debugging purposes |
 | output | Optional | String | Save generated script file to disk in this directory. Note the filename will be auto-generated. |
 | scriptonly | Optional | Boolean | Creates the excel export script. Requires an arg value for 'output' |
 ## createrandomtitles
@@ -467,6 +512,25 @@ The `AZDO_CONFIG_NAME` environment variable selects the default configuration; e
 | quiet | Optional | Boolean | Quiet mode |
 | config | Optional | String | Configuration name to use |
 # Version Control
+## analyzeallrepos
+**Analyzes all Git repositories for build readiness without cloning.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Optional | String | Team project name (if omitted, analyzes all projects) |
+| csv | Optional | Boolean | Output results in CSV format |
+## analyzerepo
+**Analyzes a Git repository for build readiness without cloning.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Required | String | Team project name |
+| reponame | Required | String | Repository name |
+| csv | Optional | Boolean | Output results in CSV format |
 ## creategitrepo
 **Creates a Git repository in an Azure DevOps Team Project.**
 ### Arguments
@@ -476,6 +540,15 @@ The `AZDO_CONFIG_NAME` environment variable selects the default configuration; e
 | config | Optional | String | Configuration name to use |
 | teamproject | Required | String | Team project name that contains the git repositories |
 | reponame | Required | String | Name of the new git repository |
+## listallgitrepos
+**Gets list of Git repositories from all Azure DevOps Team Projects.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| csv | Optional | Boolean | Output results in CSV format |
+| showlastcommit | Optional | Boolean | Include last commit info for each repository |
 ## listgitrepos
 **Gets list of Git repositories from an Azure DevOps Team Project.**
 ### Arguments
