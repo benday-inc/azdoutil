@@ -54,7 +54,7 @@ The entire CLI is built on the **Benday.CommandsFramework** library which provid
 
 - Commands are decorated with `[Command]` attributes specifying category, name, and description
 - The framework automatically discovers all command classes in the Api assembly
-- Program.cs (28 lines) creates a `DefaultProgram` instance and delegates everything to the framework
+- Program.cs (~30 lines) creates a `DefaultProgram` instance and delegates everything to the framework
 - Arguments are defined using `[Argument]` attributes on properties
 
 ### Base Command Hierarchy
@@ -129,12 +129,23 @@ Execution modes:
 2. Script export - Saves to Excel for later execution
 3. Script-only mode - Just generates the plan
 
+### BuildReadiness Module
+
+The `BuildReadiness/` directory contains the analysis engine behind the `analyzerepo` and `analyzeallrepos` commands (in `Commands/VersionControl/`) and the `analyze_repository` MCP tool. It inspects a repository's build readiness — languages, solutions, project files, NuGet/external references — **without cloning**, using the Azure DevOps Git Items API:
+
+- **BuildReadinessAnalyzer** - Orchestrates the analysis of a repository's contents
+- **SolutionFileParser** / **ProjectFileParser** - Parse `.sln` and project files into `SolutionAnalysisResult` / `ProjectFileAnalysisResult`
+- **BuildReadinessReportFormatter** - Formats results into the text report shared by the CLI and MCP paths
+- **IFileContentProvider** - Abstraction over file retrieval that enables in-memory unit testing; `DelegateFileContentProvider` bridges the protected base class HTTP methods to this interface
+
 ## Command Categories
 
 Commands are organized into logical categories (defined in `Constants.cs`):
 - **AzdoUtil Configuration** - Manage stored credentials and connections
 - **Builds** - Build and release definition operations
 - **Flow Metrics** - Cycle time, throughput, Monte Carlo forecasting
+- **MCP Server** - Run the MCP server and manage AI client registrations
+- **Miscellaneous** - Uncategorized utilities (e.g. connection data)
 - **Process Templates** - Process template operations
 - **Project Administration** - Team projects and teams
 - **Test Data** - ScriptGenerator-based data creation
@@ -176,11 +187,13 @@ public class MyCommand : AzureDevOpsCommandBase
 ## README Generation
 
 The README files are generated from templates in the `misc/` directory:
-- `misc/readme-header.md` - Introduction and getting started
+- `misc/readme-header.md` - Introduction and getting started (contains `%%CATEGORIES%%` and `%%MCPSERVER%%` tokens)
 - `misc/readme-categories-github.md` - Category descriptions for GitHub
 - `misc/readme-categories-nuget.md` - Category descriptions for NuGet package
+- `misc/readme-mcpserver-github.md` - Full MCP server section (setup per client, routing, tool tables) for GitHub
+- `misc/readme-mcpserver-nuget.md` - Condensed MCP server section for the NuGet package
 
-Commands automatically generate documentation by reflecting on `[Command]` and `[Argument]` attributes.
+Commands automatically generate documentation by reflecting on `[Command]` and `[Argument]` attributes. The `GenerateReadmeFiles` test in `MarkdownUsageFormatterFixture` assembles the templates and writes to `generated-readme-files/`; the update scripts copy those over the root READMEs. **Never hand-edit `README.md` / `README-for-nuget.md` directly — regeneration overwrites them.** `McpToolDocumentationFixture` fails the build if an `[McpServerTool]` exists that isn't documented in both MCP readme templates.
 
 Run `./update-readme-files-from-generated.sh` (or `.ps1`) to regenerate README files.
 

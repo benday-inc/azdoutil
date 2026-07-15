@@ -111,11 +111,15 @@ public class MarkdownUsageFormatterFixture
 
         var readmeHeaderGitHub = File.ReadAllText(Path.Combine(miscDir, "readme-header.md"));
         var readmeHeaderCategoriesGithub = File.ReadAllText(Path.Combine(miscDir, "readme-categories-github.md"));
+        var readmeMcpServerGitHub = File.ReadAllText(Path.Combine(miscDir, "readme-mcpserver-github.md"));
         readmeHeaderGitHub = readmeHeaderGitHub.Replace("%%CATEGORIES%%", readmeHeaderCategoriesGithub);
+        readmeHeaderGitHub = readmeHeaderGitHub.Replace("%%MCPSERVER%%", readmeMcpServerGitHub);
 
         var readmeHeaderNuGet = File.ReadAllText(Path.Combine(miscDir, "readme-header.md"));
         var readmeHeaderCategoriesNuget = File.ReadAllText(Path.Combine(miscDir, "readme-categories-nuget.md"));
+        var readmeMcpServerNuGet = File.ReadAllText(Path.Combine(miscDir, "readme-mcpserver-nuget.md"));
         readmeHeaderNuGet = readmeHeaderNuGet.Replace("%%CATEGORIES%%", readmeHeaderCategoriesNuget);
+        readmeHeaderNuGet = readmeHeaderNuGet.Replace("%%MCPSERVER%%", readmeMcpServerNuGet);
 
         var readmeCommandsForNuget = SystemUnderTest.Format(usages, true);
         var readmeCommandsForGitHub = SystemUnderTest.Format(usages, false);

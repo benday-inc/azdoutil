@@ -8,6 +8,8 @@ https://www.honestcheetah.com
 info@benday.com  
 YouTube: https://www.youtube.com/@_benday  
 
+> 📖 **New book:** [*Azure Cosmos DB for .NET Developers: From Document Thinking to Production Patterns*](https://a.co/d/0dYOd6D8) — It's the book on Cosmos DB for .NET developers! Document modeling with aggregate roots, hierarchical partition keys, request unit economics, Change Feed patterns, and a complete production case study — all in C# and ASP.NET Core.
+
 *Got ideas for Azure DevOps utilities you'd like to see? Found a bug? Let us know by submitting an issue https://github.com/benday-inc/azdoutil/issues*. *Want to contribute? Submit a pull request.*
 
 %%CATEGORIES%%
@@ -37,3 +39,5 @@ If you want to run a command against an Azure DevOps instance that is NOT your d
 
 ### Managing Configurations
 To add new configuration or modify an existing configuration, use the `azdoutil addconfig` command. You can list your configurations using the `azdoutil listconfig` command. To delete a configuration, use the `azdoutil removeconfig` command.
+
+%%MCPSERVER%%

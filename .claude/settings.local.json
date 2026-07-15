@@ -11,7 +11,15 @@
       "Bash(dotnet test:*)",
       "Bash(dotnet --version:*)",
       "WebSearch",
-      "mcp__claude_ai_Microsoft_Learn__microsoft_docs_search"
+      "mcp__claude_ai_Microsoft_Learn__microsoft_docs_search",
+      "Bash(git -C /Users/benday/code/benday-inc/azdoutil status --short)",
+      "Bash(git -C /Users/benday/code/benday-inc/azdoutil diff --stat README.md)",
+      "Bash(git -C /Users/benday/code/benday-inc/azdoutil log --oneline -5)",
+      "Bash(git -C /Users/benday/code/benday-inc/azdoutil diff README.md)",
+      "Bash(git -C /Users/benday/code/benday-inc/azdoutil stash list)",
+      "Bash(git -C /Users/benday/code/benday-inc/azdoutil show HEAD:README.md)",
+      "Bash(git -C /Users/benday/code/benday-inc/azdoutil diff misc/readme-header.md)",
+      "Bash(git -C /Users/benday/code/benday-inc/azdoutil diff README-for-nuget.md)"
     ],
     "deny": [],
     "ask": []
