@@ -55,7 +55,7 @@ The entire CLI is built on the **Benday.CommandsFramework** library which provid
 - Commands are decorated with `[Command]` attributes specifying category, name, and description
 - The framework automatically discovers all command classes in the Api assembly
 - Program.cs (~30 lines) creates a `DefaultProgram` instance and delegates everything to the framework
-- Arguments are defined using `[Argument]` attributes on properties
+- Arguments are defined by overriding `GetArguments()` and returning a fluent-built `ArgumentCollection` (there is **no** `[Argument]` attribute in the framework)
 
 ### Base Command Hierarchy
 
@@ -102,17 +102,19 @@ The Flow Metrics CLI commands in `Commands/FlowMetrics/` are thin adapters that 
 `azdoutil mcp-server` starts a [Model Context Protocol](https://modelcontextprotocol.io) server over **stdio** (using `Microsoft.Extensions.Hosting` + the `ModelContextProtocol` SDK) that exposes the flow metrics calculations to an AI assistant.
 
 - The command is `McpServerCommand` (`Commands/Mcp/`), a normal CommandsFramework command that stays alive by awaiting `host.RunAsync()`. It also sets `McpServerOptions.ServerInstructions` (sent at startup) to help clients route delivery/flow-metrics questions to these tools.
-- Delivery tools are in `McpTools/DeliveryIntelligenceTools.cs` (`[McpServerToolType]`), each a thin adapter over `FlowMetricsService`; tool descriptions use outcome language (delivery window, "what's stuck") because the description is what the LLM reads. `KnownException`s are rethrown as `McpException` so the friendly message reaches the client.
+- Delivery tools are in `McpTools/DeliveryIntelligenceTools.cs` (`[McpServerToolType]`) — `get_typical_delivery_window`, `get_throughput`, `forecast_completion_date`, `forecast_items_in_timeframe`, `get_aging_work`, `get_project_summary` — each a thin adapter over `FlowMetricsService`; tool descriptions use outcome language (delivery window, "what's stuck") because the description is what the LLM reads. `KnownException`s are rethrown as `McpException` so the friendly message reaches the client.
 - `McpTools/ConfigurationTools.cs` adds `list_configurations` so an assistant can see which Azure DevOps connections exist (never returns tokens) and get a friendly "run addconfig" message when none exist.
-- `McpTools/AzureDevOpsContextTools.cs` adds read-only "context/discovery" tools (list team projects, get project info, list teams, list process templates, get work item types/states, list/run work item queries, list git repos, analyze repo). Each runs the existing CLI command with a captured `StringBuilderTextOutputProvider` (so its report never reaches stdout) and returns that text — reusing the CLI's formatting instead of duplicating query logic. Only read-only commands are exposed; state-changing commands are intentionally omitted for now.
-- `McpTools/CliCommandCatalog.cs` + `McpTools/CliDiscoveryTools.cs` add `discover_cli_commands`, a fallback tool that searches the full CLI command catalog (built by reflecting over the same `[Command]`/`[Argument]` metadata as `azdoutil --json`, so it never drifts) and returns commands with arguments and an example command line. It flags commands already exposed as MCP tools (via a name→tool map — keep it updated when adding tools), and the server instructions tell the model to use it when no dedicated tool covers a request. Nothing is executed; it only describes commands.
+- `McpTools/AzureDevOpsContextTools.cs` adds read-only "context/discovery" tools (`list_team_projects`, `get_project_info`, `list_teams`, `list_process_templates`, `get_work_item_types`, `get_work_item_type_states`, `list_work_item_queries`, `run_work_item_query`, `list_git_repositories`, `analyze_repository`). Each runs the existing CLI command with a captured `StringBuilderTextOutputProvider` (so its report never reaches stdout) and returns that text — reusing the CLI's formatting instead of duplicating query logic. Only read-only commands are exposed; state-changing commands are intentionally omitted for now.
+- `McpTools/CliCommandCatalog.cs` + `McpTools/CliDiscoveryTools.cs` add `discover_cli_commands`, a fallback tool that searches the full CLI command catalog (built by reflecting over the `[Command]` attributes and invoking each command's `GetArguments()`, the same metadata `azdoutil --json` uses, so it never drifts) and returns commands with arguments and an example command line. It flags commands already exposed as MCP tools (via the `McpToolByCommandName` map in `CliCommandCatalog.cs` — keep it updated when adding tools), and the server instructions tell the model to use it when no dedicated tool covers a request. Nothing is executed; it only describes commands.
+- All four tool types are registered on the server in `McpServerCommand.OnExecute()` via `.WithTools<T>()`; a new `[McpServerToolType]` class must be added there or its tools won't be exposed.
+- `McpToolDocumentationFixture` (unit tests) fails the build if an `[McpServerTool]` isn't documented in both `misc/readme-mcpserver-github.md` and `misc/readme-mcpserver-nuget.md`, so adding a tool means updating those templates and regenerating the READMEs.
 - **stdout is the JSON-RPC transport, so nothing may be written to stdout** in the server path; logging is routed to stderr.
 - Configuration name is resolved per tool call, then from the `AZDO_CONFIG_NAME` environment variable, then the default configuration. Missing configurations produce an error listing the available ones.
 - The server is purely additive; existing CLI commands are unaffected.
 
 ### MCP client setup command
 
-`azdoutil mcp-config` (`Commands/Mcp/McpConfigCommand.cs`) shows or manages the MCP server registration for an AI client. With no options it prints ready-to-paste configuration for Claude Code, Claude Desktop, VS Code, Visual Studio 2022/2026, and Cursor; `/install` and `/uninstall` register/remove the server at **user (per-machine) scope** via `claude mcp add`/`remove` or `code --add-mcp`. The pure string/argument builders live in `McpTools/McpClientSetup.cs` (unit tested); the command only handles argument parsing and cross-platform process execution.
+`azdoutil mcp-config` (`Commands/Mcp/McpConfigCommand.cs`) shows or manages the MCP server registration for an AI client. With no options it prints ready-to-paste configuration for Claude Code, Claude Desktop, VS Code, Visual Studio 2022/2026, and Cursor; `/install` and `/uninstall` register/remove the server at **user (per-machine) scope** via `claude mcp add`/`remove` or `code --add-mcp`. `/client:<name>` picks the target client (install/uninstall default to Claude Code) and `/config:<name>` bakes an `AZDO_CONFIG_NAME` environment variable into the registration. The pure string/argument builders live in `McpTools/McpClientSetup.cs` (unit tested); the command only handles argument parsing and cross-platform process execution.
 
 ### ScriptGenerator System
 
@@ -138,6 +140,21 @@ The `BuildReadiness/` directory contains the analysis engine behind the `analyze
 - **BuildReadinessReportFormatter** - Formats results into the text report shared by the CLI and MCP paths
 - **IFileContentProvider** - Abstraction over file retrieval that enables in-memory unit testing; `DelegateFileContentProvider` bridges the protected base class HTTP methods to this interface
 
+### TaskGroups Module
+
+The `TaskGroups/` directory backs the task group commands in `Commands/Builds/` (`listtaskgroups`, `findtaskgroupusages`, `inlinetaskgroup`) — the main use case is retiring classic task groups by inlining their steps into the build definitions that use them:
+
+- **TaskGroupClient** - Retrieves task groups and their versions from the Azure DevOps task group API
+- **BuildDefinitionTaskGroupScanner** - Walks a build definition's phases/steps to find `TaskGroupReference`s, producing `TaskGroupUsage` records
+- **BuildDefinitionInliner** - Replaces a task group step with the task group's own steps (parameter substitution) and disables the original reference; returns an `InlineResult`. Unit tested in `BuildDefinitionInlinerFixture`
+
+### Other Api Directories
+
+- `WorkItems/` - Work item type/field/state definition models plus a few work item commands that live outside `Commands/`
+- `Excel/` - Excel read/write helpers used by the ScriptGenerator import/export paths
+- `UsageFormatters/` - `MarkdownUsageFormatter`, used by the README generation tests
+- `Messages/` - Azure DevOps REST API DTOs
+
 ## Command Categories
 
 Commands are organized into logical categories (defined in `Constants.cs`):
@@ -159,10 +176,11 @@ To add a new command:
 1. Create a new class in `Benday.AzureDevOpsUtil.Api` (or appropriate subdirectory)
 2. Inherit from `AzureDevOpsCommandBase` (or `SynchronousCommand` for simple commands)
 3. Add `[Command]` attribute with category, name, and description
-4. Add `[Argument]` attributes for parameters
-5. Override `OnExecute()` method (or `Execute()` for synchronous commands)
+4. Add a constructor taking `(CommandExecutionInfo info, ITextOutputProvider outputProvider)` — the framework activates commands through it
+5. Override `GetArguments()` to declare parameters on an `ArgumentCollection`
+6. Override `OnExecute()` method (or `Execute()` for synchronous commands), reading values via `Arguments.GetStringValue(...)` / `GetBooleanValue(...)`
 
-The framework automatically discovers the command and adds it to help.
+The framework automatically discovers the command and adds it to help. Argument names live in `Constants.cs` so the CLI, help output, and README generation stay consistent.
 
 Example:
 ```csharp
@@ -173,12 +191,30 @@ Example:
     IsAsync = true)]
 public class MyCommand : AzureDevOpsCommandBase
 {
-    [Argument(Name = "teamproject", Description = "Team project name", IsRequired = true)]
-    public string TeamProject { get; set; }
+    public MyCommand(
+        CommandExecutionInfo info, ITextOutputProvider outputProvider) : base(info, outputProvider)
+    {
+    }
+
+    public override ArgumentCollection GetArguments()
+    {
+        var arguments = new ArgumentCollection();
+
+        // adds the shared config-name / quiet arguments
+        AddCommonArguments(arguments);
+
+        arguments.AddString(Constants.ArgumentNameTeamProjectName)
+            .AsRequired()
+            .WithDescription("Team project name");
+
+        return arguments;
+    }
 
     protected override async Task OnExecute()
     {
-        var httpClient = GetHttpClientInstanceForAzureDevOps();
+        var teamProjectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);
+
+        using var httpClient = GetHttpClientInstanceForAzureDevOps();
         // Use base class methods to call Azure DevOps API
     }
 }
@@ -193,14 +229,14 @@ The README files are generated from templates in the `misc/` directory:
 - `misc/readme-mcpserver-github.md` - Full MCP server section (setup per client, routing, tool tables) for GitHub
 - `misc/readme-mcpserver-nuget.md` - Condensed MCP server section for the NuGet package
 
-Commands automatically generate documentation by reflecting on `[Command]` and `[Argument]` attributes. The `GenerateReadmeFiles` test in `MarkdownUsageFormatterFixture` assembles the templates and writes to `generated-readme-files/`; the update scripts copy those over the root READMEs. **Never hand-edit `README.md` / `README-for-nuget.md` directly — regeneration overwrites them.** `McpToolDocumentationFixture` fails the build if an `[McpServerTool]` exists that isn't documented in both MCP readme templates.
+Command documentation is generated by reflecting over the `[Command]` attributes and calling each command's `GetArguments()`. The `GenerateReadmeFiles` test in `MarkdownUsageFormatterFixture` assembles the templates and writes to `generated-readme-files/`; the update scripts copy those over the root READMEs. **Never hand-edit `README.md` / `README-for-nuget.md` directly — regeneration overwrites them.** `McpToolDocumentationFixture` fails the build if an `[McpServerTool]` exists that isn't documented in both MCP readme templates.
 
 Run `./update-readme-files-from-generated.sh` (or `.ps1`) to regenerate README files.
 
 ## CI/CD
 
 GitHub Actions workflow (`.github/workflows/dotnet.yml`):
-1. **Build job**: Builds all target frameworks (8, 9, 10), runs tests, packs NuGet package
+1. **Build job**: Builds all target frameworks (8, 9, 10) in Release, uploads build output, packs the NuGet package. Note: the workflow does **not** run `dotnet test` — tests only run locally
 2. **Deploy job**: Pushes to NuGet on main branch pushes (requires `NUGET_API_KEY` secret)
 
 ## Key Design Patterns
