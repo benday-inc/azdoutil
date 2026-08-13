@@ -20,7 +20,19 @@
       "Bash(git -C /Users/benday/code/benday-inc/azdoutil show HEAD:README.md)",
       "Bash(git -C /Users/benday/code/benday-inc/azdoutil diff misc/readme-header.md)",
       "Bash(git -C /Users/benday/code/benday-inc/azdoutil diff README-for-nuget.md)",
-      "Bash(echo \"exit: $?\")"
+      "Bash(echo \"exit: $?\")",
+      "Bash(git fetch *)",
+      "Bash(git rev-list *)",
+      "Bash(git checkout *)",
+      "Bash(git pull *)",
+      "Bash(git stash *)",
+      "Bash(python3 -m json.tool .claude/settings.local.json)",
+      "Bash(git add *)",
+      "Bash(git branch *)",
+      "Bash(git push *)",
+      "Bash(grep -rhA3 \"\\\\[Command\\(\" --include='*.cs' Benday.AzureDevOpsUtil.Api/)",
+      "Bash(git commit *)",
+      "Bash(git restore *)"
     ],
     "deny": [],
     "ask": []
