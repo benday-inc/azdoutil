@@ -131,6 +131,8 @@ Execution modes:
 2. Script export - Saves to Excel for later execution
 3. Script-only mode - Just generates the plan
 
+The **Test Data** category commands (`CreateWorkItemsFromDataGeneratorScriptCommand`, `CreateWorkItemInfoFromDataGeneratorCommand`, `CreateWorkItemsFromExcelScriptCommand`) live here in `ScriptGenerator/` rather than under `Commands/` — the framework discovers them by attribute regardless of directory.
+
 ### BuildReadiness Module
 
 The `BuildReadiness/` directory contains the analysis engine behind the `analyzerepo` and `analyzeallrepos` commands (in `Commands/VersionControl/`) and the `analyze_repository` MCP tool. It inspects a repository's build readiness — languages, solutions, project files, NuGet/external references — **without cloning**, using the Azure DevOps Git Items API:
