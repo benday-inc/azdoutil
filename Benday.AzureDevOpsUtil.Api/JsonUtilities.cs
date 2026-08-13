@@ -6,6 +6,17 @@ namespace Benday.AzureDevOpsUtil.Api;
 
 public static class JsonUtilities
 {
+    /// <summary>
+    /// The deserialization settings this tool uses everywhere.  Azure DevOps
+    /// sends camelCase and several of the message classes have no explicit
+    /// property name attributes, so matching has to ignore case or those
+    /// properties silently keep their default values.
+    /// </summary>
+    public static JsonSerializerOptions DefaultOptions { get; } = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
+
     public static T GetJsonValueAsType<T>(string json)
     {
         if (json == null)
@@ -15,10 +26,7 @@ public static class JsonUtilities
 
         try
         {
-            var returnValue = JsonSerializer.Deserialize<T>(json, new JsonSerializerOptions()
-            {
-                PropertyNameCaseInsensitive = true
-            });
+            var returnValue = JsonSerializer.Deserialize<T>(json, DefaultOptions);
 
             if (returnValue == null)
             {

@@ -142,6 +142,7 @@ The tools are all read-only:
 | Test Data | createrandomtitles | Create fake work item titles using random data generator without creating any work items. |
 | Version Control | analyzeallrepos | Analyzes all Git repositories for build readiness without cloning. |
 | Version Control | analyzerepo | Analyzes a Git repository for build readiness without cloning. |
+| Version Control | assess-tfvc-migration | Analyzes a TFVC path and reports what a conversion to Git would have to deal with. |
 | Version Control | creategitrepo | Creates a Git repository in an Azure DevOps Team Project. |
 | Version Control | listallgitrepos | Gets list of Git repositories from all Azure DevOps Team Projects. |
 | Version Control | listgitrepos | Gets list of Git repositories from an Azure DevOps Team Project. |
@@ -562,6 +563,17 @@ The tools are all read-only:
 | teamproject | Required | String | Team project name |
 | reponame | Required | String | Repository name |
 | csv | Optional | Boolean | Output results in CSV format |
+## assess-tfvc-migration
+**Analyzes a TFVC path and reports what a conversion to Git would have to deal with.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Required | String | Team project name |
+| tfvc-path | Optional | String | TFVC path to assess. Defaults to $/<teamproject>. |
+| scandepth | Optional | Int32 | How many folder levels below the path to scan for unregistered branches. Defaults to 3. |
+| csv | Optional | Boolean | Output the findings as CSV instead of a report |
 ## creategitrepo
 **Creates a Git repository in an Azure DevOps Team Project.**
 ### Arguments

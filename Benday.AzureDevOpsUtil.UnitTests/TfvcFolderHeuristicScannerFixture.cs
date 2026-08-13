@@ -9,7 +9,7 @@ public class TfvcFolderHeuristicScannerFixture
 
     private const string ProjectName = "App";
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow("Main")]
     [DataRow("main")]
     [DataRow("TRUNK")]
@@ -31,7 +31,7 @@ public class TfvcFolderHeuristicScannerFixture
             $"'{name}' should read as a branch name.");
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow("src")]
     [DataRow("docs")]
     [DataRow("tools")]

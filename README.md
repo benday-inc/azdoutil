@@ -217,6 +217,7 @@ And a discovery tool so the assistant can fall back to the command line for anyt
 | Test Data | [createrandomtitles](#createrandomtitles) | Create fake work item titles using random data generator without creating any work items. |
 | Version Control | [analyzeallrepos](#analyzeallrepos) | Analyzes all Git repositories for build readiness without cloning. |
 | Version Control | [analyzerepo](#analyzerepo) | Analyzes a Git repository for build readiness without cloning. |
+| Version Control | [assess-tfvc-migration](#assess-tfvc-migration) | Analyzes a TFVC path and reports what a conversion to Git would have to deal with. |
 | Version Control | [creategitrepo](#creategitrepo) | Creates a Git repository in an Azure DevOps Team Project. |
 | Version Control | [listallgitrepos](#listallgitrepos) | Gets list of Git repositories from all Azure DevOps Team Projects. |
 | Version Control | [listgitrepos](#listgitrepos) | Gets list of Git repositories from an Azure DevOps Team Project. |
@@ -637,6 +638,17 @@ And a discovery tool so the assistant can fall back to the command line for anyt
 | teamproject | Required | String | Team project name |
 | reponame | Required | String | Repository name |
 | csv | Optional | Boolean | Output results in CSV format |
+## <a name="assess-tfvc-migration"></a> assess-tfvc-migration
+**Analyzes a TFVC path and reports what a conversion to Git would have to deal with.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Required | String | Team project name |
+| tfvc-path | Optional | String | TFVC path to assess. Defaults to $/<teamproject>. |
+| scandepth | Optional | Int32 | How many folder levels below the path to scan for unregistered branches. Defaults to 3. |
+| csv | Optional | Boolean | Output the findings as CSV instead of a report |
 ## <a name="creategitrepo"></a> creategitrepo
 **Creates a Git repository in an Azure DevOps Team Project.**
 ### Arguments

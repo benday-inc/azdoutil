@@ -48,7 +48,10 @@ public class TfvcApiClient : ITfvcApiClient
             return Array.Empty<TfvcBranchInfo>();
         }
 
-        var response = JsonSerializer.Deserialize<TfvcBranchListResponse>(json);
+        var response = JsonSerializer.Deserialize<TfvcBranchListResponse>(
+
+
+            json, JsonUtilities.DefaultOptions);
 
         if (response == null)
         {
@@ -74,7 +77,10 @@ public class TfvcApiClient : ITfvcApiClient
             return Array.Empty<TfvcItemInfo>();
         }
 
-        var response = JsonSerializer.Deserialize<TfvcItemListResponse>(json);
+        var response = JsonSerializer.Deserialize<TfvcItemListResponse>(
+
+
+            json, JsonUtilities.DefaultOptions);
 
         if (response == null)
         {
@@ -110,7 +116,10 @@ public class TfvcApiClient : ITfvcApiClient
                 break;
             }
 
-            var response = JsonSerializer.Deserialize<TfvcChangesetListResponse>(json);
+            var response = JsonSerializer.Deserialize<TfvcChangesetListResponse>(
+
+
+                json, JsonUtilities.DefaultOptions);
 
             if (response == null || response.Value.Count == 0)
             {

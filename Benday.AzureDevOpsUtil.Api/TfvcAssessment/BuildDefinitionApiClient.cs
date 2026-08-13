@@ -37,7 +37,10 @@ public class BuildDefinitionApiClient : IBuildDefinitionApiClient
             return Array.Empty<BuildDefinitionInfo>();
         }
 
-        var response = JsonSerializer.Deserialize<BuildDefinitionInfoResponse>(json);
+        var response = JsonSerializer.Deserialize<BuildDefinitionInfoResponse>(
+
+
+            json, JsonUtilities.DefaultOptions);
 
         if (response == null)
         {
@@ -65,7 +68,9 @@ public class BuildDefinitionApiClient : IBuildDefinitionApiClient
 
         try
         {
-            return JsonSerializer.Deserialize<BuildDefinitionDetail>(json);
+            return JsonSerializer.Deserialize<BuildDefinitionDetail>(
+
+                json, JsonUtilities.DefaultOptions);
         }
         catch (JsonException)
         {
