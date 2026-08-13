@@ -1,0 +1,282 @@
+using Benday.AzureDevOpsUtil.Api.Messages;
+using Benday.AzureDevOpsUtil.Api.TfvcAssessment;
+
+namespace Benday.AzureDevOpsUtil.UnitTests;
+
+[TestClass]
+public class TfvcAssessmentReportFormatterFixture
+{
+    private TfvcAssessmentReportFormatter SystemUnderTest => new();
+
+    private static readonly DateTime UtcNow = new(2026, 6, 1, 0, 0, 0, DateTimeKind.Utc);
+
+    /// <summary>
+    /// Language that turns a description into a recommendation.  The reports in
+    /// this tool state facts and consequences and leave the decision alone.
+    /// </summary>
+    private static readonly string[] ProhibitedPhrases =
+    {
+        "consider", "recommend", "should", "you may want", "try "
+    };
+
+    /// <summary>
+    /// Phrases that contain a prohibited word but are not advice.  Keep this
+    /// list short and justify every entry.
+    /// </summary>
+    private static readonly string[] AllowedExceptions =
+    {
+    };
+
+    private static TfvcAssessmentResult BuildResult()
+    {
+        var result = new TfvcAssessmentResult
+        {
+            ProjectName = "GnarlyCorp",
+            ScopePath = "$/GnarlyCorp",
+            GeneratedUtc = UtcNow
+        };
+
+        var main = new TfvcBranchNode { Path = "$/GnarlyCorp/Main" };
+        var dev = new TfvcBranchNode { Path = "$/GnarlyCorp/Dev" };
+        var nested = new TfvcBranchNode { Path = "$/GnarlyCorp/Main/Feature" };
+
+        main.Children.Add(dev);
+        main.Children.Add(nested);
+
+        result.RegisteredBranchRoots.Add(main);
+
+        result.RegisteredBranchPaths.AddRange(new[]
+        {
+            "$/GnarlyCorp/Main", "$/GnarlyCorp/Dev", "$/GnarlyCorp/Main/Feature"
+        });
+
+        result.NestedBranches.Add(new NestedBranchPair
+        {
+            ChildPath = "$/GnarlyCorp/Main/Feature",
+            ParentPath = "$/GnarlyCorp/Main"
+        });
+
+        result.UnregisteredBranchGroups.Add(new UnregisteredBranchGroup
+        {
+            ParentPath = "$/GnarlyCorp/Legacy",
+            FolderPaths = new List<string>
+            {
+                "$/GnarlyCorp/Legacy/Prod", "$/GnarlyCorp/Legacy/QA"
+            }
+        });
+
+        result.BranchActivity.Add(new BranchActivity
+        {
+            Path = "$/GnarlyCorp/Main",
+            IsRegisteredBranch = true,
+            LastChangesetDate = UtcNow.AddDays(-2),
+            LastChangesetAuthor = "Ann Dev",
+            ChangesetsLast90Days = 40,
+            ChangesetsLast180Days = 80,
+            ChangesetsLast365Days = 120,
+            Classification = BranchActivityClassification.Active
+        });
+
+        result.BranchActivity.Add(new BranchActivity
+        {
+            Path = "$/GnarlyCorp/Old",
+            IsRegisteredBranch = true,
+            LastChangesetDate = UtcNow.AddDays(-900),
+            LastChangesetAuthor = "Bob Retired",
+            Classification = BranchActivityClassification.Dead
+        });
+
+        result.Findings.Add(new AssessmentFinding(
+            FindingCategories.BranchActivity,
+            "2 branches are active at the same time.",
+            "The Azure DevOps import creates each branch as an unrelated Git history " +
+                "with no common ancestor."));
+
+        result.Notes.Add("Folder scan walked 3 level(s) below $/GnarlyCorp.");
+
+        return result;
+    }
+
+    [TestMethod]
+    public void FormatReport_IncludesHeaderDetails()
+    {
+        var actual = SystemUnderTest.FormatReport(BuildResult());
+
+        StringAssert.Contains(actual, "# TFVC Migration Assessment", "Missing report title.");
+        StringAssert.Contains(actual, "GnarlyCorp", "Missing project name.");
+        StringAssert.Contains(actual, "$/GnarlyCorp", "Missing scope path.");
+        StringAssert.Contains(actual, "2026-06-01", "Missing generated date.");
+    }
+
+    [TestMethod]
+    public void FormatReport_EndsWithTheFixedFooter()
+    {
+        var actual = SystemUnderTest.FormatReport(BuildResult()).TrimEnd();
+
+        Assert.IsTrue(
+            actual.EndsWith(TfvcAssessmentReportFormatter.FooterLine, StringComparison.Ordinal),
+            "The report should end with the footer line.");
+    }
+
+    [TestMethod]
+    public void FormatReport_IncludesTheIndentedTree()
+    {
+        var actual = SystemUnderTest.FormatReport(BuildResult());
+
+        StringAssert.Contains(actual, "$/GnarlyCorp/Main", "Missing root branch in the tree.");
+        StringAssert.Contains(
+            actual, "  $/GnarlyCorp/Dev", "Child branches should be indented.");
+    }
+
+    [TestMethod]
+    public void FormatMermaidDiagram_RendersNodesAndEdges()
+    {
+        var result = BuildResult();
+
+        var actual = SystemUnderTest.FormatMermaidDiagram(result.RegisteredBranchRoots);
+
+        var expected =
+            "```mermaid" + Environment.NewLine +
+            "graph TD" + Environment.NewLine +
+            "    B0[\"$/GnarlyCorp/Main\"]" + Environment.NewLine +
+            "    B1[\"$/GnarlyCorp/Dev\"]" + Environment.NewLine +
+            "    B2[\"$/GnarlyCorp/Main/Feature\"]" + Environment.NewLine +
+            "    B0 --> B1" + Environment.NewLine +
+            "    B0 --> B2" + Environment.NewLine +
+            "```";
+
+        Assert.AreEqual(expected, actual, "Mermaid diagram did not match.");
+    }
+
+    [TestMethod]
+    public void FormatReport_IncludesBranchActivityTable()
+    {
+        var actual = SystemUnderTest.FormatReport(BuildResult());
+
+        StringAssert.Contains(actual, "## Branch activity", "Missing branch activity section.");
+        StringAssert.Contains(actual, "Ann Dev", "Missing last changeset author.");
+        StringAssert.Contains(actual, "Active", "Missing the active classification.");
+        StringAssert.Contains(actual, "Dead", "Missing the dead classification.");
+    }
+
+    [TestMethod]
+    public void FormatReport_MarksCappedCountsWithAPlus()
+    {
+        var result = BuildResult();
+
+        result.BranchActivity[0].CountsAreCapped = true;
+
+        var actual = SystemUnderTest.FormatReport(result);
+
+        StringAssert.Contains(actual, "40+", "A capped count should be shown as a floor.");
+    }
+
+    [TestMethod]
+    public void FormatReport_ListsUnregisteredBranchGroups()
+    {
+        var actual = SystemUnderTest.FormatReport(BuildResult());
+
+        StringAssert.Contains(
+            actual, "$/GnarlyCorp/Legacy/Prod", "Missing unregistered branch folder.");
+        StringAssert.Contains(
+            actual, "$/GnarlyCorp/Legacy/QA", "Missing unregistered branch folder.");
+    }
+
+    [TestMethod]
+    public void FormatReport_SaysWhatWasNotCovered()
+    {
+        var actual = SystemUnderTest.FormatReport(BuildResult());
+
+        StringAssert.Contains(
+            actual, "## What this scan did not cover", "Missing the limitations section.");
+    }
+
+    [TestMethod]
+    public void FormatReport_UsesNoProhibitedLanguage()
+    {
+        var report = SystemUnderTest.FormatReport(BuildResult());
+
+        AssertNoProhibitedLanguage(report);
+    }
+
+    [TestMethod]
+    public async Task AnalyzerFindings_UseNoProhibitedLanguage()
+    {
+        // Runs a real assessment so that every finding string the analyzer can
+        // produce is checked, not just the ones in the formatter fixture.
+        var client = new FakeTfvcApiClient();
+
+        client.Branches.Add(new TfvcBranchInfo
+        {
+            Path = "$/App/Main",
+            Children = new List<TfvcBranchInfo>
+            {
+                new() { Path = "$/App/Dev" },
+                new() { Path = "$/App/Main/Feature" }
+            }
+        });
+
+        client.SetChangesets("$/App/Main", FakeTfvcApiClient.Changeset(1, UtcNow.AddDays(-2)));
+        client.SetChangesets("$/App/Dev", FakeTfvcApiClient.Changeset(2, UtcNow.AddDays(-3)));
+        client.SetChangesets(
+            "$/App/Main/Feature", FakeTfvcApiClient.Changeset(3, UtcNow.AddDays(-900)));
+
+        var analyzer = new TfvcAssessmentAnalyzer(client);
+
+        var result = await analyzer.AnalyzeAsync("App", "$/App", UtcNow);
+
+        Assert.IsTrue(result.Findings.Count > 0, "Expected the assessment to produce findings.");
+
+        AssertNoProhibitedLanguage(SystemUnderTest.FormatReport(result));
+    }
+
+    private static void AssertNoProhibitedLanguage(string text)
+    {
+        var scrubbed = text;
+
+        foreach (var exception in AllowedExceptions)
+        {
+            scrubbed = scrubbed.Replace(
+                exception, string.Empty, StringComparison.OrdinalIgnoreCase);
+        }
+
+        foreach (var phrase in ProhibitedPhrases)
+        {
+            Assert.IsFalse(
+                scrubbed.Contains(phrase, StringComparison.OrdinalIgnoreCase),
+                $"Report text contains prescriptive language: '{phrase}'.");
+        }
+    }
+
+    [TestMethod]
+    public void FormatFindingsCsv_HasHeaderAndOneRowPerFinding()
+    {
+        var result = BuildResult();
+
+        var actual = SystemUnderTest.FormatFindingsCsv(result);
+
+        StringAssert.Contains(actual, "Category", "Missing the CSV header.");
+        StringAssert.Contains(actual, "Consequence", "Missing the CSV header.");
+        StringAssert.Contains(actual, "no common ancestor", "Missing the finding row.");
+    }
+
+    [TestMethod]
+    public void FormatReport_EmptyAssessmentStillProducesAReport()
+    {
+        var result = new TfvcAssessmentResult
+        {
+            ProjectName = "Empty",
+            ScopePath = "$/Empty",
+            GeneratedUtc = UtcNow
+        };
+
+        var actual = SystemUnderTest.FormatReport(result);
+
+        StringAssert.Contains(
+            actual,
+            "No TFVC folders under $/Empty are registered as branches",
+            "An empty assessment should say so plainly.");
+
+        StringAssert.Contains(actual, TfvcAssessmentReportFormatter.FooterLine, "Missing footer.");
+    }
+}

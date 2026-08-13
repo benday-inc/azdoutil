@@ -142,6 +142,22 @@ The `BuildReadiness/` directory contains the analysis engine behind the `analyze
 - **BuildReadinessReportFormatter** - Formats results into the text report shared by the CLI and MCP paths
 - **IFileContentProvider** - Abstraction over file retrieval that enables in-memory unit testing; `DelegateFileContentProvider` bridges the protected base class HTTP methods to this interface
 
+### TfvcAssessment Module
+
+The `TfvcAssessment/` directory backs the `assess-tfvc-migration` command (in `Commands/VersionControl/`). It reads a TFVC path and reports what a conversion to Git would have to deal with. Everything is read-only.
+
+Reports here are **descriptive, never prescriptive**: a finding is a fact plus its consequence, with no severity rating, no ranking, and no recommendation. `TfvcAssessmentReportFormatterFixture` fails the build if report text contains prescriptive language ("consider", "recommend", "should", "you may want", "try ").
+
+- **ITfvcApiClient** - The read-only TFVC calls the assessment needs. Services depend on this rather than HTTP, so they run against canned payloads in tests (`FakeTfvcApiClient`). `TfvcApiClient` is the real implementation: it builds the urls and deserializes, taking HTTP itself as a delegate the same way `DelegateFileContentProvider` does
+- **TfvcPath** - TFVC server path comparison. Containment is compared on directory boundaries, so `$/App/MainFrame` is not treated as living inside `$/App/Main`
+- **TfvcBranchHierarchyService** - Scopes the branches payload to a path, rebuilds the lineage tree, and finds branches whose root folder sits inside another branch's root folder
+- **TfvcFolderHeuristicScanner** - Finds folders used as branches without being registered as branches. Requires both a branch-like name and similar contents to sibling folders; caches listings per scan
+- **TfvcBranchActivityService** - Changeset counts per branch over 90/180/365 days. The changesets endpoint returns no total, so counts come from a capped walk and a capped branch is flagged so the report shows its numbers as a floor
+- **TfvcAssessmentAnalyzer** - Orchestrates the above and turns observations into findings
+- **TfvcAssessmentReportFormatter** - Markdown report (including a Mermaid `graph TD` of branch lineage) plus a findings CSV
+
+TFVC API notes worth not rediscovering: use `api-version=7.0` (matches the rest of the repo, and is what Server 2022 supports); `TfvcItem` carries `isBranch`, `size`, and `changeDate`; recursion levels are `None`/`OneLevel`/`Full`; the changesets endpoint supports `searchCriteria.itemPath`/`.fromDate`/`.toDate` plus `$top`/`$skip` but returns no total count. There is **no merge-candidates endpoint** in the TFVC REST API, and shelvesets are collection-scoped rather than project- or path-scoped.
+
 ### TaskGroups Module
 
 The `TaskGroups/` directory backs the task group commands in `Commands/Builds/` (`listtaskgroups`, `findtaskgroupusages`, `inlinetaskgroup`) — the main use case is retiring classic task groups by inlining their steps into the build definitions that use them:
@@ -168,7 +184,7 @@ Commands are organized into logical categories (defined in `Constants.cs`):
 - **Process Templates** - Process template operations
 - **Project Administration** - Team projects and teams
 - **Test Data** - ScriptGenerator-based data creation
-- **Version Control** - Git repos and TFVC to Git migration
+- **Version Control** - Git repos, TFVC to Git migration, and TFVC migration assessment
 - **Work Items** - Work item queries and operations
 
 ## Creating New Commands

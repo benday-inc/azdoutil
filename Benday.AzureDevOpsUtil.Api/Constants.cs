@@ -173,6 +173,10 @@ public static class Constants
     public const string ArgumentNameTaskGroupId = "taskgroupid";
     public const string ArgumentNameDryRun = "dryrun";
 
+    public const string CommandName_AssessTfvcMigration = "assess-tfvc-migration";
+
+    public const string ArgumentNameScanDepth = "scandepth";
+
 
 
 
