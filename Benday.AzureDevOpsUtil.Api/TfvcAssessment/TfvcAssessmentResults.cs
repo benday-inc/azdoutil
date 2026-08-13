@@ -34,6 +34,51 @@ public static class FindingCategories
     public const string NestedBranches = "Nested branches";
     public const string UnregisteredBranches = "Unregistered branches";
     public const string BranchActivity = "Branch activity";
+    public const string BuildDefinitions = "Build definitions";
+    public const string SharedFolders = "Folders shared by builds";
+}
+
+/// <summary>
+/// A build definition that pulls its source from TFVC, and the workspace it
+/// builds from.
+/// </summary>
+public class TfvcBuildDefinitionInfo
+{
+    public int Id { get; set; }
+
+    public string Name { get; set; } = string.Empty;
+
+    /// <summary>Every mapping line, map and cloak alike, in payload order.</summary>
+    public List<TfvcWorkspaceMapping> Mappings { get; set; } = new();
+
+    /// <summary>Distinct server paths brought into the workspace.</summary>
+    public List<string> MappedPaths { get; set; } = new();
+
+    /// <summary>Distinct server paths excluded from the workspace.</summary>
+    public List<string> CloakedPaths { get; set; } = new();
+
+    public DateTime? LastRunDate { get; set; }
+
+    /// <summary>No completed run within the last year, or no run at all.</summary>
+    public bool IsInactive { get; set; }
+
+    /// <summary>
+    /// More than one mapped path means the workspace is assembled from several
+    /// places, which a single Git repository cannot reproduce.
+    /// </summary>
+    public bool IsComplexMapping => MappedPaths.Count > 1;
+}
+
+/// <summary>
+/// A TFVC path and the build definitions that map it into their workspace.
+/// </summary>
+public class MappedPathUsage
+{
+    public string Path { get; set; } = string.Empty;
+
+    public List<string> DefinitionNames { get; set; } = new();
+
+    public int DefinitionCount => DefinitionNames.Count;
 }
 
 /// <summary>
@@ -127,6 +172,17 @@ public class TfvcAssessmentResult
 
     public List<BranchActivity> BranchActivity { get; set; } = new();
 
+    /// <summary>
+    /// Build definitions in the team project that pull source from TFVC.  This
+    /// covers the whole project, not just the assessed path.
+    /// </summary>
+    public List<TfvcBuildDefinitionInfo> TfvcBuildDefinitions { get; set; } = new();
+
+    /// <summary>
+    /// Every distinct path mapped by a TFVC-connected build, most-mapped first.
+    /// </summary>
+    public List<MappedPathUsage> MappedPathUsages { get; set; } = new();
+
     public List<AssessmentFinding> Findings { get; set; } = new();
 
     /// <summary>
@@ -143,4 +199,10 @@ public class TfvcAssessmentResult
 
     public int DeadBranchCount =>
         BranchActivity.Count(x => x.Classification == BranchActivityClassification.Dead);
+
+    public int ComplexBuildDefinitionCount =>
+        TfvcBuildDefinitions.Count(x => x.IsComplexMapping == true);
+
+    public int InactiveBuildDefinitionCount =>
+        TfvcBuildDefinitions.Count(x => x.IsInactive == true);
 }

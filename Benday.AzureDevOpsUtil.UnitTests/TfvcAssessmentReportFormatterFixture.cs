@@ -92,6 +92,46 @@ public class TfvcAssessmentReportFormatterFixture
             "The Azure DevOps import creates each branch as an unrelated Git history " +
                 "with no common ancestor."));
 
+        result.TfvcBuildDefinitions.Add(new TfvcBuildDefinitionInfo
+        {
+            Id = 1,
+            Name = "Web-CI",
+            LastRunDate = UtcNow.AddDays(-4),
+            MappedPaths = new List<string> { "$/GnarlyCorp/Web", "$/GnarlyCorp/Common" },
+            CloakedPaths = new List<string> { "$/GnarlyCorp/Web/Drops" },
+            Mappings = new List<TfvcWorkspaceMapping>
+            {
+                new() { ServerPath = "$/GnarlyCorp/Web", MappingType = "map" },
+                new() { ServerPath = "$/GnarlyCorp/Common", MappingType = "map" },
+                new() { ServerPath = "$/GnarlyCorp/Web/Drops", MappingType = "cloak" }
+            }
+        });
+
+        result.TfvcBuildDefinitions.Add(new TfvcBuildDefinitionInfo
+        {
+            Id = 2,
+            Name = "Batch-CI",
+            LastRunDate = UtcNow.AddDays(-500),
+            IsInactive = true,
+            MappedPaths = new List<string> { "$/GnarlyCorp/Common" },
+            Mappings = new List<TfvcWorkspaceMapping>
+            {
+                new() { ServerPath = "$/GnarlyCorp/Common", MappingType = "map" }
+            }
+        });
+
+        result.MappedPathUsages.Add(new MappedPathUsage
+        {
+            Path = "$/GnarlyCorp/Common",
+            DefinitionNames = new List<string> { "Web-CI", "Batch-CI" }
+        });
+
+        result.MappedPathUsages.Add(new MappedPathUsage
+        {
+            Path = "$/GnarlyCorp/Web",
+            DefinitionNames = new List<string> { "Web-CI" }
+        });
+
         result.Notes.Add("Folder scan walked 3 level(s) below $/GnarlyCorp.");
 
         return result;
@@ -183,6 +223,65 @@ public class TfvcAssessmentReportFormatterFixture
     }
 
     [TestMethod]
+    public void FormatReport_IncludesTheBuildDefinitionTable()
+    {
+        var actual = SystemUnderTest.FormatReport(BuildResult());
+
+        StringAssert.Contains(
+            actual, "## Build definitions that pull from TFVC", "Missing the build section.");
+        StringAssert.Contains(actual, "Web-CI", "Missing a definition name.");
+        StringAssert.Contains(actual, "complex", "The multi-path workspace should be labelled.");
+        StringAssert.Contains(actual, "simple", "The single-path workspace should be labelled.");
+    }
+
+    [TestMethod]
+    public void FormatReport_MarksInactiveBuildsInTheTable()
+    {
+        var actual = SystemUnderTest.FormatReport(BuildResult());
+
+        StringAssert.Contains(
+            actual, "(inactive)", "A build with no recent runs should be marked in the table.");
+    }
+
+    [TestMethod]
+    public void FormatReport_ExpandsComplexWorkspaces()
+    {
+        var actual = SystemUnderTest.FormatReport(BuildResult());
+
+        StringAssert.Contains(
+            actual,
+            "### Workspaces built from more than one path",
+            "Missing the expanded mapping section.");
+
+        StringAssert.Contains(
+            actual, "cloak: $/GnarlyCorp/Web/Drops", "Cloak entries should be listed too.");
+        StringAssert.Contains(actual, "map: $/GnarlyCorp/Web", "Map entries should be listed.");
+    }
+
+    [TestMethod]
+    public void FormatReport_ShowsHowManyBuildsMapEachPath()
+    {
+        var actual = SystemUnderTest.FormatReport(BuildResult());
+
+        StringAssert.Contains(
+            actual, "### How many builds map each path", "Missing the path frequency table.");
+        StringAssert.Contains(
+            actual, "| $/GnarlyCorp/Common | 2 ", "The shared path should show its build count.");
+    }
+
+    [TestMethod]
+    public void FormatReport_NeverRunBuildSaysSo()
+    {
+        var result = BuildResult();
+
+        result.TfvcBuildDefinitions[1].LastRunDate = null;
+
+        var actual = SystemUnderTest.FormatReport(result);
+
+        StringAssert.Contains(actual, "never run", "A build with no runs should say so.");
+    }
+
+    [TestMethod]
     public void FormatReport_SaysWhatWasNotCovered()
     {
         var actual = SystemUnderTest.FormatReport(BuildResult());
@@ -221,7 +320,17 @@ public class TfvcAssessmentReportFormatterFixture
         client.SetChangesets(
             "$/App/Main/Feature", FakeTfvcApiClient.Changeset(3, UtcNow.AddDays(-900)));
 
-        var analyzer = new TfvcAssessmentAnalyzer(client);
+        var buildClient = new FakeBuildDefinitionApiClient();
+
+        buildClient.Add(FakeBuildDefinitionApiClient.TfvcDefinition(
+            1, "Web-CI", UtcNow.AddDays(-3),
+            ("$/App/Web", "map"),
+            ("$/Shared/Common", "map")));
+
+        buildClient.Add(FakeBuildDefinitionApiClient.TfvcDefinition(
+            2, "Batch-CI", UtcNow.AddDays(-500), ("$/Shared/Common", "map")));
+
+        var analyzer = new TfvcAssessmentAnalyzer(client, buildClient);
 
         var result = await analyzer.AnalyzeAsync("App", "$/App", UtcNow);
 

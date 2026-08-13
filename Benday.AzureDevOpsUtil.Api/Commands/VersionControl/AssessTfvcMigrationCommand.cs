@@ -63,7 +63,9 @@ public class AssessTfvcMigrationCommand : AzureDevOpsCommandBase
 
         var outputCsv = Arguments.GetBooleanValue(Constants.ArgumentNameOutputCsv);
 
-        var analyzer = new TfvcAssessmentAnalyzer(CreateApiClient())
+        var analyzer = new TfvcAssessmentAnalyzer(
+            new TfvcApiClient(GetJsonAsync),
+            new BuildDefinitionApiClient(GetJsonAsync))
         {
             MaxScanDepth = GetScanDepth()
         };
@@ -127,20 +129,21 @@ public class AssessTfvcMigrationCommand : AzureDevOpsCommandBase
         return TfvcFolderHeuristicScanner.DefaultMaxDepth;
     }
 
-    private ITfvcApiClient CreateApiClient()
+    /// <summary>
+    /// Issues an authenticated GET and returns the body, or null when the call
+    /// did not succeed.  Both API clients are built on this.
+    /// </summary>
+    private async Task<string?> GetJsonAsync(string requestUrl)
     {
-        return new TfvcApiClient(async (requestUrl) =>
+        using var client = GetHttpClientInstanceForAzureDevOps();
+
+        var response = await client.GetAsync(requestUrl);
+
+        if (response.IsSuccessStatusCode == false)
         {
-            using var client = GetHttpClientInstanceForAzureDevOps();
+            return null;
+        }
 
-            var response = await client.GetAsync(requestUrl);
-
-            if (response.IsSuccessStatusCode == false)
-            {
-                return null;
-            }
-
-            return await response.Content.ReadAsStringAsync();
-        });
+        return await response.Content.ReadAsStringAsync();
     }
 }

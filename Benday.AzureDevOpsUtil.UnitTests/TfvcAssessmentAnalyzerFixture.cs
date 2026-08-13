@@ -190,4 +190,159 @@ public class TfvcAssessmentAnalyzerFixture
 
         Assert.AreEqual("$/App", actual.ScopePath, "The trailing slash should be removed.");
     }
+
+    [TestMethod]
+    public async Task Analyze_TfvcBuildDefinitionsProduceAFinding()
+    {
+        var buildClient = new FakeBuildDefinitionApiClient();
+
+        buildClient.Add(FakeBuildDefinitionApiClient.TfvcDefinition(
+            1, "Legacy-CI", UtcNow.AddDays(-3), ("$/App/Main", "map")));
+
+        var analyzer = new TfvcAssessmentAnalyzer(new FakeTfvcApiClient(), buildClient);
+
+        var actual = await analyzer.AnalyzeAsync(ProjectName, "$/App", UtcNow);
+
+        Assert.AreEqual(1, actual.TfvcBuildDefinitions.Count, "Expected one TFVC build.");
+
+        var finding = FindByCategory(actual, FindingCategories.BuildDefinitions);
+
+        Assert.IsNotNull(finding, "Expected a build definition finding.");
+        StringAssert.Contains(
+            finding!.Fact, "1 build definition(s) pull source from TFVC", "Wrong fact text.");
+        StringAssert.Contains(
+            finding.Consequence, "stop working when TFVC is retired", "Wrong consequence text.");
+    }
+
+    [TestMethod]
+    public async Task Analyze_ComplexWorkspaceProducesItsOwnFinding()
+    {
+        var buildClient = new FakeBuildDefinitionApiClient();
+
+        buildClient.Add(FakeBuildDefinitionApiClient.TfvcDefinition(
+            1, "Complex-CI", UtcNow.AddDays(-3),
+            ("$/App/Main", "map"),
+            ("$/Shared/Common", "map")));
+
+        var analyzer = new TfvcAssessmentAnalyzer(new FakeTfvcApiClient(), buildClient);
+
+        var actual = await analyzer.AnalyzeAsync(ProjectName, "$/App", UtcNow);
+
+        var finding = actual.Findings.FirstOrDefault(
+            x => x.Fact.Contains("maps 2 separate TFVC paths"));
+
+        Assert.IsNotNull(finding, "Expected a finding for the complex workspace.");
+        StringAssert.Contains(finding!.Fact, "Complex-CI", "The definition should be named.");
+        StringAssert.Contains(
+            finding.Consequence,
+            "cannot be reproduced from a single Git repository",
+            "Wrong consequence text.");
+    }
+
+    [TestMethod]
+    public async Task Analyze_PathMappedBySeveralBuildsOutsideTheScopeIsReported()
+    {
+        var buildClient = new FakeBuildDefinitionApiClient();
+
+        buildClient.Add(FakeBuildDefinitionApiClient.TfvcDefinition(
+            1, "Web-CI", UtcNow.AddDays(-3),
+            ("$/App/Web", "map"),
+            ("$/Shared/Common", "map")));
+
+        buildClient.Add(FakeBuildDefinitionApiClient.TfvcDefinition(
+            2, "Api-CI", UtcNow.AddDays(-3),
+            ("$/App/Api", "map"),
+            ("$/Shared/Common", "map")));
+
+        var analyzer = new TfvcAssessmentAnalyzer(new FakeTfvcApiClient(), buildClient);
+
+        var actual = await analyzer.AnalyzeAsync(ProjectName, "$/App", UtcNow);
+
+        var finding = FindByCategory(actual, FindingCategories.SharedFolders);
+
+        Assert.IsNotNull(finding, "Expected a shared folder finding.");
+        StringAssert.Contains(finding!.Fact, "$/Shared/Common", "Wrong path named.");
+        StringAssert.Contains(finding.Fact, "2 build definitions", "Wrong build count.");
+        StringAssert.Contains(
+            finding.Consequence,
+            "Multiple builds depend on this folder's contents",
+            "Wrong consequence text.");
+    }
+
+    [TestMethod]
+    public async Task Analyze_PathMappedBySeveralBuildsInsideTheScopeIsNotASharedFolderFinding()
+    {
+        var buildClient = new FakeBuildDefinitionApiClient();
+
+        buildClient.Add(FakeBuildDefinitionApiClient.TfvcDefinition(
+            1, "Web-CI", UtcNow.AddDays(-3), ("$/App/Main", "map")));
+
+        buildClient.Add(FakeBuildDefinitionApiClient.TfvcDefinition(
+            2, "Api-CI", UtcNow.AddDays(-3), ("$/App/Main", "map")));
+
+        var analyzer = new TfvcAssessmentAnalyzer(new FakeTfvcApiClient(), buildClient);
+
+        var actual = await analyzer.AnalyzeAsync(ProjectName, "$/App", UtcNow);
+
+        Assert.IsNull(
+            FindByCategory(actual, FindingCategories.SharedFolders),
+            "A path inside the assessed area is already part of what is being migrated.");
+
+        // It still shows up in the frequency table as a fact.
+        Assert.AreEqual(
+            2,
+            actual.MappedPathUsages.Single(x => x.Path == "$/App/Main").DefinitionCount,
+            "The frequency table should still count it.");
+    }
+
+    [TestMethod]
+    public async Task Analyze_WithoutABuildClientTheSectionIsSkippedOutLoud()
+    {
+        var analyzer = new TfvcAssessmentAnalyzer(new FakeTfvcApiClient());
+
+        var actual = await analyzer.AnalyzeAsync(ProjectName, "$/App", UtcNow);
+
+        Assert.AreEqual(0, actual.TfvcBuildDefinitions.Count, "Nothing should have been read.");
+        Assert.IsTrue(
+            actual.Notes.Any(x => x.Contains("Build definitions were not examined")),
+            "A skipped section should say so.");
+    }
+
+    private sealed class ThrowingBuildDefinitionApiClient : IBuildDefinitionApiClient
+    {
+        public Task<IReadOnlyList<BuildDefinitionInfo>> GetDefinitionsAsync(string projectName)
+        {
+            throw new InvalidOperationException("access denied");
+        }
+
+        public Task<BuildDefinitionDetail?> GetDefinitionAsync(
+            string projectName, int definitionId)
+        {
+            throw new InvalidOperationException("access denied");
+        }
+    }
+
+    [TestMethod]
+    public async Task Analyze_BuildDefinitionFailureDoesNotSinkTheWholeAssessment()
+    {
+        var tfvcClient = new FakeTfvcApiClient();
+
+        tfvcClient.Branches.Add(Branch("$/App/Main"));
+
+        var analyzer = new TfvcAssessmentAnalyzer(
+            tfvcClient, new ThrowingBuildDefinitionApiClient());
+
+        var actual = await analyzer.AnalyzeAsync(ProjectName, "$/App", UtcNow);
+
+        Assert.AreEqual(
+            1, actual.RegisteredBranchPaths.Count, "The branch section should still be there.");
+
+        Assert.IsTrue(
+            actual.Notes.Any(x => x.Contains("Build definitions could not be read")),
+            "The failure should be recorded rather than swallowed.");
+
+        Assert.IsTrue(
+            actual.Notes.Any(x => x.Contains("access denied")),
+            "The reason should survive into the report.");
+    }
 }

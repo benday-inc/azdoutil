@@ -9,21 +9,30 @@ namespace Benday.AzureDevOpsUtil.Api.TfvcAssessment;
 public class TfvcAssessmentAnalyzer
 {
     private readonly ITfvcApiClient _client;
+    private readonly IBuildDefinitionApiClient? _buildClient;
     private readonly TfvcBranchHierarchyService _hierarchyService;
     private readonly TfvcFolderHeuristicScanner _folderScanner;
     private readonly TfvcBranchActivityService _activityService;
+    private readonly BuildDefinitionWorkspaceService _buildWorkspaceService;
 
-    public TfvcAssessmentAnalyzer(ITfvcApiClient client)
+    /// <param name="buildClient">
+    /// Optional.  When it is not supplied the build definition section is
+    /// skipped and the report says so instead of going quiet.
+    /// </param>
+    public TfvcAssessmentAnalyzer(
+        ITfvcApiClient client, IBuildDefinitionApiClient? buildClient = null)
     {
         _client = client ?? throw new ArgumentNullException(nameof(client));
+        _buildClient = buildClient;
         _hierarchyService = new TfvcBranchHierarchyService();
         _folderScanner = new TfvcFolderHeuristicScanner();
         _activityService = new TfvcBranchActivityService();
+        _buildWorkspaceService = new BuildDefinitionWorkspaceService();
     }
 
     /// <summary>
-    /// Called before each branch is measured for activity, so a long-running
-    /// scan can report progress.
+    /// Called as the scan moves between sections and items, so a long-running
+    /// assessment can report progress.
     /// </summary>
     public Action<string>? ProgressCallback { get; set; }
 
@@ -77,9 +86,62 @@ public class TfvcAssessmentAnalyzer
                 "Counts marked with a plus sign are a floor, not an exact number.");
         }
 
+        await ScanBuildDefinitionsAsync(result, projectName, utcNow);
+
         BuildFindings(result);
 
         return result;
+    }
+
+    /// <summary>
+    /// Reads the build definitions for the whole team project.  A failure here
+    /// is recorded and the rest of the assessment carries on, because the build
+    /// section is the part most likely to be blocked by permissions.
+    /// </summary>
+    private async Task ScanBuildDefinitionsAsync(
+        TfvcAssessmentResult result, string projectName, DateTime utcNow)
+    {
+        if (_buildClient == null)
+        {
+            result.Notes.Add(
+                "Build definitions were not examined because no build API client was supplied.");
+
+            return;
+        }
+
+        ReportProgress("Reading build definitions...");
+
+        _buildWorkspaceService.ProgressCallback = ProgressCallback;
+
+        BuildDefinitionScanResult scan;
+
+        try
+        {
+            scan = await _buildWorkspaceService.ScanAsync(_buildClient, projectName, utcNow);
+        }
+        catch (Exception ex)
+        {
+            result.Notes.Add(
+                $"Build definitions could not be read: {ex.Message} " +
+                "The rest of this report is unaffected.");
+
+            return;
+        }
+
+        result.TfvcBuildDefinitions = scan.Definitions;
+        result.MappedPathUsages = scan.MappedPathUsages;
+
+        if (scan.UnreadableDefinitions.Count > 0)
+        {
+            result.Notes.Add(
+                $"{scan.UnreadableDefinitions.Count} build definition(s) could not be read: " +
+                string.Join(", ", scan.UnreadableDefinitions) + ".");
+        }
+
+        result.Notes.Add(
+            $"Build definitions were read for the whole {projectName} team project, " +
+            $"not just {result.ScopePath}. {scan.TotalDefinitionsExamined} definition(s) " +
+            "were examined.");
     }
 
     private List<BranchCandidate> BuildBranchCandidates(TfvcAssessmentResult result)
@@ -115,6 +177,60 @@ public class TfvcAssessmentAnalyzer
         AddNestedBranchFindings(result);
         AddUnregisteredBranchFindings(result);
         AddBranchActivityFindings(result);
+        AddBuildDefinitionFindings(result);
+        AddSharedFolderFindings(result);
+    }
+
+    private void AddBuildDefinitionFindings(TfvcAssessmentResult result)
+    {
+        if (result.TfvcBuildDefinitions.Count == 0)
+        {
+            return;
+        }
+
+        var detail = result.InactiveBuildDefinitionCount > 0 ?
+            $"{result.InactiveBuildDefinitionCount} of them have not completed a run in the " +
+                "last 365 days." :
+            string.Empty;
+
+        result.Findings.Add(new AssessmentFinding(
+            FindingCategories.BuildDefinitions,
+            $"{result.TfvcBuildDefinitions.Count} build definition(s) pull source from TFVC.",
+            "These builds stop working when TFVC is retired.",
+            detail));
+
+        foreach (var definition in result.TfvcBuildDefinitions.Where(x => x.IsComplexMapping == true))
+        {
+            result.Findings.Add(new AssessmentFinding(
+                FindingCategories.BuildDefinitions,
+                $"Build definition '{definition.Name}' maps {definition.MappedPaths.Count} " +
+                    "separate TFVC paths into its workspace.",
+                "A Git-based build pulls from a single repository. This build's source layout " +
+                    "cannot be reproduced from a single Git repository.",
+                string.Join(", ", definition.MappedPaths)));
+        }
+    }
+
+    /// <summary>
+    /// A folder mapped by several builds and sitting outside the path being
+    /// assessed is code that more than one thing depends on.
+    /// </summary>
+    private void AddSharedFolderFindings(TfvcAssessmentResult result)
+    {
+        var shared = result.MappedPathUsages
+            .Where(x => x.DefinitionCount > 1)
+            .Where(x => TfvcPath.IsSameOrUnder(x.Path, result.ScopePath) == false)
+            .ToList();
+
+        foreach (var usage in shared)
+        {
+            result.Findings.Add(new AssessmentFinding(
+                FindingCategories.SharedFolders,
+                $"{usage.Path} is mapped into the workspace of {usage.DefinitionCount} " +
+                    "build definitions.",
+                "Multiple builds depend on this folder's contents.",
+                string.Join(", ", usage.DefinitionNames)));
+        }
     }
 
     private void AddBranchHierarchyFindings(TfvcAssessmentResult result)

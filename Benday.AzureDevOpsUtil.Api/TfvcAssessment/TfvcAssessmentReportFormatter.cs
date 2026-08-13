@@ -27,6 +27,7 @@ public class TfvcAssessmentReportFormatter
         FormatNestedBranches(sb, result);
         FormatUnregisteredBranches(sb, result);
         FormatBranchActivity(sb, result);
+        FormatBuildDefinitions(sb, result);
         FormatFindings(sb, result);
         FormatNotes(sb, result);
         FormatFooter(sb);
@@ -58,6 +59,13 @@ public class TfvcAssessmentReportFormatter
         sb.AppendLine($"| Branches with changes in the last 90 days | {result.ActiveBranchCount} |");
         sb.AppendLine($"| Branches with changes only in the last 365 days | {result.CoolingBranchCount} |");
         sb.AppendLine($"| Branches with no changes in 365 days | {result.DeadBranchCount} |");
+        sb.AppendLine(
+            $"| Build definitions pulling from TFVC | {result.TfvcBuildDefinitions.Count} |");
+        sb.AppendLine(
+            $"| Build definitions mapping more than one path | {result.ComplexBuildDefinitionCount} |");
+        sb.AppendLine(
+            "| Paths mapped by more than one build | " +
+            $"{result.MappedPathUsages.Count(x => x.DefinitionCount > 1)} |");
     }
 
     private void FormatBranchHierarchy(StringBuilder sb, TfvcAssessmentResult result)
@@ -233,6 +241,98 @@ public class TfvcAssessmentReportFormatter
                 $"| {FormatCount(item.ChangesetsLast180Days, item.CountsAreCapped)} " +
                 $"| {FormatCount(item.ChangesetsLast365Days, item.CountsAreCapped)} " +
                 $"| {item.Classification} |");
+        }
+    }
+
+    private void FormatBuildDefinitions(StringBuilder sb, TfvcAssessmentResult result)
+    {
+        if (result.TfvcBuildDefinitions.Count == 0)
+        {
+            return;
+        }
+
+        sb.AppendLine();
+        sb.AppendLine("## Build definitions that pull from TFVC");
+        sb.AppendLine();
+        sb.AppendLine("| Definition | Mapped paths | Workspace | Last run |");
+        sb.AppendLine("|---|---|---|---|");
+
+        foreach (var definition in result.TfvcBuildDefinitions
+            .OrderBy(x => x.Name, StringComparer.OrdinalIgnoreCase))
+        {
+            var lastRun = definition.LastRunDate.HasValue == true ?
+                definition.LastRunDate.Value.ToString(DateFormat, CultureInfo.InvariantCulture) :
+                "never run";
+
+            if (definition.IsInactive == true && definition.LastRunDate.HasValue == true)
+            {
+                lastRun += " (inactive)";
+            }
+
+            var paths = definition.MappedPaths.Count == 0 ?
+                "none recorded" :
+                string.Join("<br>", definition.MappedPaths);
+
+            var shape = definition.IsComplexMapping == true ? "complex" : "simple";
+
+            sb.AppendLine(
+                $"| {definition.Name} | {paths} | {shape} | {lastRun} |");
+        }
+
+        FormatComplexMappings(sb, result);
+        FormatMappedPathFrequency(sb, result);
+    }
+
+    private void FormatComplexMappings(StringBuilder sb, TfvcAssessmentResult result)
+    {
+        var complex = result.TfvcBuildDefinitions
+            .Where(x => x.IsComplexMapping == true)
+            .OrderBy(x => x.Name, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        if (complex.Count == 0)
+        {
+            return;
+        }
+
+        sb.AppendLine();
+        sb.AppendLine("### Workspaces built from more than one path");
+        sb.AppendLine();
+
+        foreach (var definition in complex)
+        {
+            sb.AppendLine($"{definition.Name}:");
+            sb.AppendLine();
+
+            foreach (var mapping in definition.Mappings)
+            {
+                var kind = mapping.IsCloak == true ? "cloak" : "map";
+
+                sb.AppendLine($"- {kind}: {TfvcPath.Normalize(mapping.ServerPath)}");
+            }
+
+            sb.AppendLine();
+        }
+    }
+
+    private void FormatMappedPathFrequency(StringBuilder sb, TfvcAssessmentResult result)
+    {
+        if (result.MappedPathUsages.Count == 0)
+        {
+            return;
+        }
+
+        sb.AppendLine();
+        sb.AppendLine("### How many builds map each path");
+        sb.AppendLine();
+        sb.AppendLine("| Path | Builds | Definitions |");
+        sb.AppendLine("|---|---|---|");
+
+        foreach (var usage in result.MappedPathUsages)
+        {
+            sb.AppendLine(
+                $"| {usage.Path} | {usage.DefinitionCount} " +
+                $"| {string.Join(", ", usage.DefinitionNames)} |");
         }
     }
 
