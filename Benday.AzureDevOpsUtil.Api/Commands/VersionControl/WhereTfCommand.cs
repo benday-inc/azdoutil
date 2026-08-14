@@ -59,7 +59,11 @@ public class WhereTfCommand : SynchronousCommand
             return;
         }
 
-        WriteLine($"Found {locations.Count} copy/copies of tf:");
+        WriteLine(
+            locations.Count == 1 ?
+                "Found 1 copy of tf:" :
+                $"Found {locations.Count} copies of tf:");
+
         WriteLine(string.Empty);
 
         foreach (var location in locations)
