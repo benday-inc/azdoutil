@@ -151,6 +151,9 @@ public class TfvcApiClient : ITfvcApiClient
 
         if (fromDateUtc.HasValue == true)
         {
+            // Verified against Azure DevOps: ISO 8601 filters correctly here.
+            // The MM-dd-yyyy form the REST samples use works too, but it cannot
+            // carry a time and reads as ambiguous outside the US.
             var fromDate = fromDateUtc.Value.ToString(
                 "yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture);
 

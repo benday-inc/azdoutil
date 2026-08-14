@@ -134,7 +134,7 @@ public class TfvcFolderHeuristicScanner
             }
 
             var candidates = childFolders
-                .Where(x => x.IsBranch == false)
+                .Where(x => x.IsBranch != true)
                 .Where(x => registered.Contains(TfvcPath.Normalize(x.Path)) == false)
                 .Where(x => LooksLikeBranchName(TfvcPath.GetName(x.Path)) == true)
                 .Select(x => TfvcPath.Normalize(x.Path))
