@@ -160,9 +160,20 @@ public class AssessTfvcMigrationCommand : AzureDevOpsCommandBase
         var message = AzureDevOpsErrorMessageReader.GetMessageOrDefault(
             body, $"{(int)response.StatusCode} {response.ReasonPhrase}");
 
+        var hint = string.Empty;
+
+        var suggestion = TfvcPath.SuggestProjectRootedPath(tfvcPath, projectName);
+
+        if (suggestion != null)
+        {
+            hint =
+                " TFVC paths start with the team project name, which the web UI shows in its " +
+                $"own selector rather than in the folder breadcrumb. Did you mean '{suggestion}'?";
+        }
+
         throw new KnownException(
             $"Could not read TFVC path '{tfvcPath}' in team project '{projectName}'. " +
-            $"{message}");
+            $"{message}{hint}");
     }
 
     /// <summary>

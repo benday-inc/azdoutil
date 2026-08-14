@@ -133,4 +133,89 @@ public class TfvcPathFixture
 
         Assert.IsNull(actual, "A path does not enclose itself.");
     }
+
+    [TestMethod]
+    public void IsRootedInProject_TrueForPathsUnderTheProject()
+    {
+        Assert.IsTrue(
+            TfvcPath.IsRootedInProject("$/tfvc-demo-2024/Main/App", "tfvc-demo-2024"),
+            "This path is rooted in the project.");
+
+        Assert.IsTrue(
+            TfvcPath.IsRootedInProject("$/tfvc-demo-2024", "tfvc-demo-2024"),
+            "The project root itself is rooted in the project.");
+    }
+
+    [TestMethod]
+    public void IsRootedInProject_IgnoresCase()
+    {
+        Assert.IsTrue(
+            TfvcPath.IsRootedInProject("$/TFVC-Demo-2024/Main", "tfvc-demo-2024"),
+            "Project name comparison should ignore case.");
+    }
+
+    [TestMethod]
+    public void IsRootedInProject_FalseWhenTheProjectSegmentIsMissing()
+    {
+        Assert.IsFalse(
+            TfvcPath.IsRootedInProject("$/Main/App", "tfvc-demo-2024"),
+            "This path is missing its project segment.");
+    }
+
+    [TestMethod]
+    public void IsRootedInProject_FalseForAProjectSharingANamePrefix()
+    {
+        Assert.IsFalse(
+            TfvcPath.IsRootedInProject("$/tfvc-demo-2024-old/Main", "tfvc-demo-2024"),
+            "A project whose name starts the same way is a different project.");
+    }
+
+    [TestMethod]
+    public void SuggestProjectRootedPath_ReRootsAPathReadOffTheBreadcrumb()
+    {
+        // The web UI shows "Main / Benday.TfvcDemo" and keeps the project root
+        // in a separate selector, so this is the mistake it invites.
+        var actual = TfvcPath.SuggestProjectRootedPath(
+            "$/Main/Benday.TfvcDemo", "tfvc-demo-2024");
+
+        Assert.AreEqual(
+            "$/tfvc-demo-2024/Main/Benday.TfvcDemo", actual, "Wrong suggestion.");
+    }
+
+    [TestMethod]
+    public void SuggestProjectRootedPath_NullWhenAlreadyCorrect()
+    {
+        Assert.IsNull(
+            TfvcPath.SuggestProjectRootedPath(
+                "$/tfvc-demo-2024/Main/Benday.TfvcDemo", "tfvc-demo-2024"),
+            "There is nothing to suggest for a path that is already correct.");
+    }
+
+    [TestMethod]
+    public void SuggestProjectRootedPath_NullForTheCollectionRoot()
+    {
+        Assert.IsNull(
+            TfvcPath.SuggestProjectRootedPath("$/", "tfvc-demo-2024"),
+            "There is nothing to re-root.");
+    }
+
+    [TestMethod]
+    public void SuggestProjectRootedPath_HandlesTrailingSeparator()
+    {
+        var actual = TfvcPath.SuggestProjectRootedPath("$/Main/App/", "MyProject");
+
+        Assert.AreEqual("$/MyProject/Main/App", actual, "Wrong suggestion.");
+    }
+
+    [TestMethod]
+    public void SuggestProjectRootedPath_NullWithoutAProjectName()
+    {
+        Assert.IsNull(
+            TfvcPath.SuggestProjectRootedPath("$/Main/App", ""),
+            "Without a project name there is nothing to suggest.");
+
+        Assert.IsNull(
+            TfvcPath.SuggestProjectRootedPath("$/Main/App", null),
+            "Without a project name there is nothing to suggest.");
+    }
 }

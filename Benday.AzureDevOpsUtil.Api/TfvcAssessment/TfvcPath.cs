@@ -138,6 +138,62 @@ public static class TfvcPath
     }
 
     /// <summary>
+    /// True when the path sits under the team project's root.  Every TFVC
+    /// server path is rooted at "$/&lt;team project&gt;".
+    /// </summary>
+    public static bool IsRootedInProject(string? path, string? projectName)
+    {
+        if (string.IsNullOrWhiteSpace(projectName) == true)
+        {
+            return false;
+        }
+
+        return IsSameOrUnder(path, Root + projectName.Trim());
+    }
+
+    /// <summary>
+    /// The path re-rooted under the team project, for a "did you mean" hint.
+    ///
+    /// The web UI shows the project root in its own selector rather than in the
+    /// folder breadcrumb, so a path read off the breadcrumb is missing its
+    /// first segment.  Returns null when the path is already rooted in the
+    /// project or when there is nothing to re-root.
+    /// </summary>
+    public static string? SuggestProjectRootedPath(string? path, string? projectName)
+    {
+        if (string.IsNullOrWhiteSpace(projectName) == true)
+        {
+            return null;
+        }
+
+        var normalized = Normalize(path);
+
+        if (string.Equals(normalized, Root, StringComparison.Ordinal) == true)
+        {
+            return null;
+        }
+
+        if (normalized.StartsWith(Root, StringComparison.Ordinal) == false)
+        {
+            return null;
+        }
+
+        if (IsRootedInProject(normalized, projectName) == true)
+        {
+            return null;
+        }
+
+        var remainder = normalized.Substring(Root.Length).Trim(Separator);
+
+        if (remainder.Length == 0)
+        {
+            return null;
+        }
+
+        return $"{Root}{projectName.Trim()}/{remainder}";
+    }
+
+    /// <summary>
     /// Of the supplied candidates, the one that most closely encloses
     /// <paramref name="path"/>.  Returns null when nothing encloses it.
     /// </summary>
