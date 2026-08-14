@@ -190,6 +190,20 @@ public abstract class AzureDevOpsCommandBase : AsynchronousCommand
         }
     }
 
+    /// <summary>
+    /// Wires an <see cref="AgentCapabilities.AgentCapabilityService"/> to this
+    /// command's authenticated GET and PUT, so the capability commands share one
+    /// place that knows how to reach the agent pool endpoints.
+    /// </summary>
+    protected AgentCapabilities.AgentCapabilityService CreateAgentCapabilityService()
+    {
+        var client = new AgentCapabilities.AgentPoolClient(
+            url => GetStringAsync(url, false, true),
+            (url, body) => SendPutForBodySingleAttempt(url, body, true));
+
+        return new AgentCapabilities.AgentCapabilityService(client);
+    }
+
     protected HttpClient GetHttpClientInstanceForAzureDevOps(
         AzureDevOpsUrlTargetType azureDevOpsUrlTargetType = AzureDevOpsUrlTargetType.Default)
     {

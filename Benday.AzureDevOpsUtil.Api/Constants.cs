@@ -181,6 +181,22 @@ public static class Constants
 
     public const string ArgumentNameScanDepth = "scandepth";
 
+    public const string CommandName_ListAgentCapabilities = "listagentcapabilities";
+    public const string CommandName_ExportAgentCapabilities = "exportagentcapabilities";
+    public const string CommandName_ImportAgentCapabilities = "importagentcapabilities";
+    public const string CommandName_SetAgentCapabilities = "setagentcapabilities";
+    public const string CommandName_FindDemands = "finddemands";
+
+    public const string ArgumentNamePoolName = "pool";
+    public const string ArgumentNameAgentName = "agent";
+    public const string ArgumentNameAllPools = "allpools";
+    public const string ArgumentNameCustomOnly = "customonly";
+    public const string ArgumentNameReplace = "replace";
+    public const string ArgumentNameCapabilities = "capabilities";
+    public const string ArgumentNameOutputFile = "output";
+    public const string ArgumentNameBuildsScope = "builds";
+    public const string ArgumentNameReleasesScope = "releases";
+
 
 
 

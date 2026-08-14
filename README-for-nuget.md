@@ -105,12 +105,16 @@ The tools are all read-only:
 | AzdoUtil Configuration | addconfig | Add or update an Azure DevOps configuration. For example, which server or account plus auth information. |
 | AzdoUtil Configuration | listconfig | List an Azure DevOps configuration. For example, which server or account plus auth information. |
 | AzdoUtil Configuration | removeconfig | Remove an Azure DevOps configuration. For example, which server or account plus auth information. |
+| Builds | exportagentcapabilities | Script out the user-defined capabilities of the build agents to a JSON file so they can be reapplied to a new server with importagentcapabilities. Only agents that have custom capabilities are written. |
 | Builds | exportbuilddef | Export build definition |
 | Builds | exportreleasedef | Export release definition |
+| Builds | finddemands | Find the build and release definitions that have agent demands, and list the demands each one carries. Demands are the capabilities a definition requires of an agent, so this is the companion to the agent capability commands. Scans both builds and releases unless /builds or /releases is given. |
 | Builds | findtaskgroupusages | Find build definitions that reference task groups in a team project. |
+| Builds | importagentcapabilities | Reapply the user-defined capabilities from an exportagentcapabilities file onto the agents of the current server, matching agents by name. By default the imported capabilities are merged onto whatever each agent already has; use /replace to overwrite. Use /preview to see what would change without writing anything. |
 | Builds | importbuilddef | Import build definition from JSON file |
 | Builds | importreleasedef | Import release definition from JSON file |
 | Builds | inlinetaskgroup | Inline a task group's steps into a build definition and disable the original task group reference. |
+| Builds | listagentcapabilities | List the build agents across all agent pools and the user-defined capabilities each one has. Use /customonly to show only the agents that have custom capabilities. |
 | Builds | listagentpools | List agent pools |
 | Builds | listbuilddefs | List build definitions |
 | Builds | listqueues | List build queues in a team project or team projects |
@@ -118,6 +122,7 @@ The tools are all read-only:
 | Builds | listtaskgroups | List task groups in a team project. |
 | Builds | repairbuilddefagentpool | Repairs the agent pool setting for the build definitions in a team project or team projects. This is helpful after an on-prem to cloud migration. |
 | Builds | repairreleasedefagentpool | Repairs the agent pool setting for the release definitions in a team project or team projects. This is helpful after an on-prem to cloud migration. |
+| Builds | setagentcapabilities | Push a set of user-defined capabilities onto agents without going through the UI. Target a whole pool with /pool, a single agent with /agent, or every agent with /allpools. Supply the capabilities inline with /capabilities:"name=value;name2=value2" and/or from a flat JSON file with /input. Merges by default; use /replace to overwrite and /preview to see the changes first. |
 | Flow Metrics | agingwork | Get aging in-progress work items |
 | Flow Metrics | cycletimeconfidence | Get item cycle time for 50% and 85% levels. This helps you understand how items typically are delivered. |
 | Flow Metrics | forecastdurationforitemcount | Use throughput data to forecast likely number of weeks to get given number of items done using Monte Carlo simulation |
@@ -188,6 +193,15 @@ The tools are all read-only:
 | --- | --- | --- | --- |
 | config | Required | String | Name of the configuration |
 # Builds
+## exportagentcapabilities
+**Script out the user-defined capabilities of the build agents to a JSON file so they can be reapplied to a new server with importagentcapabilities. Only agents that have custom capabilities are written.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| pool | Optional | String | Only export agents in this agent pool |
+| output | Optional | String | Path to write the JSON file to. If omitted, the JSON is written to the console. |
 ## exportbuilddef
 **Export build definition**
 ### Arguments
@@ -213,6 +227,18 @@ The tools are all read-only:
 | name | Required | String | Release definition name |
 | queueinfo | Optional | Boolean | Only display queue info |
 | json | Optional | Boolean | Export to JSON |
+## finddemands
+**Find the build and release definitions that have agent demands, and list the demands each one carries. Demands are the capabilities a definition requires of an agent, so this is the companion to the agent capability commands. Scans both builds and releases unless /builds or /releases is given.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Optional | String | Team project name |
+| all | Optional | Boolean | Scan every project in this collection |
+| builds | Optional | Boolean | Only scan build definitions |
+| releases | Optional | Boolean | Only scan release definitions |
+| json | Optional | Boolean | Output results as JSON |
 ## findtaskgroupusages
 **Find build definitions that reference task groups in a team project.**
 ### Arguments
@@ -223,6 +249,16 @@ The tools are all read-only:
 | teamproject | Required | String | Team project name |
 | taskgroupid | Optional | String | Optional. Filter to only references of this task group id. |
 | json | Optional | Boolean | Output results as JSON |
+## importagentcapabilities
+**Reapply the user-defined capabilities from an exportagentcapabilities file onto the agents of the current server, matching agents by name. By default the imported capabilities are merged onto whatever each agent already has; use /replace to overwrite. Use /preview to see what would change without writing anything.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| input | Required | String | Path to the JSON file produced by exportagentcapabilities |
+| replace | Optional | Boolean | Overwrite each agent's user capabilities instead of merging |
+| preview | Optional | Boolean | Preview the changes without writing anything |
 ## importbuilddef
 **Import build definition from JSON file**
 ### Arguments
@@ -257,6 +293,16 @@ The tools are all read-only:
 | taskgroupid | Optional | String | Optional. Inline only this task group id. Default inlines all task groups in the definition. |
 | dryrun | Optional | Boolean | Write before/after JSON files locally instead of updating the build definition on the server. |
 | exporttopath | Optional | String | Directory for dry-run output files. Default is the current working directory. |
+## listagentcapabilities
+**List the build agents across all agent pools and the user-defined capabilities each one has. Use /customonly to show only the agents that have custom capabilities.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| pool | Optional | String | Only look at this agent pool |
+| customonly | Optional | Boolean | Only show agents that have user-defined capabilities |
+| json | Optional | Boolean | Output as JSON |
 ## listagentpools
 **List agent pools**
 ### Arguments
@@ -334,6 +380,20 @@ The tools are all read-only:
 | PrintJsonOnPreview | Optional | Boolean | Print modified json in preview mode |
 | preview | Optional | Boolean | Preview only. Do not update release definitions. |
 | originalreleaseinfofile | Required | String | Release def agent pool references JSON file from on-prem server. Assumes that pools have been recreated in the cloud using the same name. |
+## setagentcapabilities
+**Push a set of user-defined capabilities onto agents without going through the UI. Target a whole pool with /pool, a single agent with /agent, or every agent with /allpools. Supply the capabilities inline with /capabilities:"name=value;name2=value2" and/or from a flat JSON file with /input. Merges by default; use /replace to overwrite and /preview to see the changes first.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| capabilities | Optional | String | Capabilities as name=value pairs separated by semicolons, e.g. "VisualStudio=2022;SpecialSoftware=true" |
+| input | Optional | String | Path to a flat JSON file of name/value capabilities to apply |
+| pool | Optional | String | Apply to every agent in this pool |
+| agent | Optional | String | Apply to the agent with this name (optionally narrowed by /pool) |
+| allpools | Optional | Boolean | Apply to every agent in every pool |
+| replace | Optional | Boolean | Overwrite each agent's user capabilities instead of merging |
+| preview | Optional | Boolean | Preview the changes without writing anything |
 # Flow Metrics
 ## agingwork
 **Get aging in-progress work items**
