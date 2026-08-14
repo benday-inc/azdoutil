@@ -27,12 +27,16 @@ public class AnalyzeRepoCommand : AzureDevOpsCommandBase
         AddCommonArguments(args);
 
         args.AddString(Constants.ArgumentNameTeamProjectName)
-            .AsRequired()
-            .WithDescription("Team project name");
+            .AsNotRequired()
+            .WithDescription(
+                "Team project name. Read from the origin remote of the current directory's " +
+                "git repository when it is not supplied.");
 
         args.AddString(Constants.ArgumentNameRepositoryName)
-            .AsRequired()
-            .WithDescription("Repository name");
+            .AsNotRequired()
+            .WithDescription(
+                "Repository name. Read from the origin remote of the current directory's " +
+                "git repository when it is not supplied.");
 
         args.AddBoolean(Constants.ArgumentNameOutputCsv)
             .AllowEmptyValue()
@@ -44,9 +48,34 @@ public class AnalyzeRepoCommand : AzureDevOpsCommandBase
 
     protected override async Task OnExecute()
     {
-        var projectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);
-        var repoName = Arguments.GetStringValue(Constants.ArgumentNameRepositoryName);
+        var projectName = GetOptionalStringValue(Constants.ArgumentNameTeamProjectName);
+        var repoName = GetOptionalStringValue(Constants.ArgumentNameRepositoryName);
         var outputCsv = Arguments.GetBooleanValue(Constants.ArgumentNameOutputCsv);
+
+        if (projectName.Length == 0 || repoName.Length == 0)
+        {
+            var remote = ReadCurrentRepositoryRemote();
+
+            if (projectName.Length == 0)
+            {
+                projectName = remote.ProjectName;
+            }
+
+            if (repoName.Length == 0)
+            {
+                repoName = remote.RepositoryName;
+            }
+
+            UseConfigurationForRemote(remote);
+
+            if (IsQuietMode == false && outputCsv == false)
+            {
+                WriteLine(
+                    $"Using the origin remote of this directory: project '{projectName}', " +
+                    $"repository '{repoName}' at {remote.CollectionUrl}");
+                WriteLine(string.Empty);
+            }
+        }
 
         var repo = await FindRepository(projectName, repoName);
 

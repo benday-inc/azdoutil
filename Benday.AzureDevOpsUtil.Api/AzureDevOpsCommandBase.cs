@@ -1,4 +1,5 @@
-﻿using Benday.AzureDevOpsUtil.Api.Messages;
+﻿using Benday.AzureDevOpsUtil.Api.GitRemotes;
+using Benday.AzureDevOpsUtil.Api.Messages;
 using Benday.CommandsFramework;
 
 using System.Net.Http.Headers;
@@ -69,6 +70,109 @@ public abstract class AzureDevOpsCommandBase : AsynchronousCommand
         }
 
         set => _AzureDevOpsConfiguration = value;
+    }
+
+    /// <summary>
+    /// The value of an argument that may not have been supplied, or an empty
+    /// string.
+    /// </summary>
+    protected string GetOptionalStringValue(string argumentName)
+    {
+        if (Arguments.ContainsKey(argumentName) == true &&
+            Arguments[argumentName].HasValue == true)
+        {
+            return Arguments.GetStringValue(argumentName) ?? string.Empty;
+        }
+
+        return string.Empty;
+    }
+
+    /// <summary>
+    /// Works out which Azure DevOps repository the current directory belongs
+    /// to, for commands that can take their arguments from the git remote
+    /// rather than the command line.
+    ///
+    /// Each way this can fail says something different, so each gets its own
+    /// message rather than a generic missing-argument error.
+    /// </summary>
+    protected GitRemoteInfo ReadCurrentRepositoryRemote()
+    {
+        var currentDirectory = Directory.GetCurrentDirectory();
+
+        var gitDirectory = GitRepositoryLocator.FindGitDirectory(currentDirectory);
+
+        if (gitDirectory == null)
+        {
+            throw new KnownException(
+                $"'{currentDirectory}' is not inside a git repository, so there is nothing to " +
+                $"read the repository name from. Supply /{Constants.ArgumentNameTeamProjectName} " +
+                $"and /{Constants.ArgumentNameRepositoryName}.");
+        }
+
+        var remoteUrl = GitRepositoryLocator.FindRemoteUrl(currentDirectory);
+
+        if (string.IsNullOrWhiteSpace(remoteUrl) == true)
+        {
+            throw new KnownException(
+                "This git repository has no 'origin' remote to read the repository name from. " +
+                $"Supply /{Constants.ArgumentNameTeamProjectName} and " +
+                $"/{Constants.ArgumentNameRepositoryName}.");
+        }
+
+        var remote = GitRemoteUrlParser.Parse(remoteUrl);
+
+        if (remote == null)
+        {
+            throw new KnownException(
+                $"The origin remote of this git repository is '{remoteUrl}', which is not an " +
+                $"Azure DevOps repository url. Supply /{Constants.ArgumentNameTeamProjectName} " +
+                $"and /{Constants.ArgumentNameRepositoryName}.");
+        }
+
+        return remote;
+    }
+
+    /// <summary>
+    /// Picks the stored configuration that talks to the collection the remote
+    /// points at.  Detecting a url does not supply credentials, so this is what
+    /// makes the detected repository reachable.  An explicit /config wins.
+    /// </summary>
+    protected void UseConfigurationForRemote(GitRemoteInfo remote)
+    {
+        if (Arguments.ContainsKey(Constants.ArgumentNameConfigurationName) == true &&
+            Arguments[Constants.ArgumentNameConfigurationName].HasValue == true)
+        {
+            return;
+        }
+
+        var configurations = AzureDevOpsConfigurationManager.Instance.GetAll();
+
+        var match = configurations.FirstOrDefault(x =>
+            AreSameCollection(x.CollectionUrl, remote.CollectionUrl));
+
+        if (match == null)
+        {
+            var known = configurations.Length == 0 ?
+                "There are no configurations." :
+                "Configurations: " + string.Join(
+                    ", ", configurations.Select(x => $"{x.Name} ({x.CollectionUrl})")) + ".";
+
+            throw new KnownException(
+                $"The origin remote points at {remote.CollectionUrl}, and no azdoutil " +
+                $"configuration uses that url. {known} Add one with " +
+                $"{Constants.CommandArgumentNameAddUpdateConfig}, or name a configuration with " +
+                $"/{Constants.ArgumentNameConfigurationName}.");
+        }
+
+        Configuration = match;
+    }
+
+    private static bool AreSameCollection(string? left, string? right)
+    {
+        var trimmedLeft = (left ?? string.Empty).TrimEnd('/');
+        var trimmedRight = (right ?? string.Empty).TrimEnd('/');
+
+        return string.Equals(trimmedLeft, trimmedRight, StringComparison.OrdinalIgnoreCase);
     }
 
     protected string GetConfigurationName()

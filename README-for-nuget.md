@@ -561,8 +561,8 @@ The tools are all read-only:
 | --- | --- | --- | --- |
 | quiet | Optional | Boolean | Quiet mode |
 | config | Optional | String | Configuration name to use |
-| teamproject | Required | String | Team project name |
-| reponame | Required | String | Repository name |
+| teamproject | Optional | String | Team project name. Read from the origin remote of the current directory's git repository when it is not supplied. |
+| reponame | Optional | String | Repository name. Read from the origin remote of the current directory's git repository when it is not supplied. |
 | csv | Optional | Boolean | Output results in CSV format |
 ## assess-tfvc-migration
 **Analyzes a TFVC path and reports what a conversion to Git would have to deal with.**
