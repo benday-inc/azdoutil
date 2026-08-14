@@ -36,6 +36,7 @@ public static class FindingCategories
     public const string BranchActivity = "Branch activity";
     public const string BuildDefinitions = "Build definitions";
     public const string SharedFolders = "Folders shared by builds";
+    public const string Content = "Repository contents";
 }
 
 /// <summary>
@@ -182,6 +183,12 @@ public class TfvcAssessmentResult
     /// Every distinct path mapped by a TFVC-connected build, most-mapped first.
     /// </summary>
     public List<MappedPathUsage> MappedPathUsages { get; set; } = new();
+
+    /// <summary>
+    /// What is actually in the tree: largest files, file types, and folders
+    /// that normally hold generated output.
+    /// </summary>
+    public TfvcContentScanResult Content { get; set; } = new();
 
     public List<AssessmentFinding> Findings { get; set; } = new();
 

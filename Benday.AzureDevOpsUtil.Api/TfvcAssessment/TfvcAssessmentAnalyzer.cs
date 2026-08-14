@@ -14,6 +14,7 @@ public class TfvcAssessmentAnalyzer
     private readonly TfvcFolderHeuristicScanner _folderScanner;
     private readonly TfvcBranchActivityService _activityService;
     private readonly BuildDefinitionWorkspaceService _buildWorkspaceService;
+    private readonly TfvcContentScanner _contentScanner;
 
     /// <param name="buildClient">
     /// Optional.  When it is not supplied the build definition section is
@@ -28,6 +29,7 @@ public class TfvcAssessmentAnalyzer
         _folderScanner = new TfvcFolderHeuristicScanner();
         _activityService = new TfvcBranchActivityService();
         _buildWorkspaceService = new BuildDefinitionWorkspaceService();
+        _contentScanner = new TfvcContentScanner();
     }
 
     /// <summary>
@@ -86,11 +88,42 @@ public class TfvcAssessmentAnalyzer
                 "Counts marked with a plus sign are a floor, not an exact number.");
         }
 
+        await ScanContentAsync(result, projectName, scope);
+
         await ScanBuildDefinitionsAsync(result, projectName, utcNow);
 
         BuildFindings(result);
 
         return result;
+    }
+
+    /// <summary>
+    /// Reads the whole tree in one recursive listing.  A failure here is
+    /// recorded and the rest of the assessment carries on: on a very large tree
+    /// this is a single large response, and losing the branch analysis to it
+    /// would be a poor trade.
+    /// </summary>
+    private async Task ScanContentAsync(
+        TfvcAssessmentResult result, string projectName, string scope)
+    {
+        ReportProgress($"Reading the contents of {scope}...");
+
+        try
+        {
+            var items = await _client.GetItemsAsync(projectName, scope, TfvcRecursionLevel.Full);
+
+            result.Content = _contentScanner.Scan(items, scope);
+
+            result.Notes.Add(
+                $"{result.Content.FileCount} file(s) were examined under {scope}. " +
+                "Sizes are the current version of each file, not the size of the history.");
+        }
+        catch (Exception ex)
+        {
+            result.Notes.Add(
+                $"The contents of {scope} could not be read: {ex.Message} " +
+                "The rest of this report is unaffected.");
+        }
     }
 
     /// <summary>
@@ -177,8 +210,70 @@ public class TfvcAssessmentAnalyzer
         AddNestedBranchFindings(result);
         AddUnregisteredBranchFindings(result);
         AddBranchActivityFindings(result);
+        AddContentFindings(result);
         AddBuildDefinitionFindings(result);
         AddSharedFolderFindings(result);
+    }
+
+    private void AddContentFindings(TfvcAssessmentResult result)
+    {
+        var content = result.Content;
+
+        if (content.FileCount == 0)
+        {
+            return;
+        }
+
+        result.Findings.Add(new AssessmentFinding(
+            FindingCategories.Content,
+            $"{content.FileCount} file(s) totalling " +
+                $"{TfvcAssessmentReportFormatter.FormatSize(content.TotalSizeBytes)} are stored " +
+                $"under {result.ScopePath}.",
+            "That figure is the current version of each file. Git carries every version of " +
+                "every file in every clone, so the repository that results from a migration " +
+                "is larger than this."));
+
+        if (content.FilesOverPushLimit > 0)
+        {
+            result.Findings.Add(new AssessmentFinding(
+                FindingCategories.Content,
+                $"{content.FilesOverPushLimit} file(s) are larger than 100 MB.",
+                "Files over 100 MB exceed the push limits of most Git hosting services.",
+                DescribeLargestFiles(content, TfvcContentScanner.PushLimitSizeBytes)));
+        }
+
+        if (content.FilesOverWarningSize > 0)
+        {
+            result.Findings.Add(new AssessmentFinding(
+                FindingCategories.Content,
+                $"{content.FilesOverWarningSize} file(s) are larger than 50 MB.",
+                "Every clone of the Git repository carries every version of these files.",
+                DescribeLargestFiles(content, TfvcContentScanner.WarningSizeBytes)));
+        }
+
+        if (content.GeneratedFolders.Count > 0)
+        {
+            result.Findings.Add(new AssessmentFinding(
+                FindingCategories.Content,
+                $"{content.GeneratedFolderFileCount} file(s) totalling " +
+                    $"{TfvcAssessmentReportFormatter.FormatSize(content.GeneratedFolderSizeBytes)} " +
+                    "are stored in folders that normally hold generated output or downloaded " +
+                    "dependencies.",
+                "These files are carried into the Git repository along with every version of " +
+                    "them that was ever checked in.",
+                string.Join(", ", content.GeneratedFolders.Select(
+                    x => $"{x.Name} ({x.FileCount} file(s))"))));
+        }
+    }
+
+    private string DescribeLargestFiles(TfvcContentScanResult content, long minimumSizeBytes)
+    {
+        var matches = content.LargestFiles
+            .Where(x => x.SizeBytes >= minimumSizeBytes)
+            .Select(x => $"{x.Path} ({TfvcAssessmentReportFormatter.FormatSize(x.SizeBytes)})")
+            .ToList();
+
+        return string.Join(", ", matches);
     }
 
     private void AddBuildDefinitionFindings(TfvcAssessmentResult result)

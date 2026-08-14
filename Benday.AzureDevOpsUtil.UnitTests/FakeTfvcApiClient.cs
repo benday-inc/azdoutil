@@ -14,6 +14,14 @@ public class FakeTfvcApiClient : ITfvcApiClient
     public Dictionary<string, List<TfvcItemInfo>> ItemsByPath { get; } =
         new(StringComparer.OrdinalIgnoreCase);
 
+    /// <summary>
+    /// Recursive listings, kept separate from the one-level ones so a test that
+    /// only sets up a folder walk does not accidentally also feed the content
+    /// scan.
+    /// </summary>
+    public Dictionary<string, List<TfvcItemInfo>> FullItemsByPath { get; } =
+        new(StringComparer.OrdinalIgnoreCase);
+
     public Dictionary<string, List<TfvcChangesetInfo>> ChangesetsByPath { get; } =
         new(StringComparer.OrdinalIgnoreCase);
 
@@ -66,6 +74,14 @@ public class FakeTfvcApiClient : ITfvcApiClient
         SetChildren(parentPath, childPaths.Select(x => FolderItem(x)).ToArray());
     }
 
+    /// <summary>
+    /// Registers what a recursive listing returns for a scope path.
+    /// </summary>
+    public void SetFullListing(string scopePath, params TfvcItemInfo[] items)
+    {
+        FullItemsByPath[scopePath] = items.ToList();
+    }
+
     public void SetChangesets(string itemPath, params TfvcChangesetInfo[] changesets)
     {
         ChangesetsByPath[itemPath] = changesets.ToList();
@@ -91,7 +107,9 @@ public class FakeTfvcApiClient : ITfvcApiClient
     {
         ItemRequests.Add(scopePath);
 
-        if (ItemsByPath.TryGetValue(scopePath, out var items) == true)
+        var source = recursionLevel == TfvcRecursionLevel.Full ? FullItemsByPath : ItemsByPath;
+
+        if (source.TryGetValue(scopePath, out var items) == true)
         {
             return Task.FromResult<IReadOnlyList<TfvcItemInfo>>(items);
         }

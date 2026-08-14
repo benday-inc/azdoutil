@@ -27,6 +27,7 @@ public class TfvcAssessmentReportFormatter
         FormatNestedBranches(sb, result);
         FormatUnregisteredBranches(sb, result);
         FormatBranchActivity(sb, result);
+        FormatContent(sb, result);
         FormatBuildDefinitions(sb, result);
         FormatFindings(sb, result);
         FormatNotes(sb, result);
@@ -66,6 +67,17 @@ public class TfvcAssessmentReportFormatter
         sb.AppendLine(
             "| Paths mapped by more than one build | " +
             $"{result.MappedPathUsages.Count(x => x.DefinitionCount > 1)} |");
+
+        if (result.Content.FileCount > 0)
+        {
+            sb.AppendLine($"| Files | {result.Content.FileCount} |");
+            sb.AppendLine(
+                $"| Size at the current version | {FormatSize(result.Content.TotalSizeBytes)} |");
+            sb.AppendLine($"| Files over 100 MB | {result.Content.FilesOverPushLimit} |");
+            sb.AppendLine(
+                "| Files in generated or dependency folders | " +
+                $"{result.Content.GeneratedFolderFileCount} |");
+        }
     }
 
     private void FormatBranchHierarchy(StringBuilder sb, TfvcAssessmentResult result)
@@ -242,6 +254,119 @@ public class TfvcAssessmentReportFormatter
                 $"| {FormatCount(item.ChangesetsLast365Days, item.CountsAreCapped)} " +
                 $"| {item.Classification} |");
         }
+    }
+
+    /// <summary>
+    /// Bytes as something a person can read at a glance.
+    /// </summary>
+    public static string FormatSize(long bytes)
+    {
+        const long Kilobyte = 1024L;
+        const long Megabyte = Kilobyte * 1024L;
+        const long Gigabyte = Megabyte * 1024L;
+
+        if (bytes >= Gigabyte)
+        {
+            return (bytes / (double)Gigabyte).ToString("0.#", CultureInfo.InvariantCulture) + " GB";
+        }
+
+        if (bytes >= Megabyte)
+        {
+            return (bytes / (double)Megabyte).ToString("0.#", CultureInfo.InvariantCulture) + " MB";
+        }
+
+        if (bytes >= Kilobyte)
+        {
+            return (bytes / (double)Kilobyte).ToString("0.#", CultureInfo.InvariantCulture) + " KB";
+        }
+
+        return bytes.ToString(CultureInfo.InvariantCulture) + " bytes";
+    }
+
+    private void FormatContent(StringBuilder sb, TfvcAssessmentResult result)
+    {
+        var content = result.Content;
+
+        if (content.FileCount == 0)
+        {
+            return;
+        }
+
+        sb.AppendLine();
+        sb.AppendLine("## What is stored here");
+        sb.AppendLine();
+        sb.AppendLine(
+            $"{content.FileCount} file(s), {FormatSize(content.TotalSizeBytes)} at the current " +
+            "version of each file.");
+
+        FormatLargestFiles(sb, content);
+        FormatExtensionUsages(sb, content);
+        FormatGeneratedFolders(sb, content);
+    }
+
+    private void FormatLargestFiles(StringBuilder sb, TfvcContentScanResult content)
+    {
+        if (content.LargestFiles.Count == 0)
+        {
+            return;
+        }
+
+        sb.AppendLine();
+        sb.AppendLine($"### The {content.LargestFiles.Count} largest files");
+        sb.AppendLine();
+        sb.AppendLine("| File | Size |");
+        sb.AppendLine("|---|---|");
+
+        foreach (var file in content.LargestFiles)
+        {
+            sb.AppendLine($"| {file.Path} | {FormatSize(file.SizeBytes)} |");
+        }
+    }
+
+    private void FormatExtensionUsages(StringBuilder sb, TfvcContentScanResult content)
+    {
+        if (content.ExtensionUsages.Count == 0)
+        {
+            return;
+        }
+
+        sb.AppendLine();
+        sb.AppendLine("### File types that Git would carry forever");
+        sb.AppendLine();
+        sb.AppendLine("| Extension | Files | Size |");
+        sb.AppendLine("|---|---|---|");
+
+        foreach (var usage in content.ExtensionUsages)
+        {
+            sb.AppendLine(
+                $"| {usage.Extension} | {usage.FileCount} " +
+                $"| {FormatSize(usage.TotalSizeBytes)} |");
+        }
+    }
+
+    private void FormatGeneratedFolders(StringBuilder sb, TfvcContentScanResult content)
+    {
+        if (content.GeneratedFolders.Count == 0)
+        {
+            return;
+        }
+
+        sb.AppendLine();
+        sb.AppendLine("### Generated output and downloaded dependencies");
+        sb.AppendLine();
+        sb.AppendLine("| Folder name | Files | Size | Example |");
+        sb.AppendLine("|---|---|---|---|");
+
+        foreach (var folder in content.GeneratedFolders)
+        {
+            sb.AppendLine(
+                $"| {folder.Name} | {folder.FileCount} " +
+                $"| {FormatSize(folder.TotalSizeBytes)} | {folder.ExamplePath} |");
+        }
+
+        sb.AppendLine();
+        sb.AppendLine(
+            "Each file is counted once, against the outermost folder of this kind in its path.");
     }
 
     private void FormatBuildDefinitions(StringBuilder sb, TfvcAssessmentResult result)

@@ -132,6 +132,49 @@ public class TfvcAssessmentReportFormatterFixture
             DefinitionNames = new List<string> { "Web-CI" }
         });
 
+        result.Content = new TfvcContentScanResult
+        {
+            FileCount = 4820,
+            TotalSizeBytes = 3L * 1024 * 1024 * 1024,
+            FilesOverWarningSize = 3,
+            FilesOverPushLimit = 1,
+            LargestFiles = new List<LargeFileInfo>
+            {
+                new()
+                {
+                    Path = "$/GnarlyCorp/Main/db/Backup.bak",
+                    SizeBytes = 300L * 1024 * 1024
+                },
+                new()
+                {
+                    Path = "$/GnarlyCorp/Main/tools/Installer.iso",
+                    SizeBytes = 60L * 1024 * 1024
+                }
+            },
+            ExtensionUsages = new List<ExtensionUsage>
+            {
+                new() { Extension = ".dll", FileCount = 412, TotalSizeBytes = 380L * 1024 * 1024 },
+                new() { Extension = ".pdb", FileCount = 210, TotalSizeBytes = 90L * 1024 * 1024 }
+            },
+            GeneratedFolders = new List<GeneratedFolderUsage>
+            {
+                new()
+                {
+                    Name = "packages",
+                    FileCount = 3847,
+                    TotalSizeBytes = 1200L * 1024 * 1024,
+                    ExamplePath = "$/GnarlyCorp/Main/packages/Newtonsoft.Json/lib/net45/x.dll"
+                },
+                new()
+                {
+                    Name = "bin",
+                    FileCount = 610,
+                    TotalSizeBytes = 400L * 1024 * 1024,
+                    ExamplePath = "$/GnarlyCorp/Main/src/bin/App.dll"
+                }
+            }
+        };
+
         result.Notes.Add("Folder scan walked 3 level(s) below $/GnarlyCorp.");
 
         return result;
@@ -281,6 +324,67 @@ public class TfvcAssessmentReportFormatterFixture
         StringAssert.Contains(actual, "never run", "A build with no runs should say so.");
     }
 
+    [DataTestMethod]
+    [DataRow(512L, "512 bytes")]
+    [DataRow(2048L, "2 KB")]
+    [DataRow(1572864L, "1.5 MB")]
+    [DataRow(3221225472L, "3 GB")]
+    public void FormatSize_IsReadable(long bytes, string expected)
+    {
+        Assert.AreEqual(
+            expected, TfvcAssessmentReportFormatter.FormatSize(bytes), "Wrong size formatting.");
+    }
+
+    [TestMethod]
+    public void FormatReport_IncludesTheLargestFiles()
+    {
+        var actual = SystemUnderTest.FormatReport(BuildResult());
+
+        StringAssert.Contains(actual, "## What is stored here", "Missing the content section.");
+        StringAssert.Contains(actual, "largest files", "Missing the largest files table.");
+        StringAssert.Contains(actual, "Backup.bak", "Missing the largest file.");
+        StringAssert.Contains(actual, "300 MB", "Missing the file size.");
+    }
+
+    [TestMethod]
+    public void FormatReport_IncludesFileTypes()
+    {
+        var actual = SystemUnderTest.FormatReport(BuildResult());
+
+        StringAssert.Contains(actual, "| .dll | 412 ", "Missing the extension row.");
+        StringAssert.Contains(actual, "380 MB", "Missing the extension size.");
+    }
+
+    [TestMethod]
+    public void FormatReport_IncludesGeneratedFolders()
+    {
+        var actual = SystemUnderTest.FormatReport(BuildResult());
+
+        StringAssert.Contains(
+            actual,
+            "### Generated output and downloaded dependencies",
+            "Missing the generated folder section.");
+
+        StringAssert.Contains(actual, "| packages | 3847 ", "Missing the packages row.");
+        StringAssert.Contains(actual, "1.2 GB", "Missing the packages size.");
+        StringAssert.Contains(
+            actual, "counted once", "The report should say how the counts avoid overlapping.");
+    }
+
+    [TestMethod]
+    public void FormatReport_ContentSectionIsAbsentWhenNothingWasRead()
+    {
+        var result = BuildResult();
+
+        result.Content = new TfvcContentScanResult();
+
+        var actual = SystemUnderTest.FormatReport(result);
+
+        Assert.IsFalse(
+            actual.Contains("## What is stored here"),
+            "An unread tree should not produce an empty section.");
+    }
+
     [TestMethod]
     public void FormatReport_SaysWhatWasNotCovered()
     {
@@ -319,6 +423,12 @@ public class TfvcAssessmentReportFormatterFixture
         client.SetChangesets("$/App/Dev", FakeTfvcApiClient.Changeset(2, UtcNow.AddDays(-3)));
         client.SetChangesets(
             "$/App/Main/Feature", FakeTfvcApiClient.Changeset(3, UtcNow.AddDays(-900)));
+
+        client.SetFullListing(
+            "$/App",
+            new TfvcItemInfo { Path = "$/App/src/bin/App.dll", Size = 200L * 1024 * 1024 },
+            new TfvcItemInfo { Path = "$/App/packages/Foo/Foo.dll", Size = 1024 },
+            new TfvcItemInfo { Path = "$/App/src/Program.cs", Size = 900 });
 
         var buildClient = new FakeBuildDefinitionApiClient();
 

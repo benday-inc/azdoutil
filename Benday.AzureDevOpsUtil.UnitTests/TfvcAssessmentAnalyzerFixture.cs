@@ -308,6 +308,103 @@ public class TfvcAssessmentAnalyzerFixture
             "A skipped section should say so.");
     }
 
+    [TestMethod]
+    public async Task Analyze_ReportsWhatIsStoredInTheTree()
+    {
+        var client = new FakeTfvcApiClient();
+
+        client.SetFullListing(
+            "$/App",
+            new TfvcItemInfo { Path = "$/App", IsFolder = true },
+            new TfvcItemInfo { Path = "$/App/src/Program.cs", Size = 1024 },
+            new TfvcItemInfo
+            {
+                Path = "$/App/src/bin/App.dll",
+                Size = 120L * 1024 * 1024
+            },
+            new TfvcItemInfo
+            {
+                Path = "$/App/packages/Foo/Foo.dll",
+                Size = 2048
+            });
+
+        var analyzer = new TfvcAssessmentAnalyzer(client);
+
+        var actual = await analyzer.AnalyzeAsync(ProjectName, "$/App", UtcNow);
+
+        Assert.AreEqual(3, actual.Content.FileCount, "Wrong file count.");
+        Assert.AreEqual(1, actual.Content.FilesOverPushLimit, "Wrong count over the push limit.");
+        Assert.AreEqual(2, actual.Content.GeneratedFolders.Count, "Expected bin and packages.");
+
+        var overall = actual.Findings.FirstOrDefault(
+            x => x.Category == FindingCategories.Content && x.Fact.Contains("totalling"));
+
+        Assert.IsNotNull(overall, "Expected a finding about what is stored.");
+        StringAssert.Contains(
+            overall!.Consequence,
+            "Git carries every version of every file",
+            "The report should say the figure understates the clone.");
+
+        var pushLimit = actual.Findings.FirstOrDefault(
+            x => x.Fact.Contains("larger than 100 MB"));
+
+        Assert.IsNotNull(pushLimit, "Expected a finding about the push limit.");
+        StringAssert.Contains(
+            pushLimit!.Detail, "App.dll", "The offending file should be named.");
+    }
+
+    [TestMethod]
+    public async Task Analyze_NoContentFindingsForAnEmptyTree()
+    {
+        var client = new FakeTfvcApiClient();
+
+        var analyzer = new TfvcAssessmentAnalyzer(client);
+
+        var actual = await analyzer.AnalyzeAsync(ProjectName, "$/App", UtcNow);
+
+        Assert.AreEqual(0, actual.Content.FileCount, "Nothing was read.");
+        Assert.IsFalse(
+            actual.Findings.Any(x => x.Category == FindingCategories.Content),
+            "An empty tree produces nothing to report.");
+    }
+
+    private sealed class ThrowingTfvcApiClient : FakeTfvcApiClient, ITfvcApiClient
+    {
+        public new Task<IReadOnlyList<TfvcItemInfo>> GetItemsAsync(
+            string projectName, string scopePath, TfvcRecursionLevel recursionLevel)
+        {
+            if (recursionLevel == TfvcRecursionLevel.Full)
+            {
+                throw new InvalidOperationException("response too large");
+            }
+
+            return base.GetItemsAsync(projectName, scopePath, recursionLevel);
+        }
+    }
+
+    [TestMethod]
+    public async Task Analyze_ContentFailureDoesNotSinkTheWholeAssessment()
+    {
+        var client = new ThrowingTfvcApiClient();
+
+        client.Branches.Add(Branch("$/App/Main"));
+
+        var analyzer = new TfvcAssessmentAnalyzer(client);
+
+        var actual = await analyzer.AnalyzeAsync(ProjectName, "$/App", UtcNow);
+
+        Assert.AreEqual(
+            1, actual.RegisteredBranchPaths.Count, "The branch section should still be there.");
+
+        Assert.IsTrue(
+            actual.Notes.Any(x => x.Contains("could not be read")),
+            "The failure should be recorded rather than swallowed.");
+
+        Assert.IsTrue(
+            actual.Notes.Any(x => x.Contains("response too large")),
+            "The reason should survive into the report.");
+    }
+
     private sealed class ThrowingBuildDefinitionApiClient : IBuildDefinitionApiClient
     {
         public Task<IReadOnlyList<BuildDefinitionInfo>> GetDefinitionsAsync(string projectName)
