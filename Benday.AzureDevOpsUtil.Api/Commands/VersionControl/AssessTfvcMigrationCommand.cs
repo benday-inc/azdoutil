@@ -63,6 +63,11 @@ public class AssessTfvcMigrationCommand : AzureDevOpsCommandBase
 
         var outputCsv = Arguments.GetBooleanValue(Constants.ArgumentNameOutputCsv);
 
+        // Without this, a mistyped path reads as a real result: the report says
+        // there are no branches and no history, which looks like a finding
+        // rather than a typo.
+        await ValidateTfvcPathExists(projectName, tfvcPath);
+
         var analyzer = new TfvcAssessmentAnalyzer(
             new TfvcApiClient(GetJsonAsync),
             new BuildDefinitionApiClient(GetJsonAsync))
@@ -127,6 +132,37 @@ public class AssessTfvcMigrationCommand : AzureDevOpsCommandBase
         }
 
         return TfvcFolderHeuristicScanner.DefaultMaxDepth;
+    }
+
+    /// <summary>
+    /// Confirms the path can be read before any analysis runs, and reports what
+    /// the server said when it cannot.
+    /// </summary>
+    private async Task ValidateTfvcPathExists(string projectName, string tfvcPath)
+    {
+        using var client = GetHttpClientInstanceForAzureDevOps();
+
+        var requestUrl =
+            $"{Uri.EscapeDataString(projectName)}/_apis/tfvc/items" +
+            $"?scopePath={Uri.EscapeDataString(tfvcPath)}" +
+            $"&recursionLevel=None" +
+            $"&api-version={TfvcApiClient.ApiVersion}";
+
+        var response = await client.GetAsync(requestUrl);
+
+        if (response.IsSuccessStatusCode == true)
+        {
+            return;
+        }
+
+        var body = await response.Content.ReadAsStringAsync();
+
+        var message = AzureDevOpsErrorMessageReader.GetMessageOrDefault(
+            body, $"{(int)response.StatusCode} {response.ReasonPhrase}");
+
+        throw new KnownException(
+            $"Could not read TFVC path '{tfvcPath}' in team project '{projectName}'. " +
+            $"{message}");
     }
 
     /// <summary>
