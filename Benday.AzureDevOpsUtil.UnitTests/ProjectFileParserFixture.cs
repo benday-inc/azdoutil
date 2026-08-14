@@ -355,4 +355,62 @@ public class ProjectFileParserFixture
         Assert.AreEqual<int>(0, actual.ExternalReferences.Count, "Should have no external references.");
         Assert.AreEqual<string>("None", actual.NuGetManagementStyle, "NuGet style should be None.");
     }
+
+    /// <summary>
+    /// Everything written before the SDK-style project format carries the
+    /// MSBuild namespace, which is what anything coming out of TFVC looks like.
+    /// </summary>
+    private const string LegacyNamespacedProject = """
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj" />
+    <Reference Include="ThirdParty">
+      <HintPath>..\..\Libs\ThirdParty.dll</HintPath>
+    </Reference>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+  </ItemGroup>
+</Project>
+""";
+
+    [TestMethod]
+    public void ParseProjectFile_ReadsProjectReferencesInNamespacedProjects()
+    {
+        var actual = new ProjectFileParser().ParseProjectFile(
+            LegacyNamespacedProject, "$/App/Web/Web.csproj");
+
+        var projectReferences = actual.ExternalReferences
+            .Where(x => x.ReferenceType == "ProjectReference")
+            .ToList();
+
+        Assert.AreEqual(
+            1,
+            projectReferences.Count,
+            "The MSBuild namespace should not hide the project reference.");
+    }
+
+    [TestMethod]
+    public void ParseProjectFile_ReadsHintPathsInNamespacedProjects()
+    {
+        var actual = new ProjectFileParser().ParseProjectFile(
+            LegacyNamespacedProject, "$/App/Web/Web.csproj");
+
+        Assert.IsTrue(
+            actual.ExternalReferences.Any(x => x.ReferenceType == "HintPath"),
+            "The MSBuild namespace should not hide the hint path.");
+    }
+
+    [TestMethod]
+    public void ParseProjectFile_ReadsPackagesAndFrameworkInNamespacedProjects()
+    {
+        var actual = new ProjectFileParser().ParseProjectFile(
+            LegacyNamespacedProject, "$/App/Web/Web.csproj");
+
+        Assert.AreEqual(1, actual.PackageReferences.Count, "Missing the package reference.");
+        CollectionAssert.Contains(
+            actual.TargetFrameworks, "net472", "Missing the target framework.");
+    }
 }

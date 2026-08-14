@@ -140,6 +140,19 @@ public class TfvcApiClient : ITfvcApiClient
         return results;
     }
 
+    public async Task<string?> GetFileContentAsync(string projectName, string path)
+    {
+        // $format=text asks for the file itself rather than the json metadata
+        // that describes it.
+        var requestUrl =
+            $"{Uri.EscapeDataString(projectName)}/_apis/tfvc/items" +
+            $"?path={Uri.EscapeDataString(TfvcPath.Normalize(path))}" +
+            $"&$format=text" +
+            $"&api-version={ApiVersion}";
+
+        return await _getJsonAsync(requestUrl);
+    }
+
     public string BuildChangesetsRequestUrl(
         string projectName, string itemPath, DateTime? fromDateUtc, int top, int skip)
     {

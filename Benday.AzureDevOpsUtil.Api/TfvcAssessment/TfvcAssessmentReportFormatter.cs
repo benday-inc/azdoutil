@@ -28,7 +28,9 @@ public class TfvcAssessmentReportFormatter
         FormatUnregisteredBranches(sb, result);
         FormatBranchActivity(sb, result);
         FormatContent(sb, result);
+        FormatSolutions(sb, result);
         FormatBuildDefinitions(sb, result);
+        FormatCommonCode(sb, result);
         FormatFindings(sb, result);
         FormatNotes(sb, result);
         FormatFooter(sb);
@@ -67,6 +69,17 @@ public class TfvcAssessmentReportFormatter
         sb.AppendLine(
             "| Paths mapped by more than one build | " +
             $"{result.MappedPathUsages.Count(x => x.DefinitionCount > 1)} |");
+
+        if (result.Solutions.Solutions.Count > 0)
+        {
+            sb.AppendLine($"| Solutions | {result.Solutions.Solutions.Count} |");
+            sb.AppendLine(
+                "| Projects referenced from more than one solution | " +
+                $"{result.Solutions.SharedProjects.Count} |");
+            sb.AppendLine(
+                "| References reaching outside their solution folder | " +
+                $"{result.Solutions.CrossSolutionReferences.Count} |");
+        }
 
         if (result.Content.FileCount > 0)
         {
@@ -367,6 +380,104 @@ public class TfvcAssessmentReportFormatter
         sb.AppendLine();
         sb.AppendLine(
             "Each file is counted once, against the outermost folder of this kind in its path.");
+    }
+
+    private void FormatSolutions(StringBuilder sb, TfvcAssessmentResult result)
+    {
+        var solutions = result.Solutions;
+
+        if (solutions.Solutions.Count == 0 && solutions.Projects.Count == 0)
+        {
+            return;
+        }
+
+        sb.AppendLine();
+        sb.AppendLine("## Solutions and projects");
+        sb.AppendLine();
+        sb.AppendLine(
+            $"{solutions.Solutions.Count} solution(s) and {solutions.Projects.Count} " +
+            $"project file(s). {solutions.ProjectsUsingPackagesConfig} project(s) restore " +
+            "packages through packages.config.");
+
+        if (solutions.Solutions.Count > 0)
+        {
+            sb.AppendLine();
+            sb.AppendLine("| Solution | Projects |");
+            sb.AppendLine("|---|---|");
+
+            foreach (var solution in solutions.Solutions
+                .OrderBy(x => x.Path, StringComparer.OrdinalIgnoreCase))
+            {
+                sb.AppendLine($"| {solution.Path} | {solution.ProjectPaths.Count} |");
+            }
+        }
+
+        FormatCrossSolutionReferences(sb, solutions);
+        FormatSharedProjects(sb, solutions);
+    }
+
+    private void FormatCrossSolutionReferences(
+        StringBuilder sb, TfvcSolutionAnalysisResult solutions)
+    {
+        if (solutions.CrossSolutionReferences.Count == 0)
+        {
+            return;
+        }
+
+        sb.AppendLine();
+        sb.AppendLine("### References that reach outside their solution folder");
+        sb.AppendLine();
+        sb.AppendLine("| Project | References | Solution |");
+        sb.AppendLine("|---|---|---|");
+
+        foreach (var reference in solutions.CrossSolutionReferences)
+        {
+            sb.AppendLine(
+                $"| {reference.FromProject} | {reference.ToProject} " +
+                $"| {reference.SolutionPath} |");
+        }
+    }
+
+    private void FormatSharedProjects(StringBuilder sb, TfvcSolutionAnalysisResult solutions)
+    {
+        if (solutions.SharedProjects.Count == 0)
+        {
+            return;
+        }
+
+        sb.AppendLine();
+        sb.AppendLine("### Projects referenced from more than one solution");
+        sb.AppendLine();
+        sb.AppendLine("| Project | Solutions | Referenced by |");
+        sb.AppendLine("|---|---|---|");
+
+        foreach (var shared in solutions.SharedProjects)
+        {
+            sb.AppendLine(
+                $"| {shared.ProjectPath} | {shared.SolutionCount} " +
+                $"| {string.Join(", ", shared.SolutionPaths)} |");
+        }
+    }
+
+    private void FormatCommonCode(StringBuilder sb, TfvcAssessmentResult result)
+    {
+        if (result.CommonCodeFolders.Count == 0)
+        {
+            return;
+        }
+
+        sb.AppendLine();
+        sb.AppendLine("## Folders that both measures call shared code");
+        sb.AppendLine();
+        sb.AppendLine("| Folder | Solutions | Builds |");
+        sb.AppendLine("|---|---|---|");
+
+        foreach (var folder in result.CommonCodeFolders)
+        {
+            sb.AppendLine(
+                $"| {folder.Path} | {folder.SolutionPaths.Count} " +
+                $"| {folder.BuildDefinitionNames.Count} |");
+        }
     }
 
     private void FormatBuildDefinitions(StringBuilder sb, TfvcAssessmentResult result)

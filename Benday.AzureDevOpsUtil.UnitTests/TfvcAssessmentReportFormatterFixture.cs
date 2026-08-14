@@ -175,6 +175,57 @@ public class TfvcAssessmentReportFormatterFixture
             }
         };
 
+        result.Solutions = new TfvcSolutionAnalysisResult
+        {
+            Solutions = new List<TfvcSolutionInfo>
+            {
+                new()
+                {
+                    Path = "$/GnarlyCorp/Main/Web/Web.sln",
+                    RootFolder = "$/GnarlyCorp/Main/Web",
+                    ProjectPaths = new List<string> { "$/GnarlyCorp/Main/Web/Site.csproj" }
+                }
+            },
+            Projects = new List<TfvcProjectInfo>
+            {
+                new()
+                {
+                    Path = "$/GnarlyCorp/Main/Web/Site.csproj",
+                    UsesPackagesConfig = true
+                }
+            },
+            CrossSolutionReferences = new List<CrossSolutionReference>
+            {
+                new()
+                {
+                    SolutionPath = "$/GnarlyCorp/Main/Web/Web.sln",
+                    FromProject = "$/GnarlyCorp/Main/Web/Site.csproj",
+                    ToProject = "$/GnarlyCorp/Common/Common.csproj"
+                }
+            },
+            SharedProjects = new List<SharedProjectUsage>
+            {
+                new()
+                {
+                    ProjectPath = "$/GnarlyCorp/Common/Common.csproj",
+                    SolutionPaths = new List<string>
+                    {
+                        "$/GnarlyCorp/Main/Web/Web.sln", "$/GnarlyCorp/Main/Api/Api.sln"
+                    }
+                }
+            }
+        };
+
+        result.CommonCodeFolders.Add(new CommonCodeFolder
+        {
+            Path = "$/GnarlyCorp/Common",
+            SolutionPaths = new List<string>
+            {
+                "$/GnarlyCorp/Main/Web/Web.sln", "$/GnarlyCorp/Main/Api/Api.sln"
+            },
+            BuildDefinitionNames = new List<string> { "Web-CI", "Batch-CI" }
+        });
+
         result.Notes.Add("Folder scan walked 3 level(s) below $/GnarlyCorp.");
 
         return result;
@@ -383,6 +434,36 @@ public class TfvcAssessmentReportFormatterFixture
         Assert.IsFalse(
             actual.Contains("## What is stored here"),
             "An unread tree should not produce an empty section.");
+    }
+
+    [TestMethod]
+    public void FormatReport_IncludesSolutionSections()
+    {
+        var actual = SystemUnderTest.FormatReport(BuildResult());
+
+        StringAssert.Contains(actual, "## Solutions and projects", "Missing the solution section.");
+        StringAssert.Contains(
+            actual,
+            "### References that reach outside their solution folder",
+            "Missing the cross-solution section.");
+        StringAssert.Contains(
+            actual,
+            "### Projects referenced from more than one solution",
+            "Missing the shared project section.");
+        StringAssert.Contains(actual, "Common.csproj", "Missing the shared project path.");
+    }
+
+    [TestMethod]
+    public void FormatReport_IncludesTheCombinedSharedCodeSection()
+    {
+        var actual = SystemUnderTest.FormatReport(BuildResult());
+
+        StringAssert.Contains(
+            actual,
+            "## Folders that both measures call shared code",
+            "Missing the combined section.");
+        StringAssert.Contains(
+            actual, "| $/GnarlyCorp/Common | 2 | 2 |", "Missing the combined row.");
     }
 
     [TestMethod]

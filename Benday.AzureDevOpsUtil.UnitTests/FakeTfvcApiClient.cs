@@ -82,6 +82,28 @@ public class FakeTfvcApiClient : ITfvcApiClient
         FullItemsByPath[scopePath] = items.ToList();
     }
 
+    public Dictionary<string, string> FileContentByPath { get; } =
+        new(StringComparer.OrdinalIgnoreCase);
+
+    public List<string> FileContentRequests { get; } = new();
+
+    public void SetFileContent(string path, string content)
+    {
+        FileContentByPath[path] = content;
+    }
+
+    public Task<string?> GetFileContentAsync(string projectName, string path)
+    {
+        FileContentRequests.Add(path);
+
+        if (FileContentByPath.TryGetValue(path, out var content) == true)
+        {
+            return Task.FromResult<string?>(content);
+        }
+
+        return Task.FromResult<string?>(null);
+    }
+
     public void SetChangesets(string itemPath, params TfvcChangesetInfo[] changesets)
     {
         ChangesetsByPath[itemPath] = changesets.ToList();

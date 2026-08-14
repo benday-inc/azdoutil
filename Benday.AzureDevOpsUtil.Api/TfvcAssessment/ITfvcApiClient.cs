@@ -27,4 +27,9 @@ public interface ITfvcApiClient
     /// </summary>
     Task<IReadOnlyList<TfvcChangesetInfo>> GetChangesetsAsync(
         string projectName, string itemPath, DateTime? fromDateUtc, int maxResults);
+
+    /// <summary>
+    /// The contents of a single file, or null when it could not be read.
+    /// </summary>
+    Task<string?> GetFileContentAsync(string projectName, string path);
 }

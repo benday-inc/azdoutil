@@ -1,3 +1,5 @@
+using Benday.AzureDevOpsUtil.Api.Messages;
+
 namespace Benday.AzureDevOpsUtil.Api.TfvcAssessment;
 
 /// <summary>
@@ -15,6 +17,7 @@ public class TfvcAssessmentAnalyzer
     private readonly TfvcBranchActivityService _activityService;
     private readonly BuildDefinitionWorkspaceService _buildWorkspaceService;
     private readonly TfvcContentScanner _contentScanner;
+    private readonly TfvcSolutionAnalysisService _solutionService;
 
     /// <param name="buildClient">
     /// Optional.  When it is not supplied the build definition section is
@@ -30,6 +33,7 @@ public class TfvcAssessmentAnalyzer
         _activityService = new TfvcBranchActivityService();
         _buildWorkspaceService = new BuildDefinitionWorkspaceService();
         _contentScanner = new TfvcContentScanner();
+        _solutionService = new TfvcSolutionAnalysisService();
     }
 
     /// <summary>
@@ -117,12 +121,39 @@ public class TfvcAssessmentAnalyzer
             result.Notes.Add(
                 $"{result.Content.FileCount} file(s) were examined under {scope}. " +
                 "Sizes are the current version of each file, not the size of the history.");
+
+            // The same listing names every solution and project file, so the
+            // solution analysis reuses it rather than walking the tree again.
+            await ScanSolutionsAsync(result, projectName, items);
         }
         catch (Exception ex)
         {
             result.Notes.Add(
                 $"The contents of {scope} could not be read: {ex.Message} " +
                 "The rest of this report is unaffected.");
+        }
+    }
+
+    /// <summary>
+    /// Reads every solution and project file found in the listing.  Failures
+    /// are recorded per file, so one unreadable project does not cost the
+    /// whole section.
+    /// </summary>
+    private async Task ScanSolutionsAsync(
+        TfvcAssessmentResult result, string projectName, IReadOnlyList<TfvcItemInfo> items)
+    {
+        ReportProgress("Reading solutions and project files...");
+
+        _solutionService.ProgressCallback = ProgressCallback;
+
+        result.Solutions = await _solutionService.AnalyzeAsync(_client, projectName, items);
+
+        if (result.Solutions.UnreadableFiles.Count > 0)
+        {
+            result.Notes.Add(
+                $"{result.Solutions.UnreadableFiles.Count} solution or project file(s) " +
+                "could not be read: " +
+                string.Join(", ", result.Solutions.UnreadableFiles.Take(10)) + ".");
         }
     }
 
@@ -210,9 +241,115 @@ public class TfvcAssessmentAnalyzer
         AddNestedBranchFindings(result);
         AddUnregisteredBranchFindings(result);
         AddBranchActivityFindings(result);
+        result.CommonCodeFolders = BuildCommonCodeFolders(result);
+
         AddContentFindings(result);
+        AddSolutionFindings(result);
         AddBuildDefinitionFindings(result);
         AddSharedFolderFindings(result);
+        AddCommonCodeFindings(result);
+    }
+
+    private void AddSolutionFindings(TfvcAssessmentResult result)
+    {
+        var solutions = result.Solutions;
+
+        if (solutions.Solutions.Count == 0)
+        {
+            return;
+        }
+
+        result.Findings.Add(new AssessmentFinding(
+            FindingCategories.Solutions,
+            $"{solutions.Solutions.Count} solution(s) and {solutions.Projects.Count} " +
+                "project file(s) are stored under this path.",
+            "Each solution is a candidate for its own Git repository only to the extent " +
+                "that nothing outside its folder is needed to build it.",
+            solutions.ProjectsUsingPackagesConfig > 0 ?
+                $"{solutions.ProjectsUsingPackagesConfig} project(s) restore packages " +
+                    "through packages.config." :
+                string.Empty));
+
+        foreach (var reference in solutions.CrossSolutionReferences)
+        {
+            result.Findings.Add(new AssessmentFinding(
+                FindingCategories.Solutions,
+                $"{reference.FromProject} references {reference.ToProject}, which is outside " +
+                    $"the folder holding {reference.SolutionPath}.",
+                "If these solutions are migrated to separate Git repositories, this reference " +
+                    "will not resolve."));
+        }
+
+        foreach (var shared in solutions.SharedProjects)
+        {
+            result.Findings.Add(new AssessmentFinding(
+                FindingCategories.Solutions,
+                $"{shared.ProjectPath} is referenced by projects in {shared.SolutionCount} " +
+                    "different solutions.",
+                "This code is shared at the source level. It cannot be versioned, built, or " +
+                    "shipped independently of the solutions that reference it, and those " +
+                    "solutions cannot be migrated to separate Git repositories without " +
+                    "breaking these references.",
+                string.Join(", ", shared.SolutionPaths)));
+        }
+    }
+
+    /// <summary>
+    /// Where the solution analysis and the build definitions point at the same
+    /// folder, both measures of coupling agree, and that is worth saying once
+    /// rather than leaving the reader to join two tables.
+    /// </summary>
+    private void AddCommonCodeFindings(TfvcAssessmentResult result)
+    {
+        foreach (var folder in result.CommonCodeFolders)
+        {
+            result.Findings.Add(new AssessmentFinding(
+                FindingCategories.SharedCode,
+                $"{folder.Path} is referenced like shared code: projects in " +
+                    $"{folder.SolutionPaths.Count} solutions reference code under this path, " +
+                    $"and {folder.BuildDefinitionNames.Count} build definitions map it into " +
+                    "their workspaces.",
+                "Every solution and build listed here is coupled to this folder. None of them " +
+                    "can be migrated to an independent Git repository while these references " +
+                    "exist.",
+                "Solutions: " + string.Join(", ", folder.SolutionPaths) +
+                    ". Builds: " + string.Join(", ", folder.BuildDefinitionNames) + "."));
+        }
+    }
+
+    private List<CommonCodeFolder> BuildCommonCodeFolders(TfvcAssessmentResult result)
+    {
+        var folders = new List<CommonCodeFolder>();
+
+        var multiplyMapped = result.MappedPathUsages
+            .Where(x => x.DefinitionCount > 1)
+            .ToList();
+
+        foreach (var mapped in multiplyMapped)
+        {
+            // A shared project sitting under a multiply-mapped folder is the
+            // same folder showing up in both signals.
+            var solutions = result.Solutions.SharedProjects
+                .Where(x => TfvcPath.IsSameOrUnder(x.ProjectPath, mapped.Path) == true)
+                .SelectMany(x => x.SolutionPaths)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(x => x, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            if (solutions.Count == 0)
+            {
+                continue;
+            }
+
+            folders.Add(new CommonCodeFolder
+            {
+                Path = mapped.Path,
+                SolutionPaths = solutions,
+                BuildDefinitionNames = mapped.DefinitionNames
+            });
+        }
+
+        return folders;
     }
 
     private void AddContentFindings(TfvcAssessmentResult result)
@@ -315,6 +452,8 @@ public class TfvcAssessmentAnalyzer
         var shared = result.MappedPathUsages
             .Where(x => x.DefinitionCount > 1)
             .Where(x => TfvcPath.IsSameOrUnder(x.Path, result.ScopePath) == false)
+            .Where(x => result.CommonCodeFolders.Any(
+                folder => TfvcPath.AreEqual(folder.Path, x.Path)) == false)
             .ToList();
 
         foreach (var usage in shared)

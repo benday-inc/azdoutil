@@ -37,6 +37,8 @@ public static class FindingCategories
     public const string BuildDefinitions = "Build definitions";
     public const string SharedFolders = "Folders shared by builds";
     public const string Content = "Repository contents";
+    public const string Solutions = "Solutions and projects";
+    public const string SharedCode = "Shared code";
 }
 
 /// <summary>
@@ -155,6 +157,19 @@ public class BranchActivity
     public BranchActivityClassification Classification { get; set; }
 }
 
+/// <summary>
+/// A folder that two independent signals agree is shared code: projects in
+/// several solutions reference it, and several build definitions map it.
+/// </summary>
+public class CommonCodeFolder
+{
+    public string Path { get; set; } = string.Empty;
+
+    public List<string> SolutionPaths { get; set; } = new();
+
+    public List<string> BuildDefinitionNames { get; set; } = new();
+}
+
 public class TfvcAssessmentResult
 {
     public string ProjectName { get; set; } = string.Empty;
@@ -189,6 +204,18 @@ public class TfvcAssessmentResult
     /// that normally hold generated output.
     /// </summary>
     public TfvcContentScanResult Content { get; set; } = new();
+
+    /// <summary>
+    /// The solutions and projects found in the tree, and how they reference
+    /// each other.
+    /// </summary>
+    public TfvcSolutionAnalysisResult Solutions { get; set; } = new();
+
+    /// <summary>
+    /// Folders that both the solution analysis and the build definitions point
+    /// at as shared code.
+    /// </summary>
+    public List<CommonCodeFolder> CommonCodeFolders { get; set; } = new();
 
     public List<AssessmentFinding> Findings { get; set; } = new();
 

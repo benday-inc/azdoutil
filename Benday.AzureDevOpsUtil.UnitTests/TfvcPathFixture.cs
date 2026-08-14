@@ -218,4 +218,58 @@ public class TfvcPathFixture
             TfvcPath.SuggestProjectRootedPath("$/Main/App", null),
             "Without a project name there is nothing to suggest.");
     }
+
+    [TestMethod]
+    public void Combine_ResolvesARelativeProjectReference()
+    {
+        var actual = TfvcPath.Combine("$/App/Main/Web", @"..\Common\Common.csproj");
+
+        Assert.AreEqual("$/App/Main/Common/Common.csproj", actual, "Wrong resolved path.");
+    }
+
+    [TestMethod]
+    public void Combine_HandlesSeveralLevelsUp()
+    {
+        var actual = TfvcPath.Combine("$/App/Main/Web/Site", @"..\..\..\Shared\Common.csproj");
+
+        Assert.AreEqual("$/App/Shared/Common.csproj", actual, "Wrong resolved path.");
+    }
+
+    [TestMethod]
+    public void Combine_HandlesForwardSlashesAndCurrentDirectory()
+    {
+        var actual = TfvcPath.Combine("$/App/Web", "./Site/./Site.csproj");
+
+        Assert.AreEqual("$/App/Web/Site/Site.csproj", actual, "Wrong resolved path.");
+    }
+
+    [TestMethod]
+    public void Combine_ReturnsNullWhenItWalksAboveTheRoot()
+    {
+        Assert.IsNull(
+            TfvcPath.Combine("$/App", @"..\..\Elsewhere\Thing.csproj"),
+            "There is nothing above the collection root.");
+    }
+
+    [TestMethod]
+    public void Combine_ReturnsNullWithoutARelativePath()
+    {
+        Assert.IsNull(TfvcPath.Combine("$/App", null), "Nothing to combine.");
+        Assert.IsNull(TfvcPath.Combine("$/App", "  "), "Nothing to combine.");
+    }
+
+    [TestMethod]
+    public void Combine_ResolvedPathComparesCorrectlyAfterwards()
+    {
+        // The point of resolving rather than concatenating: the result has to
+        // survive a containment check.
+        var resolved = TfvcPath.Combine("$/App/Web/Site", @"..\..\Shared\Common.csproj");
+
+        Assert.IsFalse(
+            TfvcPath.IsSameOrUnder(resolved, "$/App/Web"),
+            "The reference leaves the solution folder and the check must see that.");
+
+        Assert.IsTrue(
+            TfvcPath.IsSameOrUnder(resolved, "$/App"), "It still sits under the project root.");
+    }
 }

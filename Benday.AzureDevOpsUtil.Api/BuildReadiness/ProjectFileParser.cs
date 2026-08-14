@@ -48,15 +48,34 @@ public class ProjectFileParser
         return result;
     }
 
+    /// <summary>
+    /// Finds elements by local name regardless of namespace.  Project files
+    /// written before the SDK-style format carry the MSBuild namespace
+    /// (xmlns="http://schemas.microsoft.com/developer/msbuild/2003"), and a
+    /// plain name lookup matches nothing in those documents.  Anything coming
+    /// out of TFVC is likely to be in that older format.
+    /// </summary>
+    private static IEnumerable<XElement> ElementsNamed(XDocument doc, string localName)
+    {
+        return doc.Descendants().Where(x =>
+            string.Equals(x.Name.LocalName, localName, StringComparison.Ordinal));
+    }
+
+    private static XElement? ChildNamed(XElement parent, string localName)
+    {
+        return parent.Elements().FirstOrDefault(x =>
+            string.Equals(x.Name.LocalName, localName, StringComparison.Ordinal));
+    }
+
     private void ExtractPackageReferences(XDocument doc, ProjectFileAnalysisResult result)
     {
-        var packageRefs = doc.Descendants("PackageReference");
+        var packageRefs = ElementsNamed(doc, "PackageReference");
 
         foreach (var element in packageRefs)
         {
             var name = element.Attribute("Include")?.Value ?? string.Empty;
             var version = element.Attribute("Version")?.Value
-                ?? element.Element("Version")?.Value
+                ?? ChildNamed(element, "Version")?.Value
                 ?? string.Empty;
 
             if (!string.IsNullOrWhiteSpace(name))
@@ -72,7 +91,7 @@ public class ProjectFileParser
 
     private void ExtractProjectReferences(XDocument doc, ProjectFileAnalysisResult result)
     {
-        var projectRefs = doc.Descendants("ProjectReference");
+        var projectRefs = ElementsNamed(doc, "ProjectReference");
 
         foreach (var element in projectRefs)
         {
@@ -94,11 +113,11 @@ public class ProjectFileParser
 
     private void ExtractHintPaths(XDocument doc, ProjectFileAnalysisResult result)
     {
-        var references = doc.Descendants("Reference");
+        var references = ElementsNamed(doc, "Reference");
 
         foreach (var refElement in references)
         {
-            var hintPath = refElement.Element("HintPath");
+            var hintPath = ChildNamed(refElement, "HintPath");
 
             if (hintPath != null && !string.IsNullOrWhiteSpace(hintPath.Value))
             {
@@ -116,8 +135,8 @@ public class ProjectFileParser
 
     private void ExtractTargetFrameworks(XDocument doc, ProjectFileAnalysisResult result)
     {
-        var targetFramework = doc.Descendants("TargetFramework").FirstOrDefault()?.Value;
-        var targetFrameworks = doc.Descendants("TargetFrameworks").FirstOrDefault()?.Value;
+        var targetFramework = ElementsNamed(doc, "TargetFramework").FirstOrDefault()?.Value;
+        var targetFrameworks = ElementsNamed(doc, "TargetFrameworks").FirstOrDefault()?.Value;
 
         if (!string.IsNullOrWhiteSpace(targetFrameworks))
         {

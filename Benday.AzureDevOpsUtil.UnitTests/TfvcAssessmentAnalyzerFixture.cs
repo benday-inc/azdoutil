@@ -442,4 +442,86 @@ public class TfvcAssessmentAnalyzerFixture
             actual.Notes.Any(x => x.Contains("access denied")),
             "The reason should survive into the report.");
     }
+
+    [TestMethod]
+    public async Task Analyze_CombinesTheTwoSharedCodeSignals()
+    {
+        var client = new FakeTfvcApiClient();
+
+        client.SetFullListing(
+            "$/App",
+            new TfvcItemInfo { Path = "$/App/Web/Web.sln", Size = 100 },
+            new TfvcItemInfo { Path = "$/App/Api/Api.sln", Size = 100 },
+            new TfvcItemInfo { Path = "$/App/Common/Common.csproj", Size = 100 });
+
+        client.SetFileContent(
+            "$/App/Web/Web.sln",
+            "Project(\"{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}\") = \"Common\", " +
+            "\"..\\Common\\Common.csproj\", \"{11111111-2222-3333-4444-555555555555}\"");
+
+        client.SetFileContent(
+            "$/App/Api/Api.sln",
+            "Project(\"{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}\") = \"Common\", " +
+            "\"..\\Common\\Common.csproj\", \"{11111111-2222-3333-4444-555555555555}\"");
+
+        client.SetFileContent(
+            "$/App/Common/Common.csproj",
+            "<Project xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\"></Project>");
+
+        var buildClient = new FakeBuildDefinitionApiClient();
+
+        buildClient.Add(FakeBuildDefinitionApiClient.TfvcDefinition(
+            1, "Web-CI", UtcNow.AddDays(-3), ("$/App/Common", "map")));
+
+        buildClient.Add(FakeBuildDefinitionApiClient.TfvcDefinition(
+            2, "Api-CI", UtcNow.AddDays(-3), ("$/App/Common", "map")));
+
+        var analyzer = new TfvcAssessmentAnalyzer(client, buildClient);
+
+        var actual = await analyzer.AnalyzeAsync(ProjectName, "$/App", UtcNow);
+
+        Assert.AreEqual(
+            2,
+            actual.Solutions.SharedProjects.Single().SolutionCount,
+            "Both solutions should reach the shared project.");
+
+        var folder = actual.CommonCodeFolders.Single();
+
+        Assert.AreEqual("$/App/Common", folder.Path, "Wrong folder.");
+        Assert.AreEqual(2, folder.SolutionPaths.Count, "Wrong solution count.");
+        Assert.AreEqual(2, folder.BuildDefinitionNames.Count, "Wrong build count.");
+
+        var finding = FindByCategory(actual, FindingCategories.SharedCode);
+
+        Assert.IsNotNull(finding, "Expected a combined shared code finding.");
+        StringAssert.Contains(
+            finding!.Consequence,
+            "None of them can be migrated to an independent Git repository",
+            "Wrong consequence text.");
+    }
+
+    [TestMethod]
+    public async Task Analyze_NoCombinedFindingWhenOnlyTheBuildSignalIsPresent()
+    {
+        var client = new FakeTfvcApiClient();
+
+        var buildClient = new FakeBuildDefinitionApiClient();
+
+        buildClient.Add(FakeBuildDefinitionApiClient.TfvcDefinition(
+            1, "Web-CI", UtcNow.AddDays(-3), ("$/Shared/Common", "map")));
+
+        buildClient.Add(FakeBuildDefinitionApiClient.TfvcDefinition(
+            2, "Api-CI", UtcNow.AddDays(-3), ("$/Shared/Common", "map")));
+
+        var analyzer = new TfvcAssessmentAnalyzer(client, buildClient);
+
+        var actual = await analyzer.AnalyzeAsync(ProjectName, "$/App", UtcNow);
+
+        Assert.AreEqual(
+            0, actual.CommonCodeFolders.Count, "Only one signal is available here.");
+
+        Assert.IsNotNull(
+            FindByCategory(actual, FindingCategories.SharedFolders),
+            "The build signal should still stand on its own.");
+    }
 }

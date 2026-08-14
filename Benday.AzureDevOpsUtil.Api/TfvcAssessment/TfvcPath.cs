@@ -138,6 +138,70 @@ public static class TfvcPath
     }
 
     /// <summary>
+    /// Resolves a relative path against a folder, the way a project file's
+    /// reference resolves against the folder holding the project.
+    ///
+    /// The relative path comes out of a project file, so it uses backslashes
+    /// and can walk upwards with "..".  Both are handled here rather than left
+    /// to string concatenation, because a raw join leaves the ".." segments in
+    /// place and every comparison made afterwards is then wrong.
+    ///
+    /// Returns null when the path walks above the "$/" root.
+    /// </summary>
+    public static string? Combine(string? baseFolder, string? relativePath)
+    {
+        if (string.IsNullOrWhiteSpace(relativePath) == true)
+        {
+            return null;
+        }
+
+        var start = Normalize(baseFolder);
+
+        if (start.StartsWith(Root, StringComparison.Ordinal) == false)
+        {
+            return null;
+        }
+
+        var segments = new List<string>(
+            start.Substring(Root.Length).Split(Separator, StringSplitOptions.RemoveEmptyEntries));
+
+        var relativeSegments = relativePath
+            .Trim()
+            .Replace('\\', Separator)
+            .Split(Separator, StringSplitOptions.RemoveEmptyEntries);
+
+        foreach (var segment in relativeSegments)
+        {
+            if (string.Equals(segment, ".", StringComparison.Ordinal) == true)
+            {
+                continue;
+            }
+
+            if (string.Equals(segment, "..", StringComparison.Ordinal) == true)
+            {
+                if (segments.Count == 0)
+                {
+                    // Walked above "$/", which is not a path that can exist.
+                    return null;
+                }
+
+                segments.RemoveAt(segments.Count - 1);
+
+                continue;
+            }
+
+            segments.Add(segment);
+        }
+
+        if (segments.Count == 0)
+        {
+            return Root;
+        }
+
+        return Root + string.Join(Separator, segments);
+    }
+
+    /// <summary>
     /// True when the path sits under the team project's root.  Every TFVC
     /// server path is rooted at "$/&lt;team project&gt;".
     /// </summary>
