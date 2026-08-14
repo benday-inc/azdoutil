@@ -582,8 +582,8 @@ The tools are all read-only:
 | --- | --- | --- | --- |
 | quiet | Optional | Boolean | Quiet mode |
 | config | Optional | String | Configuration name to use |
-| teamproject | Required | String | Team project name |
-| reponame | Required | String | Repository name |
+| teamproject | Optional | String | Team project name. Read from the origin remote of the current directory's git repository when it is not supplied. |
+| reponame | Optional | String | Repository name. Read from the origin remote of the current directory's git repository when it is not supplied. |
 | days | Optional | Int32 | How many days count as active. Defaults to 7. The last 30 days are always reported as well. |
 | csv | Optional | Boolean | Output one row per branch as CSV instead of a report |
 ## creategitrepo

@@ -162,6 +162,15 @@ Reports here are **descriptive, never prescriptive**: a finding is a fact plus i
 
 TFVC API notes worth not rediscovering, verified against a live collection: use `api-version=7.0` for the TFVC endpoints (matches the rest of the repo, and is what Server 2022 supports) and `7.1` for build definitions (matches the other build calls in this tool); recursion levels are `None`/`OneLevel`/`Full`. A one-level item listing **includes the folder that was asked for**, so callers filter it out, and it **omits `isFolder`, `isBranch`, and `size` rather than sending false or null** — those properties are nullable on `TfvcItemInfo` and "not a branch" is tested as `!= true`, never `== false`. The changesets endpoint supports `searchCriteria.itemPath`/`.fromDate`/`.toDate` plus `$top`/`$skip`, returns newest first, and returns no total count; `fromDate` accepts ISO 8601 (what this tool sends) as well as the `MM-dd-yyyy` form the REST samples show. Build definition repository type for TFVC is `TfsVersionControl`; YAML pipelines cannot use TFVC, so every TFVC-connected build is classic. There is **no merge-candidates endpoint** in the TFVC REST API, and shelvesets are collection-scoped rather than project- or path-scoped.
 
+### GitRemotes Module
+
+The `GitRemotes/` directory works out which Azure DevOps repository the current directory belongs to, so commands can take their arguments from the git remote instead of the command line.
+
+- **GitRepositoryLocator** - Walks up from a directory looking for `.git`, reads the remote url out of its config. Reads the files directly rather than running git, so it does not depend on git being installed. `.git` is a **file** rather than a directory in worktrees and submodules (it holds `gitdir: <path>`), and a worktree's git directory keeps its config in the main repository named by its `commondir` file; both are handled
+- **GitRemoteUrlParser** - Pure string parsing, no I/O. Azure DevOps has many url shapes but they reduce to two rules: every https form contains a `_git` segment, with the project before it and the repository after it, and the ssh forms instead start with `v3/` followed by account, project and repository. Anything matching neither (GitHub, GitLab, a local path) parses to null. The `CollectionUrl` it produces is in the form a stored configuration holds, trailing separator included, so it compares directly
+
+`branchhealth` uses this when `/teamproject` or `/reponame` are omitted, and then picks the stored configuration whose collection url matches. An explicit `/config` always wins. The four ways detection can fail — not in a repository, no origin remote, remote is not Azure DevOps, no matching configuration — each get their own message.
+
 ### BranchHealth Module
 
 The `BranchHealth/` directory backs the `branchhealth` command (in `Commands/VersionControl/`). It surveys the branches of one Git repository and reports how much work is in flight: active branches, unmerged branches and their median age, dead branches, and who is working on more than one thing at once. Read-only and descriptive, with the same no-severity rule as the TFVC assessment.
