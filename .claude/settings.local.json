@@ -32,7 +32,8 @@
       "Bash(git push *)",
       "Bash(grep -rhA3 \"\\\\[Command\\(\" --include='*.cs' Benday.AzureDevOpsUtil.Api/)",
       "Bash(git commit *)",
-      "Bash(git restore *)"
+      "Bash(git restore *)",
+      "PowerShell(Copy-Item *)"
     ],
     "deny": [],
     "ask": []
