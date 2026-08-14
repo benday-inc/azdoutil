@@ -162,6 +162,15 @@ Reports here are **descriptive, never prescriptive**: a finding is a fact plus i
 
 TFVC API notes worth not rediscovering, verified against a live collection: use `api-version=7.0` for the TFVC endpoints (matches the rest of the repo, and is what Server 2022 supports) and `7.1` for build definitions (matches the other build calls in this tool); recursion levels are `None`/`OneLevel`/`Full`. A one-level item listing **includes the folder that was asked for**, so callers filter it out, and it **omits `isFolder`, `isBranch`, and `size` rather than sending false or null** — those properties are nullable on `TfvcItemInfo` and "not a branch" is tested as `!= true`, never `== false`. The changesets endpoint supports `searchCriteria.itemPath`/`.fromDate`/`.toDate` plus `$top`/`$skip`, returns newest first, and returns no total count; `fromDate` accepts ISO 8601 (what this tool sends) as well as the `MM-dd-yyyy` form the REST samples show. Build definition repository type for TFVC is `TfsVersionControl`; YAML pipelines cannot use TFVC, so every TFVC-connected build is classic. There is **no merge-candidates endpoint** in the TFVC REST API, and shelvesets are collection-scoped rather than project- or path-scoped.
 
+### BranchHealth Module
+
+The `BranchHealth/` directory backs the `branchhealth` command (in `Commands/VersionControl/`). It surveys the branches of one Git repository and reports how much work is in flight: active branches, unmerged branches and their median age, dead branches, and who is working on more than one thing at once. Read-only and descriptive, with the same no-severity rule as the TFVC assessment.
+
+- **BranchHealthAnalyzer** - Does no I/O. `GET .../git/repositories/{repo}/stats/branches` returns ahead/behind counts and the last commit for every branch in one call, so the command fetches and the analyzer does the arithmetic. Ages come from the **committer** date, not the author date, because an author date survives a rebase and can be set to anything. The median excludes the default branch, since one very old default would drag it
+- **BranchHealthReportFormatter** - Markdown report plus a CSV with one row per branch. Its footer is the case study link, not the TFVC one
+
+Note that the stats endpoint is known to be slow on repositories with hundreds of branches.
+
 ### TaskGroups Module
 
 The `TaskGroups/` directory backs the task group commands in `Commands/Builds/` (`listtaskgroups`, `findtaskgroupusages`, `inlinetaskgroup`) — the main use case is retiring classic task groups by inlining their steps into the build definitions that use them:

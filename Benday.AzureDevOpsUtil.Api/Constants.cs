@@ -174,6 +174,9 @@ public static class Constants
     public const string ArgumentNameDryRun = "dryrun";
 
     public const string CommandName_AssessTfvcMigration = "assess-tfvc-migration";
+    public const string CommandName_BranchHealth = "branchhealth";
+
+    public const string ArgumentNameActivityWindowDays = "days";
 
     public const string ArgumentNameScanDepth = "scandepth";
 
