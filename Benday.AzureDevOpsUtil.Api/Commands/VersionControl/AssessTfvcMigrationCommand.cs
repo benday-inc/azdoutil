@@ -1,3 +1,4 @@
+using Benday.AzureDevOpsUtil.Api.TfCommandLine;
 using Benday.AzureDevOpsUtil.Api.TfvcAssessment;
 using Benday.CommandsFramework;
 
@@ -26,13 +27,16 @@ public class AssessTfvcMigrationCommand : AzureDevOpsCommandBase
         AddCommonArguments(arguments);
 
         arguments.AddString(Constants.ArgumentNameTeamProjectName)
-            .AsRequired()
-            .WithDescription("Team project name");
+            .AsNotRequired()
+            .WithDescription(
+                "Team project name. Read from the TFVC workspace holding the current " +
+                "directory when it is not supplied.");
 
         arguments.AddString(Constants.ArgumentNameTfvcFolder)
             .AsNotRequired()
             .WithDescription(
-                "TFVC path to assess. Defaults to $/<teamproject>.");
+                "TFVC path to assess. Defaults to the server path of the current directory " +
+                "when it is inside a workspace, and to $/<teamproject> otherwise.");
 
         arguments.AddInt32(Constants.ArgumentNameScanDepth)
             .WithDescription(
@@ -50,9 +54,33 @@ public class AssessTfvcMigrationCommand : AzureDevOpsCommandBase
 
     protected override async Task OnExecute()
     {
-        var projectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);
+        var projectName = GetOptionalStringValue(Constants.ArgumentNameTeamProjectName);
+        var tfvcPath = GetOptionalStringValue(Constants.ArgumentNameTfvcFolder);
 
-        var tfvcPath = GetTfvcPath(projectName);
+        if (projectName.Length == 0 || tfvcPath.Length == 0)
+        {
+            var location = ReadCurrentWorkspaceLocation();
+
+            if (projectName.Length == 0)
+            {
+                projectName = location.TeamProjectName;
+            }
+
+            if (tfvcPath.Length == 0)
+            {
+                tfvcPath = location.ServerPath;
+            }
+
+            UseConfigurationForCollection(location);
+
+            if (IsQuietMode == false)
+            {
+                WriteLine(
+                    $"Using the TFVC workspace holding this directory: project " +
+                    $"'{projectName}', path '{tfvcPath}' at {location.CollectionUrl}");
+                WriteLine(string.Empty);
+            }
+        }
 
         if (tfvcPath.StartsWith("$/", StringComparison.Ordinal) == false)
         {
@@ -102,20 +130,103 @@ public class AssessTfvcMigrationCommand : AzureDevOpsCommandBase
         }
     }
 
-    private string GetTfvcPath(string projectName)
+    /// <summary>
+    /// Works out where the current directory sits in TFVC.  Each way this can
+    /// fail says something different, so each gets its own message.
+    /// </summary>
+    private TfvcLocationInfo ReadCurrentWorkspaceLocation()
     {
-        if (Arguments.ContainsKey(Constants.ArgumentNameTfvcFolder) == true &&
-            Arguments[Constants.ArgumentNameTfvcFolder].HasValue == true)
-        {
-            var value = Arguments.GetStringValue(Constants.ArgumentNameTfvcFolder);
+        var currentDirectory = Directory.GetCurrentDirectory();
 
-            if (string.IsNullOrWhiteSpace(value) == false)
-            {
-                return value;
-            }
+        var tf = new TfExecutableLocator(new FileSystemProbe()).Find().FirstOrDefault();
+
+        if (tf == null)
+        {
+            throw new KnownException(
+                "The tf command line client is needed to work out which TFVC path this " +
+                $"directory holds, and no copy was found. Run {Constants.CommandName_WhereTf} " +
+                $"for where it was looked for, or supply " +
+                $"/{Constants.ArgumentNameTeamProjectName} and " +
+                $"/{Constants.ArgumentNameTfvcFolder}.");
         }
 
-        return $"$/{projectName}";
+        var output = new TfCommandRunner().Run(tf.Path, currentDirectory, "workfold");
+
+        var workspace = TfWorkfoldParser.Parse(output);
+
+        if (workspace == null)
+        {
+            throw new KnownException(
+                $"'{tf.Path} workfold' did not report a workspace for '{currentDirectory}'. " +
+                $"Supply /{Constants.ArgumentNameTeamProjectName} and " +
+                $"/{Constants.ArgumentNameTfvcFolder}.");
+        }
+
+        var location = TfWorkspaceResolver.Resolve(workspace, currentDirectory);
+
+        if (location == null)
+        {
+            var mapped = string.Join(
+                ", ", workspace.Mappings.Where(x => x.IsCloaked == false).Select(x => x.LocalPath));
+
+            throw new KnownException(
+                $"'{currentDirectory}' is not inside any folder mapped by workspace " +
+                $"'{workspace.WorkspaceName}'. That workspace maps: {mapped}. Supply " +
+                $"/{Constants.ArgumentNameTeamProjectName} and " +
+                $"/{Constants.ArgumentNameTfvcFolder}.");
+        }
+
+        if (string.IsNullOrWhiteSpace(location.TeamProjectName) == true)
+        {
+            throw new KnownException(
+                $"The current directory maps to '{location.ServerPath}', which does not name a " +
+                $"team project. Supply /{Constants.ArgumentNameTeamProjectName} and " +
+                $"/{Constants.ArgumentNameTfvcFolder}.");
+        }
+
+        return location;
+    }
+
+    /// <summary>
+    /// Picks the stored configuration for the collection the workspace belongs
+    /// to.  An explicit /config wins.
+    /// </summary>
+    private void UseConfigurationForCollection(TfvcLocationInfo location)
+    {
+        if (Arguments.ContainsKey(Constants.ArgumentNameConfigurationName) == true &&
+            Arguments[Constants.ArgumentNameConfigurationName].HasValue == true)
+        {
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(location.CollectionUrl) == true)
+        {
+            return;
+        }
+
+        var configurations = AzureDevOpsConfigurationManager.Instance.GetAll();
+
+        var match = configurations.FirstOrDefault(x =>
+            string.Equals(
+                (x.CollectionUrl ?? string.Empty).TrimEnd('/'),
+                location.CollectionUrl.TrimEnd('/'),
+                StringComparison.OrdinalIgnoreCase));
+
+        if (match == null)
+        {
+            var known = configurations.Length == 0 ?
+                "There are no configurations." :
+                "Configurations: " + string.Join(
+                    ", ", configurations.Select(x => $"{x.Name} ({x.CollectionUrl})")) + ".";
+
+            throw new KnownException(
+                $"This workspace belongs to {location.CollectionUrl}, and no azdoutil " +
+                $"configuration uses that url. {known} Add one with " +
+                $"{Constants.CommandArgumentNameAddUpdateConfig}, or name a configuration with " +
+                $"/{Constants.ArgumentNameConfigurationName}.");
+        }
+
+        Configuration = match;
     }
 
     private int GetScanDepth()

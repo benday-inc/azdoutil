@@ -170,6 +170,10 @@ The `TfCommandLine/` directory backs the `where-tf` command (in `Commands/Versio
 
 - **TfExecutableLocator** - Searches the PATH, the Visual Studio install folders (enumerating years and editions rather than listing known ones, so a future release is still found), the pre-2017 `Common7\IDE` layout, and Azure DevOps Server tool folders. Install paths are joined with a **backslash rather than the platform separator**, because they are Windows paths whatever the host platform is; the PATH separator is injectable for the same reason, since a Windows drive letter collides with the `:` separator used elsewhere
 - **IFileSystemProbe** - The filesystem and environment questions the search asks, so it can be run against a made-up machine in tests
+- **TfWorkfoldParser** / **TfWorkspaceResolver** - `tf workfold` is the only reliable way to learn which `$/` path a local directory holds. The workspace cache under `%LOCALAPPDATA%\Microsoft\Azure DevOps\<version>\Cache\Volatile\` records mapped **local** paths only, with no server path anywhere, so it cannot answer this on its own. workfold prints every mapping in the workspace rather than just the relevant one, so the resolver picks the most specific mapping containing the directory. Its output splits on the **first** colon, since the local path has a colon of its own and a TFVC server path cannot
+- **ITfCommandRunner** - Runs tf. Output decides success rather than the exit code, because tf sets a non-zero code in cases where it printed what was asked for
+
+`assess-tfvc-migration` uses these when `/teamproject` or `/tfvc-path` are omitted: the current directory resolves to a server path, the team project is its first segment, and the collection picks the stored configuration.
 
 ### GitRemotes Module
 

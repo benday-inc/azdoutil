@@ -572,8 +572,8 @@ The tools are all read-only:
 | --- | --- | --- | --- |
 | quiet | Optional | Boolean | Quiet mode |
 | config | Optional | String | Configuration name to use |
-| teamproject | Required | String | Team project name |
-| tfvc-path | Optional | String | TFVC path to assess. Defaults to $/<teamproject>. |
+| teamproject | Optional | String | Team project name. Read from the TFVC workspace holding the current directory when it is not supplied. |
+| tfvc-path | Optional | String | TFVC path to assess. Defaults to the server path of the current directory when it is inside a workspace, and to $/<teamproject> otherwise. |
 | scandepth | Optional | Int32 | How many folder levels below the path to scan for unregistered branches. Defaults to 3. |
 | csv | Optional | Boolean | Output the findings as CSV instead of a report |
 ## branchhealth
