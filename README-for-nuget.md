@@ -148,6 +148,7 @@ The tools are all read-only:
 | Version Control | listallgitrepos | Gets list of Git repositories from all Azure DevOps Team Projects. |
 | Version Control | listgitrepos | Gets list of Git repositories from an Azure DevOps Team Project. |
 | Version Control | tfvc-to-git | Converts a Team Foundation Version Control (TFVC) folder to a Git repository. |
+| Version Control | where-tf | Finds the tf command line client, which ships inside Visual Studio and is rarely on the PATH. |
 | Work Items | comparewitdfields | Compare work item fields between two work item type definition files. |
 | Work Items | copycategory | Copy category type from one category file to another. |
 | Work Items | copywitdfield | Copy work item field from one work item type definition to another. |
@@ -622,6 +623,12 @@ The tools are all read-only:
 | teamproject | Required | String | Team project name that contains the TFVC and Git repositories |
 | reponame | Required | String | Name of the new git repository |
 | tfvc-path | Required | String | Source TFVC folder to convert |
+## where-tf
+**Finds the tf command line client, which ships inside Visual Studio and is rarely on the PATH.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Print only the path of the first copy that was found |
 # Work Items
 ## comparewitdfields
 **Compare work item fields between two work item type definition files.**

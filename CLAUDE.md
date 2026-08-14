@@ -162,6 +162,15 @@ Reports here are **descriptive, never prescriptive**: a finding is a fact plus i
 
 TFVC API notes worth not rediscovering, verified against a live collection: use `api-version=7.0` for the TFVC endpoints (matches the rest of the repo, and is what Server 2022 supports) and `7.1` for build definitions (matches the other build calls in this tool); recursion levels are `None`/`OneLevel`/`Full`. A one-level item listing **includes the folder that was asked for**, so callers filter it out, and it **omits `isFolder`, `isBranch`, and `size` rather than sending false or null** — those properties are nullable on `TfvcItemInfo` and "not a branch" is tested as `!= true`, never `== false`. The changesets endpoint supports `searchCriteria.itemPath`/`.fromDate`/`.toDate` plus `$top`/`$skip`, returns newest first, and returns no total count; `fromDate` accepts ISO 8601 (what this tool sends) as well as the `MM-dd-yyyy` form the REST samples show. Build definition repository type for TFVC is `TfsVersionControl`; YAML pipelines cannot use TFVC, so every TFVC-connected build is classic. There is **no merge-candidates endpoint** in the TFVC REST API, and shelvesets are collection-scoped rather than project- or path-scoped.
 
+### TfCommandLine Module
+
+The `TfCommandLine/` directory backs the `where-tf` command (in `Commands/VersionControl/`), which finds the `tf` command line client.
+
+`tf` is not distributed on its own and there is no winget package for it: it arrives inside Visual Studio (the Team Explorer component), inside an Azure DevOps Server install, or as the cross-platform Team Explorer Everywhere client. Visual Studio moved it under a long path inside the install folder in 2017, and it is almost never on the PATH, which is why finding it takes a search rather than a lookup.
+
+- **TfExecutableLocator** - Searches the PATH, the Visual Studio install folders (enumerating years and editions rather than listing known ones, so a future release is still found), the pre-2017 `Common7\IDE` layout, and Azure DevOps Server tool folders. Install paths are joined with a **backslash rather than the platform separator**, because they are Windows paths whatever the host platform is; the PATH separator is injectable for the same reason, since a Windows drive letter collides with the `:` separator used elsewhere
+- **IFileSystemProbe** - The filesystem and environment questions the search asks, so it can be run against a made-up machine in tests
+
 ### GitRemotes Module
 
 The `GitRemotes/` directory works out which Azure DevOps repository the current directory belongs to, so commands can take their arguments from the git remote instead of the command line.

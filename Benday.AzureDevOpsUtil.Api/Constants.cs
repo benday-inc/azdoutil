@@ -175,6 +175,7 @@ public static class Constants
 
     public const string CommandName_AssessTfvcMigration = "assess-tfvc-migration";
     public const string CommandName_BranchHealth = "branchhealth";
+    public const string CommandName_WhereTf = "where-tf";
 
     public const string ArgumentNameActivityWindowDays = "days";
 

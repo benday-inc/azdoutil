@@ -223,6 +223,7 @@ And a discovery tool so the assistant can fall back to the command line for anyt
 | Version Control | [listallgitrepos](#listallgitrepos) | Gets list of Git repositories from all Azure DevOps Team Projects. |
 | Version Control | [listgitrepos](#listgitrepos) | Gets list of Git repositories from an Azure DevOps Team Project. |
 | Version Control | [tfvc-to-git](#tfvc-to-git) | Converts a Team Foundation Version Control (TFVC) folder to a Git repository. |
+| Version Control | [where-tf](#where-tf) | Finds the tf command line client, which ships inside Visual Studio and is rarely on the PATH. |
 | Work Items | [comparewitdfields](#comparewitdfields) | Compare work item fields between two work item type definition files. |
 | Work Items | [copycategory](#copycategory) | Copy category type from one category file to another. |
 | Work Items | [copywitdfield](#copywitdfield) | Copy work item field from one work item type definition to another. |
@@ -697,6 +698,12 @@ And a discovery tool so the assistant can fall back to the command line for anyt
 | teamproject | Required | String | Team project name that contains the TFVC and Git repositories |
 | reponame | Required | String | Name of the new git repository |
 | tfvc-path | Required | String | Source TFVC folder to convert |
+## <a name="where-tf"></a> where-tf
+**Finds the tf command line client, which ships inside Visual Studio and is rarely on the PATH.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Print only the path of the first copy that was found |
 # Work Items
 ## <a name="comparewitdfields"></a> comparewitdfields
 **Compare work item fields between two work item type definition files.**
