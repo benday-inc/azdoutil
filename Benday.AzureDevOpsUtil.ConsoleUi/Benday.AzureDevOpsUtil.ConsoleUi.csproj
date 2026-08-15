@@ -20,7 +20,7 @@
     <Version>$(TheVersion)</Version>
     <Description>A collection of useful command line utilities for Azure DevOps</Description>
     <PackageReleaseNotes>
-v2.23 - Added assess-tfvc-migration to report what a TFVC to Git conversion would have to deal with: branches and their activity, folders used as branches without being registered as such, build definitions that pull from TFVC and the workspaces they map, large files and checked-in build output, and solutions that share projects. Added branchhealth to survey the branches of a Git repository. Added where-tf to find the tf command line client. branchhealth, analyzerepo and assess-tfvc-migration read their arguments from the current directory's git remote or TFVC workspace when they are not supplied;
+v2.23 - Added assess-tfvc-migration to report what a TFVC to Git conversion would have to deal with: branches and their activity, folders used as branches without being registered as such, build definitions that pull from TFVC and the workspaces they map, large files and checked-in build output, and solutions that share projects; Added branchhealth to survey the branches of a Git repository; Added where-tf to find the tf command line client; Added additional commands for import/export of agent pool user defined capabilities; Added commands to search for demands in builds and releases;
 v2.22 - MCP server; Bug fixes;
 v2.21 - Adding commands to help manage classic build task group definitions including a command to inline task groups back into the build;
 v2.20 - Modified the listagentpools command to include agent capabilities in its output;
