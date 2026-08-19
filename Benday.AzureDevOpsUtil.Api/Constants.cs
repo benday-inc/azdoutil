@@ -1,4 +1,6 @@
-﻿namespace Benday.AzureDevOpsUtil.Api;
+﻿using Benday.CommandsFramework;
+
+namespace Benday.AzureDevOpsUtil.Api;
 
 public static class Constants
 {
@@ -100,7 +102,11 @@ public static class Constants
     public const string ArgumentNameCollectionUrl = "url";
     public const string ArgumentNameWindowsAuth = "windowsauth";
     public const string ArgumentNameToken = "pat";
-    public const string ArgumentNameQuietMode = "quiet";
+    /// <summary>
+    /// Quiet mode. This is the framework's reserved argument name rather than one of
+    /// azdoutil's own -- it is aliased here so the two strings cannot drift apart.
+    /// </summary>
+    public const string ArgumentNameQuietMode = CommandFrameworkConstants.CommandArgName_QuietMode;
     public const string ArgumentNameNameOnly = "nameonly";
     public const string ArgumentNameXaml = "xaml";
     public const string ArgumentNameOutputRaw = "raw";

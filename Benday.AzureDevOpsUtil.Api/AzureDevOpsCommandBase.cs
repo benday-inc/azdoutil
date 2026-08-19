@@ -21,6 +21,9 @@ public abstract class AzureDevOpsCommandBase : AsynchronousCommand
 
     protected void AddCommonArguments(ArgumentCollection arguments)
     {
+        // 'quiet' is a name the framework reserves, so declaring it here only adds the
+        // description to this command's usage output -- the value itself is read by
+        // CommandBase.IsQuietMode straight off the parsed command line
         arguments
             .AddBoolean(Constants.ArgumentNameQuietMode)
             .AsNotRequired()
@@ -29,22 +32,6 @@ public abstract class AzureDevOpsCommandBase : AsynchronousCommand
 
         arguments.AddString(Constants.ArgumentNameConfigurationName)
             .AsNotRequired().WithDescription("Configuration name to use");
-    }
-
-    public bool IsQuietMode
-    {
-        get
-        {
-            if (Arguments.ContainsKey(Constants.ArgumentNameQuietMode) == true &&
-                Arguments[Constants.ArgumentNameQuietMode].HasValue)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
     }
 
     protected AzureDevOpsConfiguration Configuration

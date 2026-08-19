@@ -56,27 +56,12 @@ public static class ExtensionMethods
         }
     }
 
-    public static CommandExecutionInfo GetCloneOfArguments(
-        this CommandExecutionInfo execInfo, string commandName, bool quietMode)
-    {
-        if (execInfo is null || execInfo.Arguments is null)
-        {
-            throw new ArgumentNullException(nameof(execInfo));
-        }
-
-        var argsClone = execInfo.Arguments.ToDictionary(entry => entry.Key, entry => entry.Value);
-
-        if (quietMode == true)
-        {
-            argsClone.TryAdd(Constants.ArgumentNameQuietMode, "true");
-        }
-
-        var returnValue = new CommandExecutionInfo();
-        returnValue.Arguments = argsClone;
-        returnValue.CommandName = commandName;
-
-        return returnValue;
-    }
+    // GetCloneOfArguments() used to be defined here as well as in the framework, with the
+    // same signature. Inside this namespace azdoutil's copy won by proximity and nobody
+    // noticed, but any other assembly importing both namespaces got an ambiguous call. The
+    // framework's copy is also the better one -- it builds the clone with
+    // ArgumentCollection.ArgumentNameComparer, so the clone keeps matching argument names
+    // without regard to case.
 
     public static void AppendLabeledValue(this StringBuilder builder, string label, string value)
     {

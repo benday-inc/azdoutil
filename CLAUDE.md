@@ -65,6 +65,19 @@ All Azure DevOps commands inherit from **AzureDevOpsCommandBase**, which provide
 - Typed Azure DevOps API calling methods with automatic retry logic
 - Common argument handling (quiet mode, configuration name)
 
+**Quiet mode belongs to the framework, not to azdoutil.** `Constants.ArgumentNameQuietMode` is an
+alias for `CommandFrameworkConstants.CommandArgName_QuietMode` so the two strings cannot drift, and
+`IsQuietMode` is `CommandBase.IsQuietMode` — azdoutil used to declare its own property that hid it
+(CS0108) and answered a different question: it read the validated `Arguments` collection, so it
+could not answer before validation had run, and it treated any supplied value as quiet, which made
+`/quiet:false` mean quiet. `AddCommonArguments()` still declares the argument, but only so the
+description shows up in usage output; the value is read off the parsed command line.
+
+Same story for `GetCloneOfArguments()` — the framework has it as of v4.18, so azdoutil's copy was
+deleted. Inside `Benday.AzureDevOpsUtil.Api` azdoutil's copy won by namespace proximity and nobody
+noticed, but any other assembly importing both namespaces got CS0121. Before adding a helper here,
+check whether the framework already has one.
+
 Commands extend either:
 - `AsynchronousCommand` - For async operations (most commands)
 - `SynchronousCommand` - For simple synchronous operations
