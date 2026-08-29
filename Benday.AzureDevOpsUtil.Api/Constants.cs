@@ -203,6 +203,19 @@ public static class Constants
     public const string ArgumentNameBuildsScope = "builds";
     public const string ArgumentNameReleasesScope = "releases";
 
+    public const string CommandName_FindNuGetToolInstaller = "find-nuget-tool-installer";
+    public const string CommandName_UpdateNuGetToolInstaller = "update-nuget-tool-installer";
+
+    public const string ArgumentNameNuGetVersion = "nugetversion";
+    public const string ArgumentNameTaskVersion = "taskversion";
+    public const string DefaultNuGetVersionSpec = "7.9.x";
+    public const string DefaultNuGetToolInstallerTaskVersion = "1.*";
+
+    public const string CommandName_FindDeploymentGroupUsages = "find-deployment-group-usages";
+
+    public const string CommandName_ExportLocalGroups = "export-local-groups";
+    public const string CommandName_ImportLocalGroups = "import-local-groups";
+
 
 
 
