@@ -12,8 +12,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.VersionControl;
 [Command(
     Category = Constants.Category_VersionControl,
     Name = Constants.CommandArgumentNameImportTfvcToGit, 
-    Description = "Converts a Team Foundation Version Control (TFVC) folder to a Git repository.", 
-    IsAsync = true)]
+    Description = "Converts a Team Foundation Version Control (TFVC) folder to a Git repository.")]
 public class ImportTfvcToGitCommand : AzureDevOpsCommandBase
 {
 
@@ -39,7 +38,7 @@ public class ImportTfvcToGitCommand : AzureDevOpsCommandBase
     }
 
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         var projectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);
         var repoName = Arguments.GetStringValue(Constants.ArgumentNameRepositoryName);
@@ -47,7 +46,7 @@ public class ImportTfvcToGitCommand : AzureDevOpsCommandBase
         
         if (tfvcPath.StartsWith("$/") == false)
         {
-            throw new KnownException($"The value for /{Constants.ArgumentNameTfvcFolder} should start with '$/'.  For example: $/{projectName}/Main/HelloWorld");
+            throw new KnownException($"The value for --{Constants.ArgumentNameTfvcFolder} should start with '$/'.  For example: $/{projectName}/Main/HelloWorld");
         }
 
         var project = await GetProject(projectName);

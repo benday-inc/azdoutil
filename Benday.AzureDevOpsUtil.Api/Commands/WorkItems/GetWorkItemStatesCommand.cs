@@ -11,8 +11,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.WorkItems;
 [Command(
     Category = Constants.Category_WorkItems,
     Name = Constants.CommandArgumentNameGetWorkItemStates, 
-    Description = "Gets the list of states for a work item type in an Azure DevOps Team Project.", 
-    IsAsync = true)]
+    Description = "Gets the list of states for a work item type in an Azure DevOps Team Project.")]
 public class GetWorkItemStatesCommand : AzureDevOpsCommandBase
 {
 
@@ -39,7 +38,7 @@ public class GetWorkItemStatesCommand : AzureDevOpsCommandBase
     }
 
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         var projectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);
         var workItemTypeName = Arguments.GetStringValue(Constants.ArgumentNameWorkItemTypeName);

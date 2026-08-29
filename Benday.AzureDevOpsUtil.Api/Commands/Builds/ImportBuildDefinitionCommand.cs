@@ -9,8 +9,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.Builds;
 [Command(
     Category = Constants.Category_Builds,
     Name = Constants.CommandArgumentNameImportBuildDefinition,
-    Description = "Import build definition from JSON file",
-    IsAsync = true)]
+    Description = "Import build definition from JSON file")]
 public class ImportBuildDefinitionCommand : AzureDevOpsCommandBase
 {
     private string _teamProjectName = string.Empty;
@@ -54,7 +53,7 @@ public class ImportBuildDefinitionCommand : AzureDevOpsCommandBase
 
     public string? LastResultRawJson { get; private set; }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         _teamProjectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);
         _inputFilePath = Arguments.GetStringValue(Constants.ArgumentNameInputFile);

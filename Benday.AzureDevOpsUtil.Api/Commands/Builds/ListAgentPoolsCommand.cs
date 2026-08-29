@@ -11,8 +11,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.Builds;
 [Command(
     Category = Constants.Category_Builds,
     Name = Constants.CommandArgumentNameListAgentPools,
-        Description = "List agent pools",
-        IsAsync = true)]
+        Description = "List agent pools")]
 public class ListAgentPoolsCommand : AzureDevOpsCommandBase
 {
     public GetAgentPoolsResponse? LastResult { get; private set; }
@@ -36,7 +35,7 @@ public class ListAgentPoolsCommand : AzureDevOpsCommandBase
         return arguments;
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         var withAgents = Arguments.GetBooleanValue(Constants.CommandArgumentNameWithAgents);
         var toJson = Arguments.GetBooleanValue(Constants.CommandArgumentNameToJson);

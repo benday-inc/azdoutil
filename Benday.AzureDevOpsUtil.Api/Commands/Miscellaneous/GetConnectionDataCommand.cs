@@ -9,7 +9,6 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.Miscellaneous;
 [Command(
     Category = Constants.Category_Misc,
     Name = Constants.CommandName_ConnectionData,
-    IsAsync = true,
     Description = "Get information about a connection to Azure DevOps.")]
 public class GetConnectionDataCommand : AzureDevOpsCommandBase
 {
@@ -30,7 +29,7 @@ public class GetConnectionDataCommand : AzureDevOpsCommandBase
         return args;
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         var result = await GetConnectionData();
 

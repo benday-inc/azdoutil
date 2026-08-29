@@ -58,7 +58,7 @@ public class ListConfigurationCommandFixture
     }
 
     [TestMethod]
-    public void ListNamedConfiguration_ThatExists()
+    public async Task ListNamedConfiguration_ThatExists()
     {
         // arrange
         Utilities.AssertFileDoesNotExist(ConfigurationManager.PathToConfigurationFile);
@@ -91,7 +91,7 @@ public class ListConfigurationCommandFixture
         _SystemUnderTest = new ListConfigurationCommand(executionInfo, OutputProvider);
 
         // act
-        _SystemUnderTest.Execute();
+        await _SystemUnderTest.ExecuteAsync();
 
         // assert        
         Utilities.AssertFileExists(ConfigurationManager.PathToConfigurationFile);
@@ -106,7 +106,7 @@ public class ListConfigurationCommandFixture
     }
 
     [TestMethod]
-    public void ListAllConfigs()
+    public async Task ListAllConfigs()
     {
         // arrange
         Utilities.AssertFileDoesNotExist(ConfigurationManager.PathToConfigurationFile);
@@ -137,7 +137,7 @@ public class ListConfigurationCommandFixture
         _SystemUnderTest = new ListConfigurationCommand(executionInfo, OutputProvider);
 
         // act
-        _SystemUnderTest.Execute();
+        await _SystemUnderTest.ExecuteAsync();
 
         // assert        
         Utilities.AssertFileExists(ConfigurationManager.PathToConfigurationFile);
@@ -151,7 +151,7 @@ public class ListConfigurationCommandFixture
     }
 
     [TestMethod]
-    public void ListAllConfigs_NoConfigs()
+    public async Task ListAllConfigs_NoConfigs()
     {
         // arrange
         Utilities.AssertFileDoesNotExist(ConfigurationManager.PathToConfigurationFile);
@@ -166,7 +166,7 @@ public class ListConfigurationCommandFixture
         _SystemUnderTest = new ListConfigurationCommand(executionInfo, OutputProvider);
 
         // act
-        _SystemUnderTest.Execute();
+        await _SystemUnderTest.ExecuteAsync();
 
         // assert        
         var output = OutputProvider.GetOutput();

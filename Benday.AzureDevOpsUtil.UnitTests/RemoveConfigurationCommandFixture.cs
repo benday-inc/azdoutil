@@ -58,7 +58,7 @@ public class RemoveConfigurationCommandFixture
     }
 
     [TestMethod]
-    public void RemoveNamedConfiguration_ThatExists()
+    public async Task RemoveNamedConfiguration_ThatExists()
     {
         // arrange
         Utilities.AssertFileDoesNotExist(ConfigurationManager.PathToConfigurationFile);
@@ -88,7 +88,7 @@ public class RemoveConfigurationCommandFixture
         _SystemUnderTest = new RemoveConfigurationCommand(executionInfo, OutputProvider);
 
         // act
-        _SystemUnderTest.Execute();
+        await _SystemUnderTest.ExecuteAsync();
 
         // assert        
         Utilities.AssertFileExists(ConfigurationManager.PathToConfigurationFile);

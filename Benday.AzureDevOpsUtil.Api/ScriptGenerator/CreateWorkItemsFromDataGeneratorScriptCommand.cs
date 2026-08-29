@@ -11,8 +11,7 @@ namespace Benday.AzureDevOpsUtil.Api.ScriptGenerator;
 [Command(
     Category = Constants.Category_TestData,
     Name = Constants.CommandName_CreateWorkItemsFromDataGenerator,
-        Description = "Create work items using random data generator",
-        IsAsync = true)]
+        Description = "Create work items using random data generator")]
 public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandBase
 {
     public CreateWorkItemsFromDataGeneratorScriptCommand(
@@ -132,7 +131,7 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
 
     private readonly string _sessionId = DateTime.Now.Ticks.ToString()[^5..];
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         var scriptOnly = Arguments.GetBooleanValue(Constants.CommandArg_ScriptOnly);
 

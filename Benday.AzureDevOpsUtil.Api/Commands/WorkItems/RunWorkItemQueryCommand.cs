@@ -10,8 +10,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.WorkItems;
 [Command(
     Category = Constants.Category_WorkItems,
     Name = Constants.CommandName_RunWorkItemQuery,
-        Description = "Run work item query",
-        IsAsync = true)]
+        Description = "Run work item query")]
 public class RunWorkItemQueryCommand : AzureDevOpsCommandBase
 {
     public RunWorkItemQueryCommand(
@@ -35,7 +34,7 @@ public class RunWorkItemQueryCommand : AzureDevOpsCommandBase
         return arguments;
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         WorkItemQueryInfo = await GetWorkItemQuery();
 

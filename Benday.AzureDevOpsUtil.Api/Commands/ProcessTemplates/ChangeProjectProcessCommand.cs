@@ -9,8 +9,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.ProcessTemplates;
 [Command(
     Category = Constants.Category_ProcessTemplates,
     Name = Constants.CommandName_ChangeProjectProcess,
-        Description = "Change the process for a Team Project",
-        IsAsync = true)]
+        Description = "Change the process for a Team Project")]
 public class ChangeProjectProcessCommand : AzureDevOpsCommandBase
 {
     public ChangeProjectProcessCommand(
@@ -89,7 +88,7 @@ public class ChangeProjectProcessCommand : AzureDevOpsCommandBase
         }
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         var projectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);
         var processName = Arguments.GetStringValue(Constants.ArgumentNameProcessName);

@@ -6,8 +6,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.FlowMetrics;
 [Command(
     Category = Constants.Category_FlowMetrics,
     Name = Constants.CommandArgumentNameGetForecastDurationForItemCount,
-        Description = "Use throughput data to forecast likely number of weeks to get given number of items done using Monte Carlo simulation",
-        IsAsync = true)]
+        Description = "Use throughput data to forecast likely number of weeks to get given number of items done using Monte Carlo simulation")]
 public class ForecastDurationForItemCountCommand : AzureDevOpsCommandBase
 {
     public ForecastDurationForItemCountCommand(
@@ -37,7 +36,7 @@ public class ForecastDurationForItemCountCommand : AzureDevOpsCommandBase
         return arguments;
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         _NumberOfItemsToForecast = Arguments.GetInt32Value(Constants.ArgumentNameForecastNumberOfItems);
         _NumberOfDaysOfHistory = Arguments.GetInt32Value(Constants.ArgumentNameCycleTimeNumberOfDays);

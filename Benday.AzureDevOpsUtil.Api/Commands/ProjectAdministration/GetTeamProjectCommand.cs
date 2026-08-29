@@ -10,8 +10,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.ProjectAdministration;
 [Command(
     Category = Constants.Category_ProjectAdmin,
     Name = Constants.CommandName_GetProject,
-        Description = "Get team project info",
-        IsAsync = true)]
+        Description = "Get team project info")]
 public class GetTeamProjectCommand : AzureDevOpsCommandBase
 {
     public GetTeamProjectCommand(
@@ -33,7 +32,7 @@ public class GetTeamProjectCommand : AzureDevOpsCommandBase
         return arguments;
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         var projectName = Arguments[Constants.ArgumentNameTeamProjectName].Value;
 

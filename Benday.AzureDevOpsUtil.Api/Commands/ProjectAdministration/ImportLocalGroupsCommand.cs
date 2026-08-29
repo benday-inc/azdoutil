@@ -14,8 +14,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.ProjectAdministration;
         "new server. Each old local group is re-resolved by name under the new app " +
         "tier machine, and its grants are merged into the same security namespace " +
         "tokens they came from. Run the generated PowerShell script on the new " +
-        "machine first so the groups exist and the server has synced them.",
-    IsAsync = true)]
+        "machine first so the groups exist and the server has synced them.")]
 public class ImportLocalGroupsCommand : AzureDevOpsCommandBase
 {
     public const string ArgumentNameMachine = "machine";
@@ -53,7 +52,7 @@ public class ImportLocalGroupsCommand : AzureDevOpsCommandBase
         return arguments;
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         var inputPath = Arguments.GetStringValue(Constants.ArgumentNameInputFile);
         var machineName = Arguments.GetStringValue(ArgumentNameMachine);

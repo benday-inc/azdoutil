@@ -13,9 +13,8 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.Mcp;
     Name = Constants.CommandArgumentNameMcpServer,
     Description =
         "Start a Model Context Protocol (MCP) server over stdio that exposes the flow metrics " +
-        "tools to an AI assistant. The process stays alive until the MCP client disconnects.",
-    IsAsync = true)]
-public class McpServerCommand : AsynchronousCommand
+        "tools to an AI assistant. The process stays alive until the MCP client disconnects.")]
+public class McpServerCommand : Command
 {
     public McpServerCommand(
         CommandExecutionInfo info, ITextOutputProvider outputProvider) : base(info, outputProvider)
@@ -31,7 +30,7 @@ public class McpServerCommand : AsynchronousCommand
         return new ArgumentCollection();
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         // IMPORTANT: stdio is the MCP JSON-RPC transport, so nothing may be
         // written to stdout here. All diagnostic logging is routed to stderr.

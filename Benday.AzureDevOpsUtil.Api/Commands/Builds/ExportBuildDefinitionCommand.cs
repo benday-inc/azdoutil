@@ -9,8 +9,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.Builds;
 [Command(
     Category = Constants.Category_Builds,
     Name = Constants.CommandArgumentNameExportBuildDefinition,
-        Description = "Export build definition",
-        IsAsync = true)]
+        Description = "Export build definition")]
 public class ExportBuildDefinitionCommand : AzureDevOpsCommandBase
 {
     private string _TeamProjectName = string.Empty;
@@ -68,7 +67,7 @@ public class ExportBuildDefinitionCommand : AzureDevOpsCommandBase
 
     public string? LastResultRawJson { get; private set; }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         // XamlBuildRunInfo
         _TeamProjectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);

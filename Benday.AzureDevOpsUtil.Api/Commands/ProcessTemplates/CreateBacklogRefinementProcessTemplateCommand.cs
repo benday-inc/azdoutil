@@ -7,8 +7,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.ProcessTemplates;
 [Command(
     Category = Constants.Category_ProcessTemplates,
     Name = Constants.CommandArgumentNameCreateBacklogRefinementProcessTemplate,
-        Description = "Creates backlog refinement process template as described at https://www.benday.com/2022/09/29/streamlining-backlog-refinement-with-azure-devops/",
-        IsAsync = true)]
+        Description = "Creates backlog refinement process template as described at https://www.benday.com/2022/09/29/streamlining-backlog-refinement-with-azure-devops/")]
 public class CreateBacklogRefinementProcessTemplateCommand : AzureDevOpsCommandBase
 {
     public CreateBacklogRefinementProcessTemplateCommand(
@@ -33,7 +32,7 @@ public class CreateBacklogRefinementProcessTemplateCommand : AzureDevOpsCommandB
         return arguments;
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         var isAgile = Arguments.GetBooleanValue("agile");
 

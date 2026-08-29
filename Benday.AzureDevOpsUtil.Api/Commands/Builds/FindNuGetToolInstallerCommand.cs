@@ -15,8 +15,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.Builds;
     Description =
         "Find the classic build definitions that use the NuGet tool installer task " +
         "(NuGetToolInstaller) and report which version of the task each step uses " +
-        "and which version of NuGet it installs.",
-    IsAsync = true)]
+        "and which version of NuGet it installs.")]
 public class FindNuGetToolInstallerCommand : AzureDevOpsCommandBase
 {
     public List<NuGetToolInstallerUsage>? LastResult { get; private set; }
@@ -57,19 +56,19 @@ public class FindNuGetToolInstallerCommand : AzureDevOpsCommandBase
         return arguments;
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         if (Arguments.HasValue(Constants.ArgumentNameAllProjects) == false &&
             Arguments.HasValue(Constants.ArgumentNameTeamProjectName) == false)
         {
             throw new KnownException(
-                $"You must specify either /{Constants.ArgumentNameAllProjects} or supply a value for /{Constants.ArgumentNameTeamProjectName}.");
+                $"You must specify either --{Constants.ArgumentNameAllProjects} or supply a value for --{Constants.ArgumentNameTeamProjectName}.");
         }
         else if (Arguments.GetBooleanValue(Constants.ArgumentNameAllProjects) == true &&
             Arguments.HasValue(Constants.ArgumentNameTeamProjectName) == true)
         {
             throw new KnownException(
-                $"You cannot specify both /{Constants.ArgumentNameAllProjects} and /{Constants.ArgumentNameTeamProjectName} at the same time.");
+                $"You cannot specify both --{Constants.ArgumentNameAllProjects} and --{Constants.ArgumentNameTeamProjectName} at the same time.");
         }
 
         var toJson = Arguments.GetBooleanValue(Constants.CommandArgumentNameToJson);

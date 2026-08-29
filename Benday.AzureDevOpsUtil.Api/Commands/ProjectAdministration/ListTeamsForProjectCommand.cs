@@ -9,7 +9,6 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.ProjectAdministration;
 [Command(
     Category = Constants.Category_ProjectAdmin,
     Name = Constants.CommandArgumentName_ListTeams,
-    IsAsync = true,
     Description = "Gets list of teams in an Azure DevOps Team Project.")]
 public class ListTeamsForProjectCommand : AzureDevOpsCommandBase
 {
@@ -32,7 +31,7 @@ public class ListTeamsForProjectCommand : AzureDevOpsCommandBase
         return args;
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         var projectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);
 

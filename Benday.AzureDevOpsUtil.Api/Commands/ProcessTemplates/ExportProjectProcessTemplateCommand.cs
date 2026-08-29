@@ -14,8 +14,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.ProcessTemplates;
 [Command(
     Category = Constants.Category_WorkItems,
     Name = Constants.CommandArgumentNameExportProjectProcessTemplate,
-    Description = "Exports the process template configuration for one or more projects. This command only works on Windows and requires witadmin.exe to be installed.",
-    IsAsync = true)]
+    Description = "Exports the process template configuration for one or more projects. This command only works on Windows and requires witadmin.exe to be installed.")]
 public class ExportProjectProcessTemplateCommand : AzureDevOpsCommandBase
 {
     public ExportProjectProcessTemplateCommand(
@@ -52,7 +51,7 @@ public class ExportProjectProcessTemplateCommand : AzureDevOpsCommandBase
         return args;
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         if (OperatingSystem.IsWindows() == false)
         {

@@ -4,10 +4,11 @@ using System.Text;
 
 using Benday.AzureDevOpsUtil.Api;
 using Benday.CommandsFramework;
+using Benday.CommandsFramework.Tui;
 
 class Program
 {
-    static void Main(string[] args)
+    static async Task<int> Main(string[] args)
     {
         var assembly = typeof(StringUtility).Assembly;
 
@@ -23,8 +24,12 @@ class Program
         options.DisplayUsageOptions.ShowCategories = true;
         options.StrictArgumentValidation = false;
 
+        // gives the tool the 'tui' keyword. This is the equivalent of the CommandsApp
+        // builder's .WithTui() for a program that configures its options directly.
+        options.TuiHost = new SpectreTuiHost();
+
         var program = new DefaultProgram(options, assembly);
 
-        program.Run(args);
+        return await program.RunAsync(args);
     }
 }

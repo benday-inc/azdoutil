@@ -11,8 +11,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.Builds;
 [Command(
     Category = Constants.Category_Builds,
     Name = Constants.CommandName_InlineTaskGroup,
-    Description = "Inline a task group's steps into a build definition and disable the original task group reference.",
-    IsAsync = true)]
+    Description = "Inline a task group's steps into a build definition and disable the original task group reference.")]
 public class InlineTaskGroupCommand : AzureDevOpsCommandBase
 {
     public InlineResult? LastResult { get; private set; }
@@ -52,7 +51,7 @@ public class InlineTaskGroupCommand : AzureDevOpsCommandBase
         return arguments;
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         var teamProjectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);
         var buildDefName = Arguments.GetStringValue(Constants.ArgumentNameBuildDefinitionName);

@@ -9,7 +9,6 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.VersionControl;
 [Command(
     Category = Constants.Category_VersionControl,
     Name = Constants.CommandName_AnalyzeAllRepos,
-    IsAsync = true,
     Description = "Analyzes all Git repositories for build readiness without cloning.")]
 public class AnalyzeAllReposCommand : AzureDevOpsCommandBase
 {
@@ -36,7 +35,7 @@ public class AnalyzeAllReposCommand : AzureDevOpsCommandBase
         return args;
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         var outputCsv = Arguments.GetBooleanValue(Constants.ArgumentNameOutputCsv);
 

@@ -16,8 +16,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.Builds;
         "Read the deployment groups and deployment group agents for one or every team " +
         "project, then trace which release definitions deploy to each group -- including " +
         "which target machines each phase's tag filter actually selects. Deployment " +
-        "groups only exist in classic release pipelines, so builds have nothing to scan.",
-    IsAsync = true)]
+        "groups only exist in classic release pipelines, so builds have nothing to scan.")]
 public class FindDeploymentGroupUsagesCommand : AzureDevOpsCommandBase
 {
     public DeploymentGroupUsageReport? LastResult { get; private set; }
@@ -58,19 +57,19 @@ public class FindDeploymentGroupUsagesCommand : AzureDevOpsCommandBase
         return arguments;
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         if (Arguments.HasValue(Constants.ArgumentNameAllProjects) == false &&
             Arguments.HasValue(Constants.ArgumentNameTeamProjectName) == false)
         {
             throw new KnownException(
-                $"You must specify either /{Constants.ArgumentNameAllProjects} or supply a value for /{Constants.ArgumentNameTeamProjectName}.");
+                $"You must specify either --{Constants.ArgumentNameAllProjects} or supply a value for --{Constants.ArgumentNameTeamProjectName}.");
         }
         else if (Arguments.GetBooleanValue(Constants.ArgumentNameAllProjects) == true &&
             Arguments.HasValue(Constants.ArgumentNameTeamProjectName) == true)
         {
             throw new KnownException(
-                $"You cannot specify both /{Constants.ArgumentNameAllProjects} and /{Constants.ArgumentNameTeamProjectName} at the same time.");
+                $"You cannot specify both --{Constants.ArgumentNameAllProjects} and --{Constants.ArgumentNameTeamProjectName} at the same time.");
         }
 
         var toJson = Arguments.GetBooleanValue(Constants.CommandArgumentNameToJson);

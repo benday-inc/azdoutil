@@ -38,8 +38,8 @@ public class FlowMetricsService
             {
                 throw new KnownException(
                     "azdoutil has no configurations yet. Ask the user to add one by running this " +
-                    "in a terminal: azdoutil addconfig /url:<your Azure DevOps URL> " +
-                    "/pat:<personal access token> (then restart the MCP server). " +
+                    "in a terminal: azdoutil addconfig --url <your Azure DevOps URL> " +
+                    "--pat <personal access token> (then restart the MCP server). " +
                     "You can also call the list_configurations tool to check what is available.");
             }
 

@@ -10,7 +10,6 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.ProjectAdministration;
 [Command(
     Category = Constants.Category_ProjectAdmin,
     Name = Constants.CommandArgumentName_CreateTeam,
-    IsAsync = true,
     Description = "Creates a new team in an Azure DevOps Team Project.")]
 public class CreateTeamCommand : AzureDevOpsCommandBase
 {
@@ -38,7 +37,7 @@ public class CreateTeamCommand : AzureDevOpsCommandBase
         return args;
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         var projectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);
         var teamName = Arguments.GetStringValue(Constants.ArgumentNameTeamName);

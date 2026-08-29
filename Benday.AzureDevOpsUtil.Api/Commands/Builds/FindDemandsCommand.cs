@@ -17,8 +17,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.Builds;
         "the demands each one carries. Demands are the capabilities a definition " +
         "requires of an agent, so this is the companion to the agent capability " +
         "commands. Scans both builds and releases unless /builds or /releases is " +
-        "given.",
-    IsAsync = true)]
+        "given.")]
 public class FindDemandsCommand : AzureDevOpsCommandBase
 {
     public List<DefinitionDemands>? LastResult { get; private set; }
@@ -65,19 +64,19 @@ public class FindDemandsCommand : AzureDevOpsCommandBase
         return arguments;
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         if (Arguments.HasValue(Constants.ArgumentNameAllProjects) == false &&
             Arguments.HasValue(Constants.ArgumentNameTeamProjectName) == false)
         {
             throw new KnownException(
-                $"You must specify either /{Constants.ArgumentNameAllProjects} or supply a value for /{Constants.ArgumentNameTeamProjectName}.");
+                $"You must specify either --{Constants.ArgumentNameAllProjects} or supply a value for --{Constants.ArgumentNameTeamProjectName}.");
         }
         else if (Arguments.GetBooleanValue(Constants.ArgumentNameAllProjects) == true &&
             Arguments.HasValue(Constants.ArgumentNameTeamProjectName) == true)
         {
             throw new KnownException(
-                $"You cannot specify both /{Constants.ArgumentNameAllProjects} and /{Constants.ArgumentNameTeamProjectName} at the same time.");
+                $"You cannot specify both --{Constants.ArgumentNameAllProjects} and --{Constants.ArgumentNameTeamProjectName} at the same time.");
         }
 
         var toJson = Arguments.GetBooleanValue(Constants.CommandArgumentNameToJson);

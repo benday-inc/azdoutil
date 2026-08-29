@@ -8,8 +8,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.WorkItems;
 [Command(
     Category = Constants.Category_WorkItems,
     Name = Constants.CommandName_ShowWorkItemQuery,
-        Description = "Show work item query",
-        IsAsync = true)]
+        Description = "Show work item query")]
 public class ShowWorkItemQueryCommand : AzureDevOpsCommandBase
 {
     public ShowWorkItemQueryCommand(
@@ -34,7 +33,7 @@ public class ShowWorkItemQueryCommand : AzureDevOpsCommandBase
         return arguments;
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         var teamProjectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);
         var workItemQueryName = Arguments.GetStringValue(Constants.ArgumentNameWorkItemQueryName);

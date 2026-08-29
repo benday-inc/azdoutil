@@ -14,8 +14,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.ProjectAdministration;
         "machine: the groups, their memberships, and every security namespace ACL " +
         "that references them, serialized to JSON. Also writes a PowerShell script " +
         "that recreates the groups and memberships on a new machine, for a server " +
-        "migration where the collection database moves to a new app tier.",
-    IsAsync = true)]
+        "migration where the collection database moves to a new app tier.")]
 public class ExportLocalGroupsCommand : AzureDevOpsCommandBase
 {
     public const string ArgumentNameMachine = "machine";
@@ -50,7 +49,7 @@ public class ExportLocalGroupsCommand : AzureDevOpsCommandBase
         return arguments;
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         var machineName = Arguments.GetStringValue(ArgumentNameMachine);
 

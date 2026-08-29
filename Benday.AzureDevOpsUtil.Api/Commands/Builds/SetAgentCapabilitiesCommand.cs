@@ -14,8 +14,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.Builds;
         "/agent, or every agent with /allpools. Supply the capabilities inline " +
         "with /capabilities:\"name=value;name2=value2\" and/or from a flat JSON " +
         "file with /input. Merges by default; use /replace to overwrite and " +
-        "/preview to see the changes first.",
-    IsAsync = true)]
+        "/preview to see the changes first.")]
 public class SetAgentCapabilitiesCommand : AzureDevOpsCommandBase
 {
     public SetAgentCapabilitiesCommand(
@@ -66,7 +65,7 @@ public class SetAgentCapabilitiesCommand : AzureDevOpsCommandBase
         return arguments;
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         var pool = GetOptionalStringValue(Constants.ArgumentNamePoolName);
         var agent = GetOptionalStringValue(Constants.ArgumentNameAgentName);
@@ -84,8 +83,8 @@ public class SetAgentCapabilitiesCommand : AzureDevOpsCommandBase
         if (desired.Count == 0)
         {
             throw new KnownException(
-                $"No capabilities to apply. Supply /{Constants.ArgumentNameCapabilities} " +
-                $"and/or /{Constants.ArgumentNameInputFile}.");
+                $"No capabilities to apply. Supply --{Constants.ArgumentNameCapabilities} " +
+                $"and/or --{Constants.ArgumentNameInputFile}.");
         }
 
         var service = CreateAgentCapabilityService();
@@ -128,15 +127,15 @@ public class SetAgentCapabilitiesCommand : AzureDevOpsCommandBase
         if (allPools == true && (hasPool == true || hasAgent == true))
         {
             throw new KnownException(
-                $"/{Constants.ArgumentNameAllPools} cannot be combined with " +
-                $"/{Constants.ArgumentNamePoolName} or /{Constants.ArgumentNameAgentName}.");
+                $"--{Constants.ArgumentNameAllPools} cannot be combined with " +
+                $"--{Constants.ArgumentNamePoolName} or --{Constants.ArgumentNameAgentName}.");
         }
 
         if (allPools == false && hasPool == false && hasAgent == false)
         {
             throw new KnownException(
-                $"Specify a target: /{Constants.ArgumentNamePoolName}, " +
-                $"/{Constants.ArgumentNameAgentName}, or /{Constants.ArgumentNameAllPools}.");
+                $"Specify a target: --{Constants.ArgumentNamePoolName}, " +
+                $"--{Constants.ArgumentNameAgentName}, or --{Constants.ArgumentNameAllPools}.");
         }
     }
 

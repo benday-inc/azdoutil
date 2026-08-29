@@ -229,7 +229,7 @@ public class AzureDevOpsContextTools
     /// </summary>
     private static async Task<string> RunAsync(
         string configName,
-        Func<CommandExecutionInfo, ITextOutputProvider, AsynchronousCommand> commandFactory,
+        Func<CommandExecutionInfo, ITextOutputProvider, Command> commandFactory,
         string commandName,
         params (string Name, string Value)[] namedArguments)
     {
@@ -237,16 +237,17 @@ public class AzureDevOpsContextTools
 
         var argumentList = new List<string> { commandName };
 
-        // Only pass /config when it differs from the default sentinel so the
-        // command falls back to its own default handling otherwise.
+        // Only pass --config when it differs from the default sentinel so the
+        // command falls back to its own default handling otherwise. The equals
+        // form keeps each name/value pair as one token.
         if (resolvedConfig != Constants.DefaultConfigurationName)
         {
-            argumentList.Add($"/{Constants.ArgumentNameConfigurationName}:{resolvedConfig}");
+            argumentList.Add($"--{Constants.ArgumentNameConfigurationName}={resolvedConfig}");
         }
 
         foreach (var (name, value) in namedArguments)
         {
-            argumentList.Add($"/{name}:{value}");
+            argumentList.Add($"--{name}={value}");
         }
 
         try

@@ -68,7 +68,6 @@ public class CliDiscoveryTools
             Name = command.Name,
             Category = command.Category,
             Description = command.Description,
-            IsAsync = command.IsAsync,
             AvailableAsMcpTool = command.AvailableAsMcpTool,
             McpToolName = command.McpToolName
             // Arguments and example intentionally omitted from the compact list.

@@ -6,8 +6,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.ProjectAdministration;
 [Command(
     Category = Constants.Category_ProjectAdmin,
     Name = Constants.CommandName_ListProjects,
-        Description = "List team projects",
-        IsAsync = true)]
+        Description = "List team projects")]
 public class ListTeamProjectsCommand : AzureDevOpsCommandBase
 {
     public ListTeamProjectsCommand(
@@ -26,7 +25,7 @@ public class ListTeamProjectsCommand : AzureDevOpsCommandBase
         return arguments;
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         using var client = GetHttpClientInstanceForAzureDevOps();
 

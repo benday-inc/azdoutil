@@ -9,8 +9,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.FlowMetrics;
 [Command(
     Category = Constants.Category_FlowMetrics,
     Name = Constants.CommandArgumentNameCycleTimeConfidenceRangesCommand,
-        Description = "Get item cycle time for 50% and 85% levels. This helps you understand how items typically are delivered.",
-        IsAsync = true)]
+        Description = "Get item cycle time for 50% and 85% levels. This helps you understand how items typically are delivered.")]
 public class CycleTimeConfidenceRangesCommand : AzureDevOpsCommandBase
 {
     public CycleTimeConfidenceRangesCommand(
@@ -39,7 +38,7 @@ public class CycleTimeConfidenceRangesCommand : AzureDevOpsCommandBase
         return arguments;
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         _NumberOfWeeksOfForecast = Arguments.GetInt32Value(Constants.ArgumentNameForecastNumberOfWeeks);
         _NumberOfDaysOfHistory = Arguments.GetInt32Value(Constants.ArgumentNameCycleTimeNumberOfDays);

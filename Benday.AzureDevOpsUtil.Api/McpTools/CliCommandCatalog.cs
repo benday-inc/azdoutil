@@ -65,8 +65,7 @@ public static class CliCommandCatalog
             {
                 Name = attribute.Name,
                 Category = attribute.Category,
-                Description = attribute.Description,
-                IsAsync = attribute.IsAsync
+                Description = attribute.Description
             };
 
             if (McpToolByCommandName.TryGetValue(attribute.Name, out var toolName))
@@ -128,7 +127,7 @@ public static class CliCommandCatalog
 
         foreach (var argument in descriptor.Arguments.Where(x => x.IsRequired))
         {
-            builder.Append($" /{argument.Name}:<{argument.DataType.ToLowerInvariant()}>");
+            builder.Append($" --{argument.Name} <{argument.DataType.ToLowerInvariant()}>");
         }
 
         return builder.ToString();
@@ -152,7 +151,6 @@ public class CliCommandDescriptor
     public string Name { get; set; } = string.Empty;
     public string Category { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-    public bool IsAsync { get; set; }
     public bool AvailableAsMcpTool { get; set; }
     public string? McpToolName { get; set; }
     public string CommandLineExample { get; set; } = string.Empty;

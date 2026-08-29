@@ -11,8 +11,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.Builds;
 [Command(
     Category = Constants.Category_Builds,
     Name = Constants.CommandName_FindTaskGroupUsages,
-    Description = "Find build definitions that reference task groups in a team project.",
-    IsAsync = true)]
+    Description = "Find build definitions that reference task groups in a team project.")]
 public class FindTaskGroupUsagesCommand : AzureDevOpsCommandBase
 {
     public List<TaskGroupUsage>? LastResult { get; private set; }
@@ -44,7 +43,7 @@ public class FindTaskGroupUsagesCommand : AzureDevOpsCommandBase
         return arguments;
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         var teamProjectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);
         var taskGroupIdFilter = Arguments.HasValue(Constants.ArgumentNameTaskGroupId)

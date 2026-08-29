@@ -9,7 +9,6 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.VersionControl;
 [Command(
     Category = Constants.Category_VersionControl,
     Name = Constants.CommandName_AnalyzeRepo,
-    IsAsync = true,
     Description = "Analyzes a Git repository for build readiness without cloning.")]
 public class AnalyzeRepoCommand : AzureDevOpsCommandBase
 {
@@ -46,7 +45,7 @@ public class AnalyzeRepoCommand : AzureDevOpsCommandBase
         return args;
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         var projectName = GetOptionalStringValue(Constants.ArgumentNameTeamProjectName);
         var repoName = GetOptionalStringValue(Constants.ArgumentNameRepositoryName);

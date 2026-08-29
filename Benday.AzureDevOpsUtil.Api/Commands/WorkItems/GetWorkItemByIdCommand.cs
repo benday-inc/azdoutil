@@ -9,8 +9,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.WorkItems;
 [Command(
     Category = Constants.Category_WorkItems,
     Name = Constants.CommandName_GetWorkItemById,
-        Description = "Get work item by id",
-        IsAsync = true)]
+        Description = "Get work item by id")]
 public class GetWorkItemByIdCommand : AzureDevOpsCommandBase
 {
     public GetWorkItemByIdCommand(
@@ -30,7 +29,7 @@ public class GetWorkItemByIdCommand : AzureDevOpsCommandBase
         return arguments;
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         WorkItemId = Arguments.GetInt32Value(Constants.CommandArg_WorkItemId);
 
