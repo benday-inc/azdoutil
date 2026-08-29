@@ -7,7 +7,7 @@ using Benday.CommandsFramework;
 
 class Program
 {
-    static void Main(string[] args)
+    static async Task<int> Main(string[] args)
     {
         var assembly = typeof(StringUtility).Assembly;
 
@@ -25,6 +25,6 @@ class Program
 
         var program = new DefaultProgram(options, assembly);
 
-        program.Run(args);
+        return await program.RunAsync(args);
     }
 }

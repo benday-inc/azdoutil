@@ -13,8 +13,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.Builds;
         "file onto the agents of the current server, matching agents by name. " +
         "By default the imported capabilities are merged onto whatever each agent " +
         "already has; use /replace to overwrite. Use /preview to see what would " +
-        "change without writing anything.",
-    IsAsync = true)]
+        "change without writing anything.")]
 public class ImportAgentCapabilitiesCommand : AzureDevOpsCommandBase
 {
     public ImportAgentCapabilitiesCommand(
@@ -49,7 +48,7 @@ public class ImportAgentCapabilitiesCommand : AzureDevOpsCommandBase
         return arguments;
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         var inputPath = Arguments.GetPathToFile(Constants.ArgumentNameInputFile);
         var replace = Arguments.GetBooleanValue(Constants.ArgumentNameReplace);

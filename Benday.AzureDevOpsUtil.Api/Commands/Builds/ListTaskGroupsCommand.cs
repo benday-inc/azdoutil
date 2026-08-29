@@ -9,8 +9,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.Builds;
 [Command(
     Category = Constants.Category_Builds,
     Name = Constants.CommandName_ListTaskGroups,
-    Description = "List task groups in a team project.",
-    IsAsync = true)]
+    Description = "List task groups in a team project.")]
 public class ListTaskGroupsCommand : AzureDevOpsCommandBase
 {
     public List<TaskGroupInfo>? LastResult { get; private set; }
@@ -54,7 +53,7 @@ public class ListTaskGroupsCommand : AzureDevOpsCommandBase
         return results;
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         var teamProjectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);
         var nameOnly = Arguments.GetBooleanValue(Constants.ArgumentNameNameOnly);

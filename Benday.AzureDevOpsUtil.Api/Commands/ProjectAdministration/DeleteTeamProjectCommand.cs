@@ -6,8 +6,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.ProjectAdministration;
 [Command(
     Category = Constants.Category_ProjectAdmin,
     Name = Constants.CommandName_DeleteProject,
-        Description = "Delete team project",
-        IsAsync = true)]
+        Description = "Delete team project")]
 public class DeleteTeamProjectCommand : AzureDevOpsCommandBase
 {
     public DeleteTeamProjectCommand(
@@ -32,7 +31,7 @@ public class DeleteTeamProjectCommand : AzureDevOpsCommandBase
         return arguments;
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         var projectName = Arguments[Constants.ArgumentNameTeamProjectName].Value;
 
@@ -53,19 +52,21 @@ public class DeleteTeamProjectCommand : AzureDevOpsCommandBase
                 Console.WriteLine("********");
                 Console.WriteLine("********");
                 Console.WriteLine("********");
-                Console.WriteLine($"YOU ARE ABOUT TO DELETE THIS TEAM PROJECT!!!");
+                WriteLine($"YOU ARE ABOUT TO DELETE THIS TEAM PROJECT!!!");
 
                 WriteLine($"\tTeam Project Name: {project.Name}");
-                Console.WriteLine("********");
-                Console.WriteLine("********");
-                Console.WriteLine("********");
-                Console.WriteLine("Are you sure?  (yes/no)");
+                WriteLine("********");
+                WriteLine("********");
+                WriteLine("********");
+                WriteLine("Are you sure?  (yes/no)");
 
-                var value = Console.ReadLine();
+                // reads through the framework's input provider so a test can
+                // drive this without a console
+                var value = ReadLine();
 
                 if (value != "yes")
                 {
-                    Console.WriteLine("Aborting.");
+                    WriteLine("Aborting.");
                     return;
                 }
                 else

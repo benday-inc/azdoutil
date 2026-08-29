@@ -50,12 +50,13 @@ dotnet pack --configuration Release --output ./artifacts
 
 ### Command Framework Pattern
 
-The entire CLI is built on the **Benday.CommandsFramework** library which provides automatic command discovery and execution:
+The entire CLI is built on the **Benday.CommandsFramework** library (v5 — restored from the `LocalNuGet` feed until v5 is published) which provides automatic command discovery and execution:
 
-- Commands are decorated with `[Command]` attributes specifying category, name, and description
+- Commands are decorated with `[Command]` attributes specifying category, name, and description (`IsAsync` is gone in v5 — the type system says how a command runs)
 - The framework automatically discovers all command classes in the Api assembly
-- Program.cs (~30 lines) creates a `DefaultProgram` instance and delegates everything to the framework
+- Program.cs (~30 lines) creates a `DefaultProgram` instance and delegates everything to the framework; `Main` returns the exit code from `RunAsync` — a `Main` that discards it would silently always exit 0
 - Arguments are defined by overriding `GetArguments()` and returning a fluent-built `ArgumentCollection` (there is **no** `[Argument]` attribute in the framework)
+- v5 notes: there is one `Command` base class (`SynchronousCommand` is gone; a sequential command returns `Task.CompletedTask`); `OnExecute` takes a `CancellationToken`, which most commands accept but do not yet thread through to their HTTP calls; arguments render and are documented in POSIX form (`--name value`) while the old `/name:value` form still parses with a deprecation warning on stderr; `CommandRegistryFixture` keeps the framework's registry and argument checks in the test suite (duplicate/reserved names like `tui` fail there rather than silently at run time)
 
 ### Base Command Hierarchy
 
@@ -127,7 +128,7 @@ The Flow Metrics CLI commands in `Commands/FlowMetrics/` are thin adapters that 
 
 ### MCP client setup command
 
-`azdoutil mcp-config` (`Commands/Mcp/McpConfigCommand.cs`) shows or manages the MCP server registration for an AI client. With no options it prints ready-to-paste configuration for Claude Code, Claude Desktop, VS Code, Visual Studio 2022/2026, and Cursor; `/install` and `/uninstall` register/remove the server at **user (per-machine) scope** via `claude mcp add`/`remove` or `code --add-mcp`. `/client:<name>` picks the target client (install/uninstall default to Claude Code) and `/config:<name>` bakes an `AZDO_CONFIG_NAME` environment variable into the registration. The pure string/argument builders live in `McpTools/McpClientSetup.cs` (unit tested); the command only handles argument parsing and cross-platform process execution.
+`azdoutil mcp-config` (`Commands/Mcp/McpConfigCommand.cs`) shows or manages the MCP server registration for an AI client. With no options it prints ready-to-paste configuration for Claude Code, Claude Desktop, VS Code, Visual Studio 2022/2026, and Cursor; `--install` and `--uninstall` register/remove the server at **user (per-machine) scope** via `claude mcp add`/`remove` or `code --add-mcp`. `--client <name>` picks the target client (install/uninstall default to Claude Code) and `--config <name>` bakes an `AZDO_CONFIG_NAME` environment variable into the registration. The pure string/argument builders live in `McpTools/McpClientSetup.cs` (unit tested); the command only handles argument parsing and cross-platform process execution.
 
 ### ScriptGenerator System
 

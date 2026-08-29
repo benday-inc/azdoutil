@@ -11,7 +11,7 @@ namespace Benday.AzureDevOpsUtil.Api.WorkItems;
 [Command(
     Category = Constants.Category_WorkItems,
     Name = Constants.CommandArgumentNameCompareWitdFields,
-    Description = "Compare work item fields between two work item type definition files.", IsAsync = true)]
+    Description = "Compare work item fields between two work item type definition files.")]
 public class CompareWorkItemFieldsCommand : AzureDevOpsCommandBase
 {
 
@@ -42,7 +42,7 @@ public class CompareWorkItemFieldsCommand : AzureDevOpsCommandBase
     }
 
 
-    protected override Task OnExecute()
+    protected override Task OnExecute(CancellationToken cancellationToken)
     {
         var file1 = Arguments.GetPathToFile(Constants.ArgumentNameComparisonFile1, true);
         var file2 = Arguments.GetPathToFile(Constants.ArgumentNameComparisonFile2, true);

@@ -12,7 +12,7 @@ namespace Benday.AzureDevOpsUtil.Api.WorkItems;
 [Command(
     Category = Constants.Category_WorkItems,
     Name = Constants.CommandArgumentNameCopyCategory,
-    Description = "Copy category type from one category file to another.", IsAsync = true)]
+    Description = "Copy category type from one category file to another.")]
 public class CopyCategoryCommand : AzureDevOpsCommandBase
 {
 
@@ -47,7 +47,7 @@ public class CopyCategoryCommand : AzureDevOpsCommandBase
     }
 
 
-    protected override Task OnExecute()
+    protected override Task OnExecute(CancellationToken cancellationToken)
     {
         var file1 = Arguments.GetPathToFile(Constants.ArgumentNameComparisonFile1, true);
         var file2 = Arguments.GetPathToFile(Constants.ArgumentNameComparisonFile2, true);

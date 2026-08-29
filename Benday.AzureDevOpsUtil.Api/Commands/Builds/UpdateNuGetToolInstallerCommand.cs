@@ -14,8 +14,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.Builds;
     Description =
         "Update the NuGet tool installer steps (NuGetToolInstaller) in a classic build " +
         "definition to a chosen task version and NuGet version, set each step's display " +
-        "name to show the NuGet version, and save the change back to the server.",
-    IsAsync = true)]
+        "name to show the NuGet version, and save the change back to the server.")]
 public class UpdateNuGetToolInstallerCommand : AzureDevOpsCommandBase
 {
     public NuGetToolInstallerUpdateResult? LastResult { get; private set; }
@@ -63,7 +62,7 @@ public class UpdateNuGetToolInstallerCommand : AzureDevOpsCommandBase
         return arguments;
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         var teamProjectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);
         var buildDefName = Arguments.GetStringValue(Constants.ArgumentNameBuildDefinitionName);

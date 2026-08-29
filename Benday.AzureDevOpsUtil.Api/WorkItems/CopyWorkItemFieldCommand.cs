@@ -11,7 +11,7 @@ namespace Benday.AzureDevOpsUtil.Api.WorkItems;
 [Command(
     Category = Constants.Category_WorkItems,
     Name = Constants.CommandArgumentNameCopyWitdField,
-    Description = "Copy work item field from one work item type definition to another.", IsAsync = true)]
+    Description = "Copy work item field from one work item type definition to another.")]
 public class CopyWorkItemFieldCommand : AzureDevOpsCommandBase
 {
 
@@ -44,7 +44,7 @@ public class CopyWorkItemFieldCommand : AzureDevOpsCommandBase
     }
 
 
-    protected override Task OnExecute()
+    protected override Task OnExecute(CancellationToken cancellationToken)
     {
         var file1 = Arguments.GetPathToFile(Constants.ArgumentNameComparisonFile1, true);
         var file2 = Arguments.GetPathToFile(Constants.ArgumentNameComparisonFile2, true);

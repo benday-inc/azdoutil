@@ -5,9 +5,8 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.Configuration;
 [Command(
     Category = Constants.Category_AzdoUtilConfig,
     Name = Constants.CommandArgumentNameListConfig,
-        Description = "List an Azure DevOps configuration. For example, which server or account plus auth information.",
-        IsAsync = false)]
-public class ListConfigurationCommand : SynchronousCommand
+        Description = "List an Azure DevOps configuration. For example, which server or account plus auth information.")]
+public class ListConfigurationCommand : Command
 {
     public ListConfigurationCommand(
         CommandExecutionInfo info, ITextOutputProvider outputProvider) : base(info, outputProvider)
@@ -25,7 +24,7 @@ public class ListConfigurationCommand : SynchronousCommand
         return arguments;
     }
 
-    protected override void OnExecute()
+    protected override Task OnExecute(CancellationToken cancellationToken)
     {
         if (Arguments[Constants.ArgumentNameConfigurationName].HasValue)
         {
@@ -41,6 +40,8 @@ public class ListConfigurationCommand : SynchronousCommand
 
             Print(configs);
         }
+
+        return Task.CompletedTask;
     }
 
     private void Print(AzureDevOpsConfiguration[] configs)

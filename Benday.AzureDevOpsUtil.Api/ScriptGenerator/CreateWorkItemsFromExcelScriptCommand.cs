@@ -10,8 +10,7 @@ namespace Benday.AzureDevOpsUtil.Api.ScriptGenerator;
 [Command(
     Category = Constants.Category_TestData,
     Name = Constants.CommandName_CreateWorkItemsFromExcelScript,
-        Description = "Create work items using Excel script",
-        IsAsync = true)]
+        Description = "Create work items using Excel script")]
 public class CreateWorkItemsFromExcelScriptCommand : AzureDevOpsCommandBase
 {
     public CreateWorkItemsFromExcelScriptCommand(
@@ -54,7 +53,7 @@ public class CreateWorkItemsFromExcelScriptCommand : AzureDevOpsCommandBase
     private List<WorkItemScriptAction>? _actions;
     private string _teamProjectName = string.Empty;
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         _skipFutureDates = Arguments.GetBooleanValue(Constants.CommandArg_SkipFutureDates);
 

@@ -12,8 +12,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.Builds;
 [Command(
     Category = Constants.Category_Builds,
     Name = Constants.CommandArgumentNameListBuildDefinitions,
-        Description = "List build definitions",
-        IsAsync = true)]
+        Description = "List build definitions")]
 public class ListBuildDefinitionsCommand : AzureDevOpsCommandBase
 {
     private string _TeamProjectName = string.Empty;
@@ -68,19 +67,19 @@ public class ListBuildDefinitionsCommand : AzureDevOpsCommandBase
         return json;
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         if (Arguments.HasValue(Constants.ArgumentNameAllProjects) == false &&
             Arguments.HasValue(Constants.ArgumentNameTeamProjectName) == false)
         {
             throw new KnownException(
-                $"You must specify either /{Constants.ArgumentNameAllProjects} or supply a value for /{Constants.ArgumentNameTeamProjectName}.");
+                $"You must specify either --{Constants.ArgumentNameAllProjects} or supply a value for --{Constants.ArgumentNameTeamProjectName}.");
         }
         else if (Arguments.HasValue(Constants.ArgumentNameAllProjects) == true &&
             Arguments.HasValue(Constants.ArgumentNameTeamProjectName) == true)
         {
             throw new KnownException(
-                $"You cannot specify both /{Constants.ArgumentNameAllProjects} and /{Constants.ArgumentNameTeamProjectName} at the same time.");
+                $"You cannot specify both --{Constants.ArgumentNameAllProjects} and --{Constants.ArgumentNameTeamProjectName} at the same time.");
         }
 
         bool allProjects;

@@ -27,15 +27,15 @@ Everything starts with a configuration. After you've installed azdoutil, you'll 
 Configurations are named and you can have as many as you'd like.
 
 ### Set a Default Configuration
-There's one default configuration named `(default)`. If you only work with one Azure DevOps instance, then all you'll need to do is to is run `azdoutil addconfig /url:{url} /pat:{pat}` and that will set your default configuration. 
+There's one default configuration named `(default)`. If you only work with one Azure DevOps instance, then all you'll need to do is to is run `azdoutil addconfig --url {url} --pat {pat}` and that will set your default configuration. 
 
 ### Additional Named Configurations
-If you want to add additional named configurations, you'll run `azdoutil addconfig /config:{name} /url:{url} /pat:{pat}`. 
+If you want to add additional named configurations, you'll run `azdoutil addconfig --config {name} --url {url} --pat {pat}`. 
 
 ### Running Commands
 Once you've set a default configuration, you can run any azdoutil command without having to specify any additional URL or PAT info.  
 
-If you want to run a command against an Azure DevOps instance that is NOT your default, you'll need to supply the `/config:{name}`.
+If you want to run a command against an Azure DevOps instance that is NOT your default, you'll need to supply the `--config {name}` argument.
 
 ### Managing Configurations
 To add new configuration or modify an existing configuration, use the `azdoutil addconfig` command. You can list your configurations using the `azdoutil listconfig` command. To delete a configuration, use the `azdoutil removeconfig` command.

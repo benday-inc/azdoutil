@@ -8,7 +8,7 @@ using System.Text.Json;
 
 namespace Benday.AzureDevOpsUtil.Api;
 
-public abstract class AzureDevOpsCommandBase : AsynchronousCommand
+public abstract class AzureDevOpsCommandBase : Command
 {
     private AzureDevOpsConfiguration? _AzureDevOpsConfiguration;
 
@@ -92,8 +92,8 @@ public abstract class AzureDevOpsCommandBase : AsynchronousCommand
         {
             throw new KnownException(
                 $"'{currentDirectory}' is not inside a git repository, so there is nothing to " +
-                $"read the repository name from. Supply /{Constants.ArgumentNameTeamProjectName} " +
-                $"and /{Constants.ArgumentNameRepositoryName}.");
+                $"read the repository name from. Supply --{Constants.ArgumentNameTeamProjectName} " +
+                $"and --{Constants.ArgumentNameRepositoryName}.");
         }
 
         var remoteUrl = GitRepositoryLocator.FindRemoteUrl(currentDirectory);
@@ -102,8 +102,8 @@ public abstract class AzureDevOpsCommandBase : AsynchronousCommand
         {
             throw new KnownException(
                 "This git repository has no 'origin' remote to read the repository name from. " +
-                $"Supply /{Constants.ArgumentNameTeamProjectName} and " +
-                $"/{Constants.ArgumentNameRepositoryName}.");
+                $"Supply --{Constants.ArgumentNameTeamProjectName} and " +
+                $"--{Constants.ArgumentNameRepositoryName}.");
         }
 
         var remote = GitRemoteUrlParser.Parse(remoteUrl);
@@ -112,8 +112,8 @@ public abstract class AzureDevOpsCommandBase : AsynchronousCommand
         {
             throw new KnownException(
                 $"The origin remote of this git repository is '{remoteUrl}', which is not an " +
-                $"Azure DevOps repository url. Supply /{Constants.ArgumentNameTeamProjectName} " +
-                $"and /{Constants.ArgumentNameRepositoryName}.");
+                $"Azure DevOps repository url. Supply --{Constants.ArgumentNameTeamProjectName} " +
+                $"and --{Constants.ArgumentNameRepositoryName}.");
         }
 
         return remote;
@@ -148,7 +148,7 @@ public abstract class AzureDevOpsCommandBase : AsynchronousCommand
                 $"The origin remote points at {remote.CollectionUrl}, and no azdoutil " +
                 $"configuration uses that url. {known} Add one with " +
                 $"{Constants.CommandArgumentNameAddUpdateConfig}, or name a configuration with " +
-                $"/{Constants.ArgumentNameConfigurationName}.");
+                $"--{Constants.ArgumentNameConfigurationName}.");
         }
 
         Configuration = match;

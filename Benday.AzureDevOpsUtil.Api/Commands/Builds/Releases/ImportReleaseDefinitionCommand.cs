@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 #nullable enable
 namespace Benday.AzureDevOpsUtil.Api.Commands.Builds.Releases;
 
-[Command(Category = "Builds", Name = "importreleasedef", Description = "Import release definition from JSON file", IsAsync = true)]
+[Command(Category = "Builds", Name = "importreleasedef", Description = "Import release definition from JSON file")]
 public class ImportReleaseDefinitionCommand(
   CommandExecutionInfo info,
   ITextOutputProvider outputProvider) : AzureDevOpsCommandBase(info, outputProvider)
@@ -42,7 +42,7 @@ public class ImportReleaseDefinitionCommand(
 
   public string? LastResultRawJson { get; private set; }
 
-  protected override async Task OnExecute()
+  protected override async Task OnExecute(CancellationToken cancellationToken)
   {
     this._teamProjectName = this.Arguments.GetStringValue("teamproject");
     this._inputFilePath = this.Arguments.GetStringValue("input");

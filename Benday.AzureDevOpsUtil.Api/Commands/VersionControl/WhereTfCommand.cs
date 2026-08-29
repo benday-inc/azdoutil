@@ -6,10 +6,9 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.VersionControl;
 [Command(
     Category = Constants.Category_VersionControl,
     Name = Constants.CommandName_WhereTf,
-    IsAsync = false,
     Description =
         "Finds the tf command line client, which ships inside Visual Studio and is rarely on the PATH.")]
-public class WhereTfCommand : SynchronousCommand
+public class WhereTfCommand : Command
 {
     public WhereTfCommand(
         CommandExecutionInfo info, ITextOutputProvider outputProvider) :
@@ -31,7 +30,7 @@ public class WhereTfCommand : SynchronousCommand
         return arguments;
     }
 
-    protected override void OnExecute()
+    protected override Task OnExecute(CancellationToken cancellationToken)
     {
         var quiet = Arguments.GetBooleanValue(Constants.ArgumentNameQuietMode);
 
@@ -48,7 +47,7 @@ public class WhereTfCommand : SynchronousCommand
                 WriteNotFound();
             }
 
-            return;
+            return Task.CompletedTask;
         }
 
         if (quiet == true)
@@ -56,7 +55,7 @@ public class WhereTfCommand : SynchronousCommand
             // One bare path, so a script can capture it.
             WriteLine(locations[0].Path);
 
-            return;
+            return Task.CompletedTask;
         }
 
         WriteLine(
@@ -74,6 +73,8 @@ public class WhereTfCommand : SynchronousCommand
         }
 
         WriteOnPathAdvice(locations);
+
+        return Task.CompletedTask;
     }
 
     private void WriteOnPathAdvice(List<TfLocation> locations)

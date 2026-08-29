@@ -9,8 +9,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.FlowMetrics;
 [Command(
     Category = Constants.Category_FlowMetrics,
     Name = Constants.CommandArgumentNameGetCycleTimeAndThroughput,
-        Description = "Get cycle time and throughput data for a team project for a date range",
-        IsAsync = true)]
+        Description = "Get cycle time and throughput data for a team project for a date range")]
 public class GetCycleTimeAndThroughputCommand : AzureDevOpsCommandBase
 {
     public GetCycleTimeAndThroughputCommand(
@@ -38,7 +37,7 @@ public class GetCycleTimeAndThroughputCommand : AzureDevOpsCommandBase
         return arguments;
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         _NumberOfDaysOfHistory = Arguments.GetInt32Value(Constants.ArgumentNameCycleTimeNumberOfDays);
         _TeamProjectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);

@@ -9,8 +9,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.WorkItems;
 [Command(
     Category = Constants.Category_WorkItems,
     Name = Constants.CommandName_SetWorkItemState,
-        Description = "Set the state value on an existing work item",
-        IsAsync = true)]
+        Description = "Set the state value on an existing work item")]
 public class SetWorkItemStateCommand : AzureDevOpsCommandBase
 {
     public SetWorkItemStateCommand(
@@ -30,7 +29,7 @@ public class SetWorkItemStateCommand : AzureDevOpsCommandBase
         return arguments;
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         var workItemId = Arguments.GetInt32Value(Constants.CommandArg_WorkItemId);
         var toState = Arguments.GetStringValue(Constants.CommandArg_State);
@@ -95,7 +94,7 @@ public class SetWorkItemStateCommand : AzureDevOpsCommandBase
         }
         else
         {
-            throw new KnownException($"Work item type does not have a state '{toState}'. Use /{Constants.CommandArgumentNameOverride} to force set the value.");
+            throw new KnownException($"Work item type does not have a state '{toState}'. Use --{Constants.CommandArgumentNameOverride} to force set the value.");
         }
     }
 

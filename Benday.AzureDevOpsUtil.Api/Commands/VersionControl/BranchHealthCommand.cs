@@ -10,7 +10,6 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.VersionControl;
 [Command(
     Category = Constants.Category_VersionControl,
     Name = Constants.CommandName_BranchHealth,
-    IsAsync = true,
     Description =
         "Surveys the branches in a Git repository and reports how much work is in flight.")]
 public class BranchHealthCommand : AzureDevOpsCommandBase
@@ -56,7 +55,7 @@ public class BranchHealthCommand : AzureDevOpsCommandBase
         return arguments;
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         var projectName = GetOptionalStringValue(Constants.ArgumentNameTeamProjectName);
         var repositoryName = GetOptionalStringValue(Constants.ArgumentNameRepositoryName);

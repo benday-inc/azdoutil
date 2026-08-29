@@ -7,8 +7,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.WorkItems;
 [Command(
     Category = Constants.Category_WorkItems,
     Name = Constants.CommandArgumentNameGetWorkItemFields,
-    Description = "Gets a list of work item fields for a work item type in an Azure DevOps Team Project.",
-    IsAsync = true)]
+    Description = "Gets a list of work item fields for a work item type in an Azure DevOps Team Project.")]
 public class GetWorkItemFieldsCommand : AzureDevOpsCommandBase
 {
     public GetWorkItemFieldsCommand(
@@ -35,7 +34,7 @@ public class GetWorkItemFieldsCommand : AzureDevOpsCommandBase
         return args;
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         var projectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);
         var workItemTypeName = Arguments.GetStringValue(Constants.ArgumentNameWorkItemTypeName);

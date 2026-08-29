@@ -9,9 +9,8 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.Configuration;
 [Command(
     Category = Constants.Category_AzdoUtilConfig,
     Name = Constants.CommandArgumentNameAddUpdateConfig,
-    Description = "Add or update an Azure DevOps configuration. For example, which server or account plus auth information.",
-    IsAsync = false)]
-public class AddUpdateConfigurationCommand : SynchronousCommand
+    Description = "Add or update an Azure DevOps configuration. For example, which server or account plus auth information.")]
+public class AddUpdateConfigurationCommand : Command
 {
     public AddUpdateConfigurationCommand(
         CommandExecutionInfo info, ITextOutputProvider outputProvider) : base(info, outputProvider)
@@ -41,17 +40,17 @@ public class AddUpdateConfigurationCommand : SynchronousCommand
         return arguments;
     }
 
-    protected override void OnExecute()
+    protected override Task OnExecute(CancellationToken cancellationToken)
     {
         if (Arguments.HasValue(Constants.ArgumentNameToken) == true &&
             Arguments.HasValue(Constants.ArgumentNameWindowsAuth) == true)
         {
-            throw new KnownException($"Cannot set both /{Constants.ArgumentNameToken} and /{Constants.ArgumentNameWindowsAuth}");
+            throw new KnownException($"Cannot set both --{Constants.ArgumentNameToken} and --{Constants.ArgumentNameWindowsAuth}");
         }
         else if (Arguments.HasValue(Constants.ArgumentNameToken) == false &&
             Arguments.HasValue(Constants.ArgumentNameWindowsAuth) == false)
         {
-            throw new KnownException($"You must set either /{Constants.ArgumentNameToken} or /{Constants.ArgumentNameWindowsAuth}");
+            throw new KnownException($"You must set either --{Constants.ArgumentNameToken} or --{Constants.ArgumentNameWindowsAuth}");
         }
 
         var configName = Constants.DefaultConfigurationName;
@@ -78,5 +77,7 @@ public class AddUpdateConfigurationCommand : SynchronousCommand
         };
 
         AzureDevOpsConfigurationManager.Instance.Save(config);
+
+        return Task.CompletedTask;
     }
 }

@@ -11,7 +11,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.VersionControl;
 
 [Command(
     Category = Constants.Category_VersionControl,
-    Name = Constants.CommandArgumentNameCreateGitRepository, Description = "Creates a Git repository in an Azure DevOps Team Project.", IsAsync = true)]
+    Name = Constants.CommandArgumentNameCreateGitRepository, Description = "Creates a Git repository in an Azure DevOps Team Project.")]
 public class CreateGitRepositoryCommand : AzureDevOpsCommandBase
 {
 
@@ -36,7 +36,7 @@ public class CreateGitRepositoryCommand : AzureDevOpsCommandBase
     }
 
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         var projectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);
         var repoName = Arguments.GetStringValue(Constants.ArgumentNameRepositoryName);

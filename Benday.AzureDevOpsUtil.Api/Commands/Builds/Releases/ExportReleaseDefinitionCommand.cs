@@ -14,8 +14,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.Builds.Releases;
 [Command(
     Category = Constants.Category_Builds,
     Name = Constants.CommandArgumentNameExportReleaseDefinition,
-        Description = "Export release definition",
-        IsAsync = true)]
+        Description = "Export release definition")]
 public class ExportReleaseDefinitionCommand : AzureDevOpsCommandBase
 {
     private string _TeamProjectName = string.Empty;
@@ -55,7 +54,7 @@ public class ExportReleaseDefinitionCommand : AzureDevOpsCommandBase
     public ReleaseQueueInfo? QueueInfo { get; set; }
     public string? LastResultRawJson { get; private set; }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         _TeamProjectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);
         _ReleaseDefinitionName = Arguments.GetStringValue(Constants.ArgumentNameReleaseDefinitionName);

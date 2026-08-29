@@ -11,8 +11,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.FlowMetrics;
 [Command(
     Category = Constants.Category_FlowMetrics,
     Name = Constants.CommandArgumentNameForecastWorkItemDelivery,
-        Description = "Use throughput data to forecast when a work item is likely to be done based on the current backlog priority using Monte Carlo simulation",
-        IsAsync = true)]
+        Description = "Use throughput data to forecast when a work item is likely to be done based on the current backlog priority using Monte Carlo simulation")]
 public class ForecastWorkItemDeliveryCommand : AzureDevOpsCommandBase
 {
     public ForecastWorkItemDeliveryCommand(
@@ -75,7 +74,7 @@ public class ForecastWorkItemDeliveryCommand : AzureDevOpsCommandBase
         }
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         var workItemId = Arguments.GetInt32Value(Constants.CommandArg_WorkItemId);
 

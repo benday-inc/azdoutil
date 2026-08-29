@@ -13,8 +13,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.Builds;
 [Command(
     Category = Constants.Category_Builds,
     Name = Constants.CommandArgumentNameListQueues,
-        Description = "List build queues in a team project or team projects",
-        IsAsync = true)]
+        Description = "List build queues in a team project or team projects")]
 public class ListQueuesCommand : AzureDevOpsCommandBase
 {
     public GetBuildQueuesResponse? LastResult { get; private set; }
@@ -128,7 +127,7 @@ public class ListQueuesCommand : AzureDevOpsCommandBase
         WriteLine();
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         var toJson = Arguments.GetBooleanValue(Constants.CommandArgumentNameToJson);
 
@@ -136,13 +135,13 @@ public class ListQueuesCommand : AzureDevOpsCommandBase
             Arguments.HasValue(Constants.ArgumentNameTeamProjectName) == false)
         {
             throw new KnownException(
-                $"You must specify either /{Constants.ArgumentNameAllProjects} or supply a value for /{Constants.ArgumentNameTeamProjectName}.");
+                $"You must specify either --{Constants.ArgumentNameAllProjects} or supply a value for --{Constants.ArgumentNameTeamProjectName}.");
         }
         else if (Arguments.HasValue(Constants.ArgumentNameAllProjects) == true &&
             Arguments.HasValue(Constants.ArgumentNameTeamProjectName) == true)
         {
             throw new KnownException(
-                $"You cannot specify both /{Constants.ArgumentNameAllProjects} and /{Constants.ArgumentNameTeamProjectName} at the same time.");
+                $"You cannot specify both --{Constants.ArgumentNameAllProjects} and --{Constants.ArgumentNameTeamProjectName} at the same time.");
         }
 
         bool allProjects;

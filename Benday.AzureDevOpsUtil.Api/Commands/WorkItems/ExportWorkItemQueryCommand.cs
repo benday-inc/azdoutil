@@ -12,8 +12,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.WorkItems;
 [Command(
     Category = Constants.Category_WorkItems,
     Name = Constants.CommandName_ExportWorkItemQuery,
-        Description = "Export work item query results",
-        IsAsync = true)]
+        Description = "Export work item query results")]
 public class ExportWorkItemQueryCommand : AzureDevOpsCommandBase
 {
     private const int BATCH_SIZE = 200;
@@ -47,7 +46,7 @@ public class ExportWorkItemQueryCommand : AzureDevOpsCommandBase
     private string? _workItemQueryName;
     private string? _exportToPath;
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         _teamProjectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);
         _workItemQueryName = Arguments.GetStringValue(Constants.ArgumentNameWorkItemQueryName);

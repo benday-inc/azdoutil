@@ -4,8 +4,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.WorkItems;
 [Command(
     Category = Constants.Category_WorkItems,
     Name = Constants.CommandArgumentNameGetAreas,
-    Description = "Gets a list of areas in an Azure DevOps Team Project.",
-    IsAsync = true)]
+    Description = "Gets a list of areas in an Azure DevOps Team Project.")]
 public class GetAreasCommand : GetClassificationNodesCommandBase
 {
     public GetAreasCommand(CommandExecutionInfo info, ITextOutputProvider outputProvider) :
@@ -28,7 +27,7 @@ public class GetAreasCommand : GetClassificationNodesCommandBase
         return args;
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         var verbose = Arguments.GetBooleanValue(Constants.ArgumentNameVerbose);
         var teamProjectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);

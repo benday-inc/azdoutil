@@ -19,17 +19,17 @@ public class ExtensionMethodsTests
     }
 
     [TestMethod]
-    public void RemoveAllArgumentsExcept_ThrowsArgumentNullException_WhenArgumentsIsNull()
+    public void RemoveAllArgumentsExcept_HandlesDefaultExecutionInfo()
     {
-        // Arrange
-        var execInfo = new CommandExecutionInfo
-        {
-            Arguments = null
-        };
+        // Arrange -- in v5 Arguments reads through to Request.Arguments and can
+        // no longer be null; a default CommandExecutionInfo has an empty request
+        var execInfo = new CommandExecutionInfo();
 
-        // Act & Assert
-        Assert.Throws<ArgumentNullException>(() =>
-            execInfo.RemoveAllArgumentsExcept(false));
+        // Act
+        execInfo.RemoveAllArgumentsExcept(false);
+
+        // Assert
+        Assert.AreEqual(0, execInfo.Arguments.Count);
     }
 
     [TestMethod]
@@ -38,12 +38,12 @@ public class ExtensionMethodsTests
         // Arrange
         var execInfo = new CommandExecutionInfo
         {
-            Arguments = new Dictionary<string, string>
+            Request = new CommandCallRequest("test", new Dictionary<string, string>
             {
                 { "arg1", "value1" },
                 { "arg2", "value2" },
                 { "arg3", "value3" }
-            }
+            })
         };
 
         // Act
@@ -59,13 +59,13 @@ public class ExtensionMethodsTests
         // Arrange
         var execInfo = new CommandExecutionInfo
         {
-            Arguments = new Dictionary<string, string>
+            Request = new CommandCallRequest("test", new Dictionary<string, string>
             {
                 { Constants.ArgumentNameQuietMode, "true" },
                 { Constants.ArgumentNameConfigurationName, "config" },
                 { "arg1", "value1" },
                 { "arg2", "value2" }
-            }
+            })
         };
 
         // Act
@@ -83,12 +83,12 @@ public class ExtensionMethodsTests
         // Arrange
         var execInfo = new CommandExecutionInfo
         {
-            Arguments = new Dictionary<string, string>
+            Request = new CommandCallRequest("test", new Dictionary<string, string>
             {
                 { "arg1", "value1" },
                 { "arg2", "value2" },
                 { "arg3", "value3" }
-            }
+            })
         };
 
         // Act
@@ -107,14 +107,14 @@ public class ExtensionMethodsTests
         // Arrange
         var execInfo = new CommandExecutionInfo
         {
-            Arguments = new Dictionary<string, string>
+            Request = new CommandCallRequest("test", new Dictionary<string, string>
             {
                 { Constants.ArgumentNameQuietMode, "true" },
                 { Constants.ArgumentNameConfigurationName, "config" },
                 { "arg1", "value1" },
                 { "arg2", "value2" },
                 { "arg3", "value3" }
-            }
+            })
         };
 
         // Act
@@ -135,12 +135,12 @@ public class ExtensionMethodsTests
         // Arrange
         var execInfo = new CommandExecutionInfo
         {
-            Arguments = new Dictionary<string, string>
+            Request = new CommandCallRequest("test", new Dictionary<string, string>
             {
                 { "ARG1", "value1" },
                 { "arg2", "value2" },
                 { "Arg3", "value3" }
-            }
+            })
         };
 
         // Act
@@ -159,12 +159,12 @@ public class ExtensionMethodsTests
         // Arrange
         var execInfo = new CommandExecutionInfo
         {
-            Arguments = new Dictionary<string, string>
+            Request = new CommandCallRequest("test", new Dictionary<string, string>
             {
                 { Constants.ArgumentNameQuietMode, "true" },
                 { Constants.ArgumentNameConfigurationName, "config" },
                 { "arg1", "value1" }
-            }
+            })
         };
 
         // Act
@@ -183,11 +183,11 @@ public class ExtensionMethodsTests
         // Arrange
         var execInfo = new CommandExecutionInfo
         {
-            Arguments = new Dictionary<string, string>
+            Request = new CommandCallRequest("test", new Dictionary<string, string>
             {
                 { Constants.ArgumentNameQuietMode, "true" },
                 { "arg1", "value1" }
-            }
+            })
         };
 
         // Act

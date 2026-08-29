@@ -58,15 +58,15 @@ Everything starts with a configuration. After you've installed azdoutil, you'll 
 Configurations are named and you can have as many as you'd like.
 
 ### Set a Default Configuration
-There's one default configuration named `(default)`. If you only work with one Azure DevOps instance, then all you'll need to do is to is run `azdoutil addconfig /url:{url} /pat:{pat}` and that will set your default configuration. 
+There's one default configuration named `(default)`. If you only work with one Azure DevOps instance, then all you'll need to do is to is run `azdoutil addconfig --url {url} --pat {pat}` and that will set your default configuration. 
 
 ### Additional Named Configurations
-If you want to add additional named configurations, you'll run `azdoutil addconfig /config:{name} /url:{url} /pat:{pat}`. 
+If you want to add additional named configurations, you'll run `azdoutil addconfig --config {name} --url {url} --pat {pat}`. 
 
 ### Running Commands
 Once you've set a default configuration, you can run any azdoutil command without having to specify any additional URL or PAT info.  
 
-If you want to run a command against an Azure DevOps instance that is NOT your default, you'll need to supply the `/config:{name}`.
+If you want to run a command against an Azure DevOps instance that is NOT your default, you'll need to supply the `--config {name}` argument.
 
 ### Managing Configurations
 To add new configuration or modify an existing configuration, use the `azdoutil addconfig` command. You can list your configurations using the `azdoutil listconfig` command. To delete a configuration, use the `azdoutil removeconfig` command.
@@ -85,11 +85,11 @@ The command takes no arguments and communicates over stdio. Connection details c
 Run `azdoutil mcp-config` to print ready-to-paste configuration for every supported client, or let azdoutil register the server for you at user (per-machine) scope:
 
 ```
-azdoutil mcp-config /install                       # Claude Code, default configuration
-azdoutil mcp-config /install /config:myconfig      # Claude Code, using "myconfig"
-azdoutil mcp-config /install /client:vscode /config:myconfig
-azdoutil mcp-config /uninstall                     # remove from Claude Code
-azdoutil mcp-config /config:myconfig               # just print instructions, change nothing
+azdoutil mcp-config --install                       # Claude Code, default configuration
+azdoutil mcp-config --install --config myconfig      # Claude Code, using "myconfig"
+azdoutil mcp-config --install --client vscode --config myconfig
+azdoutil mcp-config --uninstall                     # remove from Claude Code
+azdoutil mcp-config --config myconfig               # just print instructions, change nothing
 ```
 
 **Claude Code (CLI)** — or register it yourself (omit `-e AZDO_CONFIG_NAME=...` to use the default configuration):
@@ -208,7 +208,7 @@ And a discovery tool so the assistant can fall back to the command line for anyt
 | Flow Metrics | [forecastworkitem](#forecastworkitem) | Use throughput data to forecast when a work item is likely to be done based on the current backlog priority using Monte Carlo simulation |
 | Flow Metrics | [suggest-sle](#suggest-sle) | Calculate a suggested service level expectation (SLE) based on cycle time |
 | Flow Metrics | [throughputcycletime](#throughputcycletime) | Get cycle time and throughput data for a team project for a date range |
-| MCP Server | [mcp-config](#mcp-config) | Show or manage the MCP server registration for an AI client. With no options it prints ready-to-paste configuration; with /install or /uninstall it registers or removes the server at user scope (per-machine) for Claude Code or VS Code. |
+| MCP Server | [mcp-config](#mcp-config) | Show or manage the MCP server registration for an AI client. With no options it prints ready-to-paste configuration; with --install or --uninstall it registers or removes the server at user scope (per-machine) for Claude Code or VS Code. |
 | MCP Server | [mcp-server](#mcp-server) | Start a Model Context Protocol (MCP) server over stdio that exposes the flow metrics tools to an AI assistant. The process stays alive until the MCP client disconnects. |
 | Miscellaneous | [connectiondata](#connectiondata) | Get information about a connection to Azure DevOps. |
 | Process Templates | [addrefinementprocess](#addrefinementprocess) | Creates backlog refinement process template as described at https://www.benday.com/2022/09/29/streamlining-backlog-refinement-with-azure-devops/ |
@@ -584,7 +584,7 @@ And a discovery tool so the assistant can fall back to the command line for anyt
 | teamname | Optional | String | Team name |
 # MCP Server
 ## <a name="mcp-config"></a> mcp-config
-**Show or manage the MCP server registration for an AI client. With no options it prints ready-to-paste configuration; with /install or /uninstall it registers or removes the server at user scope (per-machine) for Claude Code or VS Code.**
+**Show or manage the MCP server registration for an AI client. With no options it prints ready-to-paste configuration; with --install or --uninstall it registers or removes the server at user scope (per-machine) for Claude Code or VS Code.**
 ### Arguments
 | Argument | Is Optional | Data Type | Description |
 | --- | --- | --- | --- |

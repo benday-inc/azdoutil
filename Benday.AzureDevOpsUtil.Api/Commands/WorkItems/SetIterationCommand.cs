@@ -6,8 +6,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.WorkItems;
 [Command(
     Category = Constants.Category_WorkItems,
     Name = Constants.CommandName_SetIteration,
-        Description = "Create iteration including start and end date",
-        IsAsync = true)]
+        Description = "Create iteration including start and end date")]
 public class SetIterationCommand : AzureDevOpsCommandBase
 {
     public SetIterationCommand(
@@ -34,7 +33,7 @@ public class SetIterationCommand : AzureDevOpsCommandBase
     }
 
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         _startDate = Arguments.GetDateTimeValue(Constants.CommandArg_StartDate);
         _endDate = Arguments.GetDateTimeValue(Constants.CommandArg_EndDate);

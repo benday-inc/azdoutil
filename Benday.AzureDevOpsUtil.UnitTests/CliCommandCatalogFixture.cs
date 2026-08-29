@@ -24,7 +24,7 @@ public class CliCommandCatalogFixture
         Assert.AreEqual("Project Administration", getProject!.Category, "Wrong category.");
         Assert.IsTrue(getProject.Arguments.Any(a => a.Name == "teamproject" && a.IsRequired),
             "getproject should have a required teamproject argument.");
-        Assert.IsTrue(getProject.CommandLineExample.Contains("/teamproject:"),
+        Assert.IsTrue(getProject.CommandLineExample.Contains("--teamproject "),
             $"Example should include required args. Actual: '{getProject.CommandLineExample}'");
 
         Assert.IsTrue(commands.Any(x => x.Name == "tfvc-to-git"),

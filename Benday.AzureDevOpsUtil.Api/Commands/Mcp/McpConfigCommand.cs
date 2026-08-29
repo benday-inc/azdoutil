@@ -11,10 +11,9 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.Mcp;
     Name = Constants.CommandArgumentNameMcpConfig,
     Description =
         "Show or manage the MCP server registration for an AI client. With no options it prints " +
-        "ready-to-paste configuration; with /install or /uninstall it registers or removes the " +
-        "server at user scope (per-machine) for Claude Code or VS Code.",
-    IsAsync = false)]
-public class McpConfigCommand : SynchronousCommand
+        "ready-to-paste configuration; with --install or --uninstall it registers or removes the " +
+        "server at user scope (per-machine) for Claude Code or VS Code.")]
+public class McpConfigCommand : Command
 {
     private const string ClientClaudeCode = "claude-code";
     private const string ClientVsCode = "vscode";
@@ -50,14 +49,14 @@ public class McpConfigCommand : SynchronousCommand
         return arguments;
     }
 
-    protected override void OnExecute()
+    protected override Task OnExecute(CancellationToken cancellationToken)
     {
         var install = IsFlagSet(Constants.ArgumentNameMcpInstall);
         var uninstall = IsFlagSet(Constants.ArgumentNameMcpUninstall);
 
         if (install && uninstall)
         {
-            throw new KnownException("Specify either /install or /uninstall, not both.");
+            throw new KnownException("Specify either --install or --uninstall, not both.");
         }
 
         var configName = GetOptionalConfigName();
@@ -75,6 +74,8 @@ public class McpConfigCommand : SynchronousCommand
         {
             WriteLine(McpClientSetup.PrintableInstructions(configName));
         }
+
+        return Task.CompletedTask;
     }
 
     private bool IsFlagSet(string name)
@@ -159,7 +160,7 @@ public class McpConfigCommand : SynchronousCommand
 
             default:
                 WriteLine("Nothing to uninstall for the 'print' client. " +
-                          "Use /client:claude-code or /client:vscode.");
+                          "Use --client claude-code or --client vscode.");
                 break;
         }
     }

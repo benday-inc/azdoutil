@@ -7,8 +7,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.FlowMetrics;
 [Command(
     Category = Constants.Category_FlowMetrics,
     Name = Constants.CommandArgumentNameSuggestServiceLevelExpectation,
-        Description = "Calculate a suggested service level expectation (SLE) based on cycle time",
-        IsAsync = true)]
+        Description = "Calculate a suggested service level expectation (SLE) based on cycle time")]
 public class CalculateSuggestedServiceLevelExpectationCommand : AzureDevOpsCommandBase
 {
     public CalculateSuggestedServiceLevelExpectationCommand(
@@ -41,7 +40,7 @@ public class CalculateSuggestedServiceLevelExpectationCommand : AzureDevOpsComma
         return arguments;
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         _NumberOfWeeksOfForecast = Arguments.GetInt32Value(Constants.ArgumentNameForecastNumberOfWeeks);
         _NumberOfDaysOfHistory = Arguments.GetInt32Value(Constants.ArgumentNameCycleTimeNumberOfDays);

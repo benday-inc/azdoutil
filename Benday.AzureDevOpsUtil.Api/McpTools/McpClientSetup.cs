@@ -102,7 +102,7 @@ public static class McpClientSetup
             ? $"using configuration '{configName}'"
             : "using the default configuration";
 
-        var configFlag = HasConfig(configName) ? $" /config:{configName}" : string.Empty;
+        var configFlag = HasConfig(configName) ? $" --config {configName}" : string.Empty;
 
         var claudeEnvFlag = HasConfig(configName)
             ? $" -e {ConfigEnvironmentVariableName}={configName}"
@@ -118,7 +118,7 @@ public static class McpClientSetup
         builder.AppendLine();
 
         builder.AppendLine("--- Claude Code (CLI) ---");
-        builder.AppendLine($"  azdoutil mcp-config /install{configFlag}");
+        builder.AppendLine($"  azdoutil mcp-config --install{configFlag}");
         builder.AppendLine($"  or:  claude mcp add azdoutil -s user{claudeEnvFlag} -- azdoutil mcp-server");
         builder.AppendLine();
 
@@ -132,7 +132,7 @@ public static class McpClientSetup
         builder.AppendLine();
 
         builder.AppendLine("--- VS Code (GitHub Copilot) ---");
-        builder.AppendLine($"  azdoutil mcp-config /install /client:vscode{configFlag}");
+        builder.AppendLine($"  azdoutil mcp-config --install --client vscode{configFlag}");
         builder.AppendLine("  or run the 'MCP: Open User Configuration' command and add under \"servers\":");
         builder.AppendLine($"    \"azdoutil\": {withType}");
         builder.AppendLine("  Then open Copilot Chat and switch to Agent mode.");

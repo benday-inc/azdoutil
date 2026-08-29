@@ -9,8 +9,7 @@ namespace Benday.AzureDevOpsUtil.Api.ScriptGenerator;
 [Command(
     Category = Constants.Category_TestData,
     Name = Constants.CommandName_CreateRandomTitles,
-        Description = "Create fake work item titles using random data generator without creating any work items.",
-        IsAsync = true)]
+        Description = "Create fake work item titles using random data generator without creating any work items.")]
 public class CreateWorkItemInfoFromDataGeneratorCommand : AzureDevOpsCommandBase
 {
     public CreateWorkItemInfoFromDataGeneratorCommand(
@@ -27,7 +26,7 @@ public class CreateWorkItemInfoFromDataGeneratorCommand : AzureDevOpsCommandBase
         return arguments;
     }
 
-    protected override Task OnExecute()
+    protected override Task OnExecute(CancellationToken cancellationToken)
     {
         GenerateTitlesOnly();
 

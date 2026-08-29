@@ -58,7 +58,7 @@ public class AddUpdateConfigurationCommandFixture
     }
 
     [TestMethod]
-    public void AddNamedConfiguration()
+    public async Task AddNamedConfiguration()
     {
         // arrange
         Utilities.AssertFileDoesNotExist(ConfigurationManager.PathToConfigurationFile);
@@ -78,7 +78,7 @@ public class AddUpdateConfigurationCommandFixture
         _SystemUnderTest = new AddUpdateConfigurationCommand(executionInfo, OutputProvider);
 
         // act
-        _SystemUnderTest.Execute();
+        await _SystemUnderTest.ExecuteAsync();
 
         // assert        
         Utilities.AssertFileExists(ConfigurationManager.PathToConfigurationFile);
@@ -95,7 +95,7 @@ public class AddUpdateConfigurationCommandFixture
     }
 
     [TestMethod]
-    public void AddNamedConfiguration_WindowsAuth()
+    public async Task AddNamedConfiguration_WindowsAuth()
     {
         // arrange
         Utilities.AssertFileDoesNotExist(ConfigurationManager.PathToConfigurationFile);
@@ -115,7 +115,7 @@ public class AddUpdateConfigurationCommandFixture
         _SystemUnderTest = new AddUpdateConfigurationCommand(executionInfo, OutputProvider);
 
         // act
-        _SystemUnderTest.Execute();
+        await _SystemUnderTest.ExecuteAsync();
 
         // assert        
         var output = OutputProvider.GetOutput();
@@ -132,7 +132,7 @@ public class AddUpdateConfigurationCommandFixture
     }
 
     [TestMethod]
-    public void AddNamedConfiguration_CannotSetPatAndWindowsAuth()
+    public async Task AddNamedConfiguration_CannotSetPatAndWindowsAuth()
     {
         // arrange
         Utilities.AssertFileDoesNotExist(ConfigurationManager.PathToConfigurationFile);
@@ -153,11 +153,11 @@ public class AddUpdateConfigurationCommandFixture
         _SystemUnderTest = new AddUpdateConfigurationCommand(executionInfo, OutputProvider);
 
         // act / assert
-        Assert.ThrowsExactly<KnownException>(() => _SystemUnderTest.Execute());
+        await Assert.ThrowsExactlyAsync<KnownException>(() => _SystemUnderTest.ExecuteAsync());
     }
 
     [TestMethod]
-    public void AddNamedConfiguration_MustSetPatOrWindowsAuth()
+    public async Task AddNamedConfiguration_MustSetPatOrWindowsAuth()
     {
         // arrange
         Utilities.AssertFileDoesNotExist(ConfigurationManager.PathToConfigurationFile);
@@ -176,11 +176,11 @@ public class AddUpdateConfigurationCommandFixture
         _SystemUnderTest = new AddUpdateConfigurationCommand(executionInfo, OutputProvider);
 
         // act / assert
-        Assert.ThrowsExactly<KnownException>(() => _SystemUnderTest.Execute());
+        await Assert.ThrowsExactlyAsync<KnownException>(() => _SystemUnderTest.ExecuteAsync());
     }
 
     [TestMethod]
-    public void AddDefaultConfiguration()
+    public async Task AddDefaultConfiguration()
     {
         // arrange
         Utilities.AssertFileDoesNotExist(ConfigurationManager.PathToConfigurationFile);
@@ -199,7 +199,7 @@ public class AddUpdateConfigurationCommandFixture
         _SystemUnderTest = new AddUpdateConfigurationCommand(executionInfo, OutputProvider);
 
         // act
-        _SystemUnderTest.Execute();
+        await _SystemUnderTest.ExecuteAsync();
 
         // assert        
         Utilities.AssertFileExists(ConfigurationManager.PathToConfigurationFile);

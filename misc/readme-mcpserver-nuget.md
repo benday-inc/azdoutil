@@ -1,7 +1,7 @@
 ## MCP Server (AI assistant integration)
 azdoutil can run as a [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server so an AI assistant (GitHub Copilot, Claude, etc.) can answer delivery questions in plain language — "how long does stuff usually take?", "when will these 10 items be done?", "what's stuck?" — by calling azdoutil's flow metrics calculations directly.
 
-Start it with `azdoutil mcp-server`. Run `azdoutil mcp-config` to print ready-to-paste setup for Claude Code, Claude Desktop, VS Code, Visual Studio 2022/2026, and Cursor — or run `azdoutil mcp-config /install` and let it register the server for you at user (per-machine) scope. See the [GitHub README](https://github.com/benday-inc/azdoutil#mcp-server-ai-assistant-integration) for full setup and routing details.
+Start it with `azdoutil mcp-server`. Run `azdoutil mcp-config` to print ready-to-paste setup for Claude Code, Claude Desktop, VS Code, Visual Studio 2022/2026, and Cursor — or run `azdoutil mcp-config --install` and let it register the server for you at user (per-machine) scope. See the [GitHub README](https://github.com/benday-inc/azdoutil#mcp-server-ai-assistant-integration) for full setup and routing details.
 
 The tools are all read-only:
 

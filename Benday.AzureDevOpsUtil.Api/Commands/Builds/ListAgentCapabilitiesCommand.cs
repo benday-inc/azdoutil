@@ -11,8 +11,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.Builds;
     Description =
         "List the build agents across all agent pools and the user-defined " +
         "capabilities each one has. Use /customonly to show only the agents " +
-        "that have custom capabilities.",
-    IsAsync = true)]
+        "that have custom capabilities.")]
 public class ListAgentCapabilitiesCommand : AzureDevOpsCommandBase
 {
     public IReadOnlyList<AgentCapabilityRecord>? LastResult { get; private set; }
@@ -47,7 +46,7 @@ public class ListAgentCapabilitiesCommand : AzureDevOpsCommandBase
         return arguments;
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         var poolFilter = GetOptionalStringValue(Constants.ArgumentNamePoolName);
         var customOnly = Arguments.GetBooleanValue(Constants.ArgumentNameCustomOnly);

@@ -11,8 +11,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.Builds;
     Description =
         "Script out the user-defined capabilities of the build agents to a JSON " +
         "file so they can be reapplied to a new server with importagentcapabilities. " +
-        "Only agents that have custom capabilities are written.",
-    IsAsync = true)]
+        "Only agents that have custom capabilities are written.")]
 public class ExportAgentCapabilitiesCommand : AzureDevOpsCommandBase
 {
     public AgentCapabilityExport? LastResult { get; private set; }
@@ -39,7 +38,7 @@ public class ExportAgentCapabilitiesCommand : AzureDevOpsCommandBase
         return arguments;
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         var poolFilter = GetOptionalStringValue(Constants.ArgumentNamePoolName);
         var outputPath = GetOptionalStringValue(Constants.ArgumentNameOutputFile);

@@ -5,8 +5,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.ProjectAdministration;
 [Command(
     Category = Constants.Category_ProjectAdmin,
     Name = Constants.CommandName_ListProcessTemplates,
-        Description = "List process templates",
-        IsAsync = true)]
+        Description = "List process templates")]
 public class ListProcessTemplatesCommand : AzureDevOpsCommandBase
 {
     public ListProcessTemplatesCommand(
@@ -23,7 +22,7 @@ public class ListProcessTemplatesCommand : AzureDevOpsCommandBase
         return arguments;
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         await GetProcessTypes();
     }

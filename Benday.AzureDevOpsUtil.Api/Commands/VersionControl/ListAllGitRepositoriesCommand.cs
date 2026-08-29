@@ -10,7 +10,6 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.VersionControl;
 [Command(
     Category = Constants.Category_VersionControl,
     Name = Constants.CommandArgumentName_ListAllGitRepos,
-    IsAsync = true,
     Description = "Gets list of Git repositories from all Azure DevOps Team Projects.")]
 public class ListAllGitRepositoriesCommand : AzureDevOpsCommandBase
 {
@@ -38,7 +37,7 @@ public class ListAllGitRepositoriesCommand : AzureDevOpsCommandBase
         return args;
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         var outputCsv = Arguments.GetBooleanValue(Constants.ArgumentNameOutputCsv);
         var showLastCommit = Arguments.GetBooleanValue(Constants.ArgumentNameShowLastCommitInfo);

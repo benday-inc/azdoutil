@@ -12,11 +12,11 @@ The command takes no arguments and communicates over stdio. Connection details c
 Run `azdoutil mcp-config` to print ready-to-paste configuration for every supported client, or let azdoutil register the server for you at user (per-machine) scope:
 
 ```
-azdoutil mcp-config /install                       # Claude Code, default configuration
-azdoutil mcp-config /install /config:myconfig      # Claude Code, using "myconfig"
-azdoutil mcp-config /install /client:vscode /config:myconfig
-azdoutil mcp-config /uninstall                     # remove from Claude Code
-azdoutil mcp-config /config:myconfig               # just print instructions, change nothing
+azdoutil mcp-config --install                       # Claude Code, default configuration
+azdoutil mcp-config --install --config myconfig      # Claude Code, using "myconfig"
+azdoutil mcp-config --install --client vscode --config myconfig
+azdoutil mcp-config --uninstall                     # remove from Claude Code
+azdoutil mcp-config --config myconfig               # just print instructions, change nothing
 ```
 
 **Claude Code (CLI)** — or register it yourself (omit `-e AZDO_CONFIG_NAME=...` to use the default configuration):

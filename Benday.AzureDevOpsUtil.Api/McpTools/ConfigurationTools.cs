@@ -41,8 +41,8 @@ public class ConfigurationTools
         result.Message = result.Count == 0
             ? "azdoutil has no configurations yet, so there is nothing to report on. Ask the user " +
               "to add one by running this in a terminal: " +
-              "azdoutil addconfig /url:<your Azure DevOps URL> /pat:<personal access token> " +
-              "(add /config:<name> for a named configuration), then restart the MCP server."
+              "azdoutil addconfig --url <your Azure DevOps URL> --pat <personal access token> " +
+              "(add --config <name> for a named configuration), then restart the MCP server."
             : $"{result.Count} configuration(s) available. Pass a configuration's name as the " +
               "configName parameter to any tool, or set the AZDO_CONFIG_NAME environment variable, " +
               "to choose which connection to use.";

@@ -14,8 +14,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.Builds.Releases;
 [Command(
     Category = Constants.Category_Builds,
     Name = Constants.CommandArgumentNameRepairReleaseDefAgentPool,
-        Description = "Repairs the agent pool setting for the release definitions in a team project or team projects. This is helpful after an on-prem to cloud migration.",
-        IsAsync = true)]
+        Description = "Repairs the agent pool setting for the release definitions in a team project or team projects. This is helpful after an on-prem to cloud migration.")]
 public class RepairReleaseDefinitionAgentPoolCommand : AzureDevOpsCommandBase
 {
     private string _TeamProjectName = string.Empty;
@@ -73,7 +72,7 @@ public class RepairReleaseDefinitionAgentPoolCommand : AzureDevOpsCommandBase
         _OutputDir = outputDir;
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         var previewOnly = Arguments.GetBooleanValue(Constants.ArgumentNamePreviewOnly);
 
@@ -81,13 +80,13 @@ public class RepairReleaseDefinitionAgentPoolCommand : AzureDevOpsCommandBase
             Arguments.HasValue(Constants.ArgumentNameTeamProjectName) == false)
         {
             throw new KnownException(
-                $"You must specify either /{Constants.ArgumentNameAllProjects} or supply a value for /{Constants.ArgumentNameTeamProjectName}.");
+                $"You must specify either --{Constants.ArgumentNameAllProjects} or supply a value for --{Constants.ArgumentNameTeamProjectName}.");
         }
         else if (Arguments.HasValue(Constants.ArgumentNameAllProjects) == true &&
             Arguments.HasValue(Constants.ArgumentNameTeamProjectName) == true)
         {
             throw new KnownException(
-                $"You cannot specify both /{Constants.ArgumentNameAllProjects} and /{Constants.ArgumentNameTeamProjectName} at the same time.");
+                $"You cannot specify both --{Constants.ArgumentNameAllProjects} and --{Constants.ArgumentNameTeamProjectName} at the same time.");
         }
 
         bool allProjects;

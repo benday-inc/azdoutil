@@ -7,7 +7,6 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.VersionControl;
 [Command(
     Category = Constants.Category_VersionControl,
     Name = Constants.CommandName_AssessTfvcMigration,
-    IsAsync = true,
     Description =
         "Analyzes a TFVC path and reports what a conversion to Git would have to deal with.")]
 public class AssessTfvcMigrationCommand : AzureDevOpsCommandBase
@@ -52,7 +51,7 @@ public class AssessTfvcMigrationCommand : AzureDevOpsCommandBase
         return arguments;
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         var projectName = GetOptionalStringValue(Constants.ArgumentNameTeamProjectName);
         var tfvcPath = GetOptionalStringValue(Constants.ArgumentNameTfvcFolder);
@@ -85,7 +84,7 @@ public class AssessTfvcMigrationCommand : AzureDevOpsCommandBase
         if (tfvcPath.StartsWith("$/", StringComparison.Ordinal) == false)
         {
             throw new KnownException(
-                $"The value for /{Constants.ArgumentNameTfvcFolder} should start with '$/'.  " +
+                $"The value for --{Constants.ArgumentNameTfvcFolder} should start with '$/'.  " +
                 $"For example: $/{projectName}/Main");
         }
 
@@ -146,8 +145,8 @@ public class AssessTfvcMigrationCommand : AzureDevOpsCommandBase
                 "The tf command line client is needed to work out which TFVC path this " +
                 $"directory holds, and no copy was found. Run {Constants.CommandName_WhereTf} " +
                 $"for where it was looked for, or supply " +
-                $"/{Constants.ArgumentNameTeamProjectName} and " +
-                $"/{Constants.ArgumentNameTfvcFolder}.");
+                $"--{Constants.ArgumentNameTeamProjectName} and " +
+                $"--{Constants.ArgumentNameTfvcFolder}.");
         }
 
         var output = new TfCommandRunner().Run(tf.Path, currentDirectory, "workfold");
@@ -158,8 +157,8 @@ public class AssessTfvcMigrationCommand : AzureDevOpsCommandBase
         {
             throw new KnownException(
                 $"'{tf.Path} workfold' did not report a workspace for '{currentDirectory}'. " +
-                $"Supply /{Constants.ArgumentNameTeamProjectName} and " +
-                $"/{Constants.ArgumentNameTfvcFolder}.");
+                $"Supply --{Constants.ArgumentNameTeamProjectName} and " +
+                $"--{Constants.ArgumentNameTfvcFolder}.");
         }
 
         var location = TfWorkspaceResolver.Resolve(workspace, currentDirectory);
@@ -172,16 +171,16 @@ public class AssessTfvcMigrationCommand : AzureDevOpsCommandBase
             throw new KnownException(
                 $"'{currentDirectory}' is not inside any folder mapped by workspace " +
                 $"'{workspace.WorkspaceName}'. That workspace maps: {mapped}. Supply " +
-                $"/{Constants.ArgumentNameTeamProjectName} and " +
-                $"/{Constants.ArgumentNameTfvcFolder}.");
+                $"--{Constants.ArgumentNameTeamProjectName} and " +
+                $"--{Constants.ArgumentNameTfvcFolder}.");
         }
 
         if (string.IsNullOrWhiteSpace(location.TeamProjectName) == true)
         {
             throw new KnownException(
                 $"The current directory maps to '{location.ServerPath}', which does not name a " +
-                $"team project. Supply /{Constants.ArgumentNameTeamProjectName} and " +
-                $"/{Constants.ArgumentNameTfvcFolder}.");
+                $"team project. Supply --{Constants.ArgumentNameTeamProjectName} and " +
+                $"--{Constants.ArgumentNameTfvcFolder}.");
         }
 
         return location;
@@ -223,7 +222,7 @@ public class AssessTfvcMigrationCommand : AzureDevOpsCommandBase
                 $"This workspace belongs to {location.CollectionUrl}, and no azdoutil " +
                 $"configuration uses that url. {known} Add one with " +
                 $"{Constants.CommandArgumentNameAddUpdateConfig}, or name a configuration with " +
-                $"/{Constants.ArgumentNameConfigurationName}.");
+                $"--{Constants.ArgumentNameConfigurationName}.");
         }
 
         Configuration = match;

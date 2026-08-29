@@ -12,8 +12,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.Builds.Releases;
 [Command(
     Category = Constants.Category_Builds,
     Name = Constants.CommandArgumentNameListReleaseDefinitions,
-        Description = "List release definitions",
-        IsAsync = true)]
+        Description = "List release definitions")]
 public class ListReleaseDefinitionsCommand : AzureDevOpsCommandBase
 {
     private string _TeamProjectName = string.Empty;
@@ -63,19 +62,19 @@ public class ListReleaseDefinitionsCommand : AzureDevOpsCommandBase
         return json;
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         if (Arguments.HasValue(Constants.ArgumentNameAllProjects) == false &&
             Arguments.HasValue(Constants.ArgumentNameTeamProjectName) == false)
         {
             throw new KnownException(
-                $"You must specify either /{Constants.ArgumentNameAllProjects} or supply a value for /{Constants.ArgumentNameTeamProjectName}.");
+                $"You must specify either --{Constants.ArgumentNameAllProjects} or supply a value for --{Constants.ArgumentNameTeamProjectName}.");
         }
         else if (Arguments.HasValue(Constants.ArgumentNameAllProjects) == true &&
             Arguments.HasValue(Constants.ArgumentNameTeamProjectName) == true)
         {
             throw new KnownException(
-                $"You cannot specify both /{Constants.ArgumentNameAllProjects} and /{Constants.ArgumentNameTeamProjectName} at the same time.");
+                $"You cannot specify both --{Constants.ArgumentNameAllProjects} and --{Constants.ArgumentNameTeamProjectName} at the same time.");
         }
 
         bool allProjects;
@@ -97,7 +96,7 @@ public class ListReleaseDefinitionsCommand : AzureDevOpsCommandBase
         if (queueInfoOnly == true && allProjects == false)
         {
             throw new KnownException(
-                $"You cannot specify /{Constants.CommandArgumentNameQueueInfo} and /{Constants.ArgumentNameTeamProjectName} at the same time.");
+                $"You cannot specify --{Constants.CommandArgumentNameQueueInfo} and --{Constants.ArgumentNameTeamProjectName} at the same time.");
         }
 
         if (allProjects == true && queueInfoOnly == true)

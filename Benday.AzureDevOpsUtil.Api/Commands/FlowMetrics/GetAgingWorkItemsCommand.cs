@@ -9,8 +9,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.FlowMetrics;
 [Command(
     Category = Constants.Category_FlowMetrics,
     Name = Constants.CommandArgumentNameGetAgingWorkItemsCommand,
-        Description = "Get aging in-progress work items",
-        IsAsync = true)]
+        Description = "Get aging in-progress work items")]
 public class GetAgingWorkItemsCommand : AzureDevOpsCommandBase
 {
     public GetAgingWorkItemsCommand(
@@ -35,7 +34,7 @@ public class GetAgingWorkItemsCommand : AzureDevOpsCommandBase
         return arguments;
     }
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         _TeamProjectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);
 

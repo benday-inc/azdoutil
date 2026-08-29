@@ -11,8 +11,7 @@ namespace Benday.AzureDevOpsUtil.Api.Commands.WorkItems;
 [Command(
     Category = Constants.Category_WorkItems,
     Name = Constants.CommandArgumentNameListWorkItemQueries, 
-    Description = "Gets a list of all work item queries in an Azure DevOps Team Project.", 
-    IsAsync = true)]
+    Description = "Gets a list of all work item queries in an Azure DevOps Team Project.")]
 public class ListWorkItemQueriesCommand : AzureDevOpsCommandBase
 {
 
@@ -35,7 +34,7 @@ public class ListWorkItemQueriesCommand : AzureDevOpsCommandBase
     }
 
 
-    protected override async Task OnExecute()
+    protected override async Task OnExecute(CancellationToken cancellationToken)
     {
         var projectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);
         
