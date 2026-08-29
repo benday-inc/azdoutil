@@ -108,6 +108,8 @@ The tools are all read-only:
 | Builds | exportagentcapabilities | Script out the user-defined capabilities of the build agents to a JSON file so they can be reapplied to a new server with importagentcapabilities. Only agents that have custom capabilities are written. |
 | Builds | exportbuilddef | Export build definition |
 | Builds | exportreleasedef | Export release definition |
+| Builds | find-deployment-group-usages | Read the deployment groups and deployment group agents for one or every team project, then trace which release definitions deploy to each group -- including which target machines each phase's tag filter actually selects. Deployment groups only exist in classic release pipelines, so builds have nothing to scan. |
+| Builds | find-nuget-tool-installer | Find the classic build definitions that use the NuGet tool installer task (NuGetToolInstaller) and report which version of the task each step uses and which version of NuGet it installs. |
 | Builds | finddemands | Find the build and release definitions that have agent demands, and list the demands each one carries. Demands are the capabilities a definition requires of an agent, so this is the companion to the agent capability commands. Scans both builds and releases unless /builds or /releases is given. |
 | Builds | findtaskgroupusages | Find build definitions that reference task groups in a team project. |
 | Builds | importagentcapabilities | Reapply the user-defined capabilities from an exportagentcapabilities file onto the agents of the current server, matching agents by name. By default the imported capabilities are merged onto whatever each agent already has; use /replace to overwrite. Use /preview to see what would change without writing anything. |
@@ -123,6 +125,7 @@ The tools are all read-only:
 | Builds | repairbuilddefagentpool | Repairs the agent pool setting for the build definitions in a team project or team projects. This is helpful after an on-prem to cloud migration. |
 | Builds | repairreleasedefagentpool | Repairs the agent pool setting for the release definitions in a team project or team projects. This is helpful after an on-prem to cloud migration. |
 | Builds | setagentcapabilities | Push a set of user-defined capabilities onto agents without going through the UI. Target a whole pool with /pool, a single agent with /agent, or every agent with /allpools. Supply the capabilities inline with /capabilities:"name=value;name2=value2" and/or from a flat JSON file with /input. Merges by default; use /replace to overwrite and /preview to see the changes first. |
+| Builds | update-nuget-tool-installer | Update the NuGet tool installer steps (NuGetToolInstaller) in a classic build definition to a chosen task version and NuGet version, set each step's display name to show the NuGet version, and save the change back to the server. |
 | Flow Metrics | agingwork | Get aging in-progress work items |
 | Flow Metrics | cycletimeconfidence | Get item cycle time for 50% and 85% levels. This helps you understand how items typically are delivered. |
 | Flow Metrics | forecastdurationforitemcount | Use throughput data to forecast likely number of weeks to get given number of items done using Monte Carlo simulation |
@@ -138,7 +141,9 @@ The tools are all read-only:
 | Project Administration | createproject | Create team projects |
 | Project Administration | createteam | Creates a new team in an Azure DevOps Team Project. |
 | Project Administration | deleteproject | Delete team project |
+| Project Administration | export-local-groups | Export the permission grants held by Windows local groups on the app tier machine: the groups, their memberships, and every security namespace ACL that references them, serialized to JSON. Also writes a PowerShell script that recreates the groups and memberships on a new machine, for a server migration where the collection database moves to a new app tier. |
 | Project Administration | getproject | Get team project info |
+| Project Administration | import-local-groups | Reapply the permission grants from an export-local-groups JSON file on the new server. Each old local group is re-resolved by name under the new app tier machine, and its grants are merged into the same security namespace tokens they came from. Run the generated PowerShell script on the new machine first so the groups exist and the server has synced them. |
 | Project Administration | listprocesstemplates | List process templates |
 | Project Administration | listprojects | List team projects |
 | Project Administration | listteams | Gets list of teams in an Azure DevOps Team Project. |
@@ -227,6 +232,28 @@ The tools are all read-only:
 | name | Required | String | Release definition name |
 | queueinfo | Optional | Boolean | Only display queue info |
 | json | Optional | Boolean | Export to JSON |
+## find-deployment-group-usages
+**Read the deployment groups and deployment group agents for one or every team project, then trace which release definitions deploy to each group -- including which target machines each phase's tag filter actually selects. Deployment groups only exist in classic release pipelines, so builds have nothing to scan.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Optional | String | Team project name |
+| all | Optional | Boolean | Scan every project in this collection |
+| csv | Optional | Boolean | Output one CSV row per release phase to deployment group usage |
+| json | Optional | Boolean | Output results as JSON |
+## find-nuget-tool-installer
+**Find the classic build definitions that use the NuGet tool installer task (NuGetToolInstaller) and report which version of the task each step uses and which version of NuGet it installs.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Optional | String | Team project name |
+| all | Optional | Boolean | Scan every project in this collection |
+| csv | Optional | Boolean | Output results in CSV format |
+| json | Optional | Boolean | Output results as JSON |
 ## finddemands
 **Find the build and release definitions that have agent demands, and list the demands each one carries. Demands are the capabilities a definition requires of an agent, so this is the companion to the agent capability commands. Scans both builds and releases unless /builds or /releases is given.**
 ### Arguments
@@ -394,6 +421,19 @@ The tools are all read-only:
 | allpools | Optional | Boolean | Apply to every agent in every pool |
 | replace | Optional | Boolean | Overwrite each agent's user capabilities instead of merging |
 | preview | Optional | Boolean | Preview the changes without writing anything |
+## update-nuget-tool-installer
+**Update the NuGet tool installer steps (NuGetToolInstaller) in a classic build definition to a chosen task version and NuGet version, set each step's display name to show the NuGet version, and save the change back to the server.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| teamproject | Required | String | Team project name |
+| name | Required | String | Build definition name |
+| nugetversion | Optional | String | Version of NuGet the task should install. Default is '7.9.x'. |
+| taskversion | Optional | String | Version spec for the NuGetToolInstaller task itself. Default is '1.*'. |
+| dryrun | Optional | Boolean | Write before/after JSON files locally instead of updating the build definition on the server. |
+| exporttopath | Optional | String | Directory for dry-run output files. Default is the current working directory. |
 # Flow Metrics
 ## agingwork
 **Get aging in-progress work items**
@@ -537,6 +577,15 @@ The tools are all read-only:
 | config | Optional | String | Configuration name to use |
 | teamproject | Required | String | Team project name to delete |
 | confirm | Optional | Boolean | Confirm delete |
+## export-local-groups
+**Export the permission grants held by Windows local groups on the app tier machine: the groups, their memberships, and every security namespace ACL that references them, serialized to JSON. Also writes a PowerShell script that recreates the groups and memberships on a new machine, for a server migration where the collection database moves to a new app tier.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| machine | Required | String | Name of the app tier machine whose local groups should be exported. Grants are matched by the domain part of each Windows identity. |
+| output | Optional | String | Path for the export JSON file. Default is 'local-groups-export.json' in the current directory. The PowerShell script is written next to it with a .ps1 extension. |
 ## getproject
 **Get team project info**
 ### Arguments
@@ -545,6 +594,16 @@ The tools are all read-only:
 | quiet | Optional | Boolean | Quiet mode |
 | config | Optional | String | Configuration name to use |
 | teamproject | Required | String | Team project name |
+## import-local-groups
+**Reapply the permission grants from an export-local-groups JSON file on the new server. Each old local group is re-resolved by name under the new app tier machine, and its grants are merged into the same security namespace tokens they came from. Run the generated PowerShell script on the new machine first so the groups exist and the server has synced them.**
+### Arguments
+| Argument | Is Optional | Data Type | Description |
+| --- | --- | --- | --- |
+| quiet | Optional | Boolean | Quiet mode |
+| config | Optional | String | Configuration name to use |
+| input | Required | String | Path to the JSON file written by export-local-groups |
+| machine | Required | String | Name of the NEW app tier machine. Groups are resolved as MACHINE\GroupName under this name. |
+| preview | Optional | Boolean | Resolve the groups and show what would be applied without changing anything |
 ## listprocesstemplates
 **List process templates**
 ### Arguments
