@@ -4,6 +4,7 @@ using System.Text;
 
 using Benday.AzureDevOpsUtil.Api;
 using Benday.CommandsFramework;
+using Benday.CommandsFramework.Tui;
 
 class Program
 {
@@ -22,6 +23,10 @@ class Program
         options.Website = "https://www.benday.com";
         options.DisplayUsageOptions.ShowCategories = true;
         options.StrictArgumentValidation = false;
+
+        // gives the tool the 'tui' keyword. This is the equivalent of the CommandsApp
+        // builder's .WithTui() for a program that configures its options directly.
+        options.TuiHost = new SpectreTuiHost();
 
         var program = new DefaultProgram(options, assembly);
 
