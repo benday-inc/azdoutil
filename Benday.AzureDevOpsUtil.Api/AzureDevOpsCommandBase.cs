@@ -1,4 +1,5 @@
-﻿using Benday.AzureDevOpsUtil.Api.GitRemotes;
+﻿using Benday.AzureDevOpsUtil.Api.ApiVersioning;
+using Benday.AzureDevOpsUtil.Api.GitRemotes;
 using Benday.AzureDevOpsUtil.Api.Messages;
 using Benday.CommandsFramework;
 
@@ -194,6 +195,18 @@ public abstract class AzureDevOpsCommandBase : Command
     protected HttpClient GetHttpClientInstanceForAzureDevOps(
         AzureDevOpsUrlTargetType azureDevOpsUrlTargetType = AzureDevOpsUrlTargetType.Default)
     {
+        return CreateHttpClient(azureDevOpsUrlTargetType, clampApiVersion: true);
+    }
+
+    /// <summary>
+    /// The authenticated client, optionally without the api-version clamp.
+    ///
+    /// The clamp is off for the OPTIONS probe that feeds the clamp, which would
+    /// otherwise be asking itself what it is allowed to ask.
+    /// </summary>
+    private HttpClient CreateHttpClient(
+        AzureDevOpsUrlTargetType azureDevOpsUrlTargetType, bool clampApiVersion)
+    {
         var baseUrl = Configuration.CollectionUrl;
 
         if (azureDevOpsUrlTargetType == AzureDevOpsUrlTargetType.Release &&
@@ -204,27 +217,148 @@ public abstract class AzureDevOpsCommandBase : Command
 
         var baseUri = new Uri(baseUrl);
 
-        if (Configuration.IsWindowsAuth == true)
+        HttpMessageHandler handler = Configuration.IsWindowsAuth == true ?
+            new HttpClientHandler() { UseDefaultCredentials = true } :
+            new HttpClientHandler();
+
+        if (clampApiVersion == true)
         {
-            var client = new HttpClient(
-                new HttpClientHandler() {  UseDefaultCredentials = true });           
+            ApplyPinnedApiVersion();
 
-            client.BaseAddress = baseUri;
-
-            return client;
+            handler = new ApiVersionClampingHandler(
+                handler, Configuration.CollectionUrl, ProbeApiVersionCatalog);
         }
-        else
+
+        var client = new HttpClient(handler)
         {
-            var client = new HttpClient();            
+            BaseAddress = baseUri
+        };
 
-            client.BaseAddress = baseUri;
-
+        if (Configuration.IsWindowsAuth == false)
+        {
             client.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Basic",
                 Configuration.GetTokenBase64Encoded());
+        }
 
-            return client;
-        }        
+        return client;
+    }
+
+    /// <summary>
+    /// Asks the collection what it can serve.  OPTIONS on the _apis root takes
+    /// no api-version of its own, which is what makes it answerable by a server
+    /// of any age.
+    /// </summary>
+    private async Task<string?> ProbeApiVersionCatalog(CancellationToken cancellationToken)
+    {
+        using var client = CreateHttpClient(
+            AzureDevOpsUrlTargetType.Default, clampApiVersion: false);
+
+        using var request = new HttpRequestMessage(HttpMethod.Options, "_apis");
+
+        using var response = await client.SendAsync(request, cancellationToken);
+
+        if (response.IsSuccessStatusCode == false)
+        {
+            return null;
+        }
+
+        return await response.Content.ReadAsStringAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// The server's own build, read off its About page.
+    ///
+    /// This is a web page rather than an endpoint, because there is no endpoint
+    /// -- see <see cref="ServerVersionReader"/>.  A server that will not serve
+    /// it, or serves a sign-in page instead, produces an empty result rather
+    /// than an error: this is diagnostic information, not something a command
+    /// depends on.
+    /// </summary>
+    protected async Task<ServerVersionInfo> GetServerVersion(CancellationToken cancellationToken)
+    {
+        try
+        {
+            // no api-version on this url, so the clamp has nothing to do and is
+            // left out to keep an html 404 out of its investigation path
+            using var client = CreateHttpClient(
+                AzureDevOpsUrlTargetType.Default, clampApiVersion: false);
+
+            using var response = await client.GetAsync(
+                ServerVersionReader.AboutPagePath, cancellationToken);
+
+            if (response.IsSuccessStatusCode == false)
+            {
+                return new ServerVersionInfo();
+            }
+
+            return ServerVersionReader.Read(
+                await response.Content.ReadAsStringAsync(cancellationToken));
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            return new ServerVersionInfo();
+        }
+    }
+
+    /// <summary>
+    /// Seeds the version cache from the stored configuration, so that a pinned
+    /// version is in place before the first request rather than after the first
+    /// failure.  Discovery is skipped entirely for a collection that has one.
+    /// </summary>
+    private void ApplyPinnedApiVersion()
+    {
+        if (string.IsNullOrWhiteSpace(Configuration.MaxApiVersion) == true ||
+            ServerApiVersionCache.Get(Configuration.CollectionUrl) != null)
+        {
+            return;
+        }
+
+        if (ApiVersion.TryParse(Configuration.MaxApiVersion, out var pinned) == false)
+        {
+            throw new KnownException(
+                $"Configuration '{Configuration.Name}' has a max api-version of " +
+                $"'{Configuration.MaxApiVersion}', which is not an api-version. Expected " +
+                $"something like 5.0. Fix it with {Constants.CommandArgumentNameAddUpdateConfig}.");
+        }
+
+        ServerApiVersionCache.Set(
+            Configuration.CollectionUrl, ServerApiVersionInfo.Pinned(pinned));
+    }
+
+    /// <summary>
+    /// What this collection says it can serve, probing it if that is not
+    /// already known.  Returns null when the collection would not answer.
+    /// </summary>
+    protected async Task<ServerApiVersionInfo?> GetServerApiVersionInfo(
+        CancellationToken cancellationToken)
+    {
+        ApplyPinnedApiVersion();
+
+        var known = ServerApiVersionCache.Get(Configuration.CollectionUrl);
+
+        if (known?.Catalog != null)
+        {
+            return known;
+        }
+
+        var catalog = ApiVersionCatalog.Parse(await ProbeApiVersionCatalog(cancellationToken));
+
+        if (catalog == null)
+        {
+            return known;
+        }
+
+        var info = ServerApiVersionInfo.FromCatalog(catalog);
+
+        // a pinned version was set deliberately and outranks what the collection
+        // says about itself, so reporting must not overwrite it
+        if (known?.IsPinned != true)
+        {
+            ServerApiVersionCache.Set(Configuration.CollectionUrl, info);
+        }
+
+        return info;
     }
 
     protected async Task<T?> CallEndpointViaGetAndGetResult<T>(

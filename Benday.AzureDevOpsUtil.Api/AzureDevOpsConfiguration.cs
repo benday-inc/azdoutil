@@ -25,6 +25,17 @@ public class AzureDevOpsConfiguration
     }
     public string Token { get; set; } = string.Empty;
     public bool IsWindowsAuth { get; set; }
+
+    /// <summary>
+    /// Highest REST api-version this collection will be asked for, overruling
+    /// what it would otherwise be discovered to support.
+    ///
+    /// Discovery needs the collection to answer OPTIONS on its _apis root.  A
+    /// server that will not -- a proxy or an IIS configuration that blocks the
+    /// verb -- leaves nothing to go on, and pinning the version here is what
+    /// makes such a collection usable.  Empty means discover it.
+    /// </summary>
+    public string MaxApiVersion { get; set; } = string.Empty;
     public bool IsAzureDevOpsService
     {
         get

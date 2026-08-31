@@ -73,6 +73,11 @@ public class ListConfigurationCommand : Command
             WriteLine($"Account Name / TPC Name: {config.AccountNameOrCollectionName}");
             WriteLine($"Token: {config.Token}");
             WriteLine($"Use Windows Auth: {config.IsWindowsAuth}");
+
+            if (string.IsNullOrWhiteSpace(config.MaxApiVersion) == false)
+            {
+                WriteLine($"Max API Version: {config.MaxApiVersion}");
+            }
         }
     }
 }

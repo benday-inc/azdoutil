@@ -1,5 +1,7 @@
 using System.Text.Json;
 
+using Benday.CommandsFramework;
+
 namespace Benday.AzureDevOpsUtil.Api.SecurityMigration;
 
 /// <summary>
@@ -19,10 +21,21 @@ public class SecurityApiClient : ISecurityApiClient
     public const string ApiVersion = "5.0";
 
     /// <summary>
-    /// Descriptors are long strings and go on the query string, so identity
-    /// reads are chunked.
+    /// How much query string one identity read may take up.
+    ///
+    /// Descriptors are long -- a TFS-internal group descriptor escapes to about
+    /// 95 characters -- and they go on the query string, so identity reads have
+    /// to be chunked.  Chunking by *count* is not enough: IIS caps a query
+    /// string at 2048 bytes by default (requestFiltering/requestLimits
+    /// @maxQueryString, and ASP.NET's own maxQueryStringLength matches it), and
+    /// 25 descriptors overruns that.  IIS answers an overrun with 404.15, which
+    /// is indistinguishable from an empty result once the body is discarded, so
+    /// the export would quietly report no groups at all.
+    ///
+    /// Batching by length instead keeps every request inside the cap whatever
+    /// the descriptors turn out to look like.
     /// </summary>
-    public const int DescriptorBatchSize = 25;
+    public const int MaxQueryStringLength = 1900;
 
     private readonly Func<string, Task<string?>> _getJsonAsync;
     private readonly Func<string, string, Task<string?>> _postJsonAsync;
@@ -137,15 +150,17 @@ public class SecurityApiClient : ISecurityApiClient
     {
         var results = new List<TfsIdentityInfo>();
 
-        foreach (var chunk in descriptors.Chunk(DescriptorBatchSize))
+        var queryMembership = includeDirectMembership == true ?
+            "&queryMembership=Direct" : string.Empty;
+
+        var fixedLength =
+            "descriptors=".Length + queryMembership.Length + $"&api-version={ApiVersion}".Length;
+
+        foreach (var chunk in ChunkByLength(descriptors, MaxQueryStringLength - fixedLength))
         {
             // Descriptors contain ';' and '\', so each is escaped individually;
             // the commas separating them stay literal.
-            var descriptorList = string.Join(
-                ",", chunk.Select(Uri.EscapeDataString));
-
-            var queryMembership = includeDirectMembership == true ?
-                "&queryMembership=Direct" : string.Empty;
+            var descriptorList = string.Join(",", chunk);
 
             var requestUrl =
                 $"_apis/identities?descriptors={descriptorList}{queryMembership}" +
@@ -153,10 +168,60 @@ public class SecurityApiClient : ISecurityApiClient
 
             var json = await _getJsonAsync(requestUrl);
 
+            if (string.IsNullOrWhiteSpace(json) == true)
+            {
+                // Silence here would be reported as "this machine holds no
+                // permission grants", which on a migration is a wrong answer
+                // that looks like a right one.
+                throw new KnownException(
+                    $"Could not read {chunk.Count} identities from the collection. " +
+                    "The identity call returned nothing. If this is an on-prem server, " +
+                    "check that the request is not being rejected for query string length " +
+                    "(IIS requestFiltering/requestLimits @maxQueryString, and ASP.NET " +
+                    "httpRuntime @maxQueryStringLength, both default to 2048 bytes).");
+            }
+
             results.AddRange(ParseIdentities(json));
         }
 
         return results;
+    }
+
+    /// <summary>
+    /// Groups the already-escaped descriptors into batches whose joined length
+    /// stays within <paramref name="budget"/>.  A descriptor too long to share
+    /// a batch with anything gets one to itself rather than being dropped.
+    /// </summary>
+    private static IEnumerable<List<string>> ChunkByLength(
+        IReadOnlyList<string> descriptors, int budget)
+    {
+        var batch = new List<string>();
+        var length = 0;
+
+        foreach (var descriptor in descriptors)
+        {
+            var escaped = Uri.EscapeDataString(descriptor);
+
+            // every descriptor after the first brings a comma with it
+            var cost = escaped.Length + (batch.Count == 0 ? 0 : 1);
+
+            if (batch.Count > 0 && length + cost > budget)
+            {
+                yield return batch;
+
+                batch = [];
+                length = 0;
+                cost = escaped.Length;
+            }
+
+            batch.Add(escaped);
+            length += cost;
+        }
+
+        if (batch.Count > 0)
+        {
+            yield return batch;
+        }
     }
 
     public async Task<TfsIdentityInfo?> ReadIdentityByAccountNameAsync(string accountName)

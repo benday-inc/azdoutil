@@ -31,13 +31,13 @@ public class ListTeamProjectsCommand : AzureDevOpsCommandBase
 
         var requestUrl = $"_apis/projects?$top=10000&api-version=7.0";
 
-        var temp = await client.GetAsync(requestUrl);
+        var response = await client.GetAsync(requestUrl, cancellationToken);
 
-        var result = await client.GetStringAsync(requestUrl);
+        var result = await response.Content.ReadAsStringAsync(cancellationToken);
 
-        if (temp.IsSuccessStatusCode == false)
+        if (response.IsSuccessStatusCode == false)
         {
-            throw new KnownException($"Failed to get projects.  Status code: {temp.StatusCode}.  Content: {result}");
+            throw new KnownException($"Failed to get projects.  Status code: {response.StatusCode}.  Content: {result}");
         }
 
         var resultAsJson = JsonUtilities.GetJsonValueAsType<ListProjectsResponse>(result);

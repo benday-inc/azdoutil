@@ -102,6 +102,7 @@ public static class Constants
     public const string ArgumentNameCollectionUrl = "url";
     public const string ArgumentNameWindowsAuth = "windowsauth";
     public const string ArgumentNameToken = "pat";
+    public const string ArgumentNameMaxApiVersion = "maxapiversion";
     /// <summary>
     /// Quiet mode. This is the framework's reserved argument name rather than one of
     /// azdoutil's own -- it is aliased here so the two strings cannot drift apart.

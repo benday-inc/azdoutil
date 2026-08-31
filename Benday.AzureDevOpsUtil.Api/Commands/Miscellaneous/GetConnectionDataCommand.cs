@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using System.Web;
 
+using Benday.AzureDevOpsUtil.Api.ApiVersioning;
 using Benday.AzureDevOpsUtil.Api.Messages;
 using Benday.CommandsFramework;
 
@@ -46,7 +47,76 @@ public class GetConnectionDataCommand : AzureDevOpsCommandBase
         else
         {
             Print(result);
+
+            await PrintServerVersion(cancellationToken);
+
+            await PrintApiVersionSupport(result, cancellationToken);
         }
+    }
+
+    /// <summary>
+    /// The server's build, when it will say.  There is no endpoint for this, so
+    /// it comes off the About page and may simply not be there.
+    /// </summary>
+    private async Task PrintServerVersion(CancellationToken cancellationToken)
+    {
+        var version = await GetServerVersion(cancellationToken);
+
+        if (version.IsEmpty == true)
+        {
+            WriteLine("Server Version", "not reported by this server");
+
+            return;
+        }
+
+        if (version.ServiceVersion.Length > 0)
+        {
+            WriteLine("Server Version", version.ServiceVersion);
+        }
+
+        if (version.BuildNumber.Length > 0)
+        {
+            WriteLine("Server Build", version.BuildNumber);
+
+            var release = AzureDevOpsProductVersion.DescribeBuild(version.BuildNumber);
+
+            if (release.Length > 0)
+            {
+                WriteLine("Release", release);
+            }
+        }
+    }
+
+    /// <summary>
+    /// What this collection will actually accept as an api-version.
+    ///
+    /// Worth printing next to the connection details because it is the thing
+    /// that decides whether a command works against an older server, and there
+    /// is no other way to see it -- the response carries no product version of
+    /// its own.
+    /// </summary>
+    private async Task PrintApiVersionSupport(
+        ConnectionDataResponse result, CancellationToken cancellationToken)
+    {
+        var info = await GetServerApiVersionInfo(cancellationToken);
+
+        var catalog = info?.Catalog;
+
+        if (catalog == null)
+        {
+            WriteLine("Max REST api-version", "could not be determined");
+
+            return;
+        }
+
+        var isHosted = result.DeploymentType.Contains(
+            "hosted", StringComparison.OrdinalIgnoreCase);
+
+        WriteLine("Max REST api-version (released)", catalog.MaxReleasedVersion.ToString());
+        WriteLine("Max REST api-version (incl. preview)", catalog.MaxVersion.ToString());
+        WriteLine("Product (inferred)",
+            AzureDevOpsProductVersion.Describe(catalog.MaxReleasedVersion, isHosted));
+        WriteLine("API resource count", catalog.Locations.Count.ToString());
     }
 
     public async Task<ConnectionDataResponse?> GetConnectionData()

@@ -260,6 +260,7 @@ And a discovery tool so the assistant can fall back to the command line for anyt
 | pat | Optional | String | PAT for this collection |
 | windowsauth | Optional | Boolean | Use windows authentication with the current logged in user |
 | url | Required | String | URL for this collection (example: https://dev.azure.com/accountname) |
+| maxapiversion | Optional | String | Highest REST api-version to use with this collection (example: 5.0). Only needed for an older server that will not answer the automatic check. |
 ## <a name="listconfig"></a> listconfig
 **List an Azure DevOps configuration. For example, which server or account plus auth information.**
 ### Arguments

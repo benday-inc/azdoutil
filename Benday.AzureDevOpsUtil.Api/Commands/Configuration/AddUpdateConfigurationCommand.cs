@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 
+using Benday.AzureDevOpsUtil.Api.ApiVersioning;
 using Benday.CommandsFramework;
 
 using OfficeOpenXml.Utils;
@@ -37,6 +38,12 @@ public class AddUpdateConfigurationCommand : Command
             .WithDescription("URL for this collection (example: https://dev.azure.com/accountname)")
             .AsRequired();
 
+        arguments.AddString(Constants.ArgumentNameMaxApiVersion)
+            .WithDescription(
+                "Highest REST api-version to use with this collection (example: 5.0). " +
+                "Only needed for an older server that will not answer the automatic check.")
+            .AsNotRequired();
+
         return arguments;
     }
 
@@ -68,12 +75,26 @@ public class AddUpdateConfigurationCommand : Command
             token = Arguments.GetStringValue(Constants.ArgumentNameToken);
         }
 
+        var maxApiVersion = string.Empty;
+
+        if (Arguments.HasValue(Constants.ArgumentNameMaxApiVersion) == true)
+        {
+            maxApiVersion = Arguments.GetStringValue(Constants.ArgumentNameMaxApiVersion);
+
+            if (ApiVersion.TryParse(maxApiVersion, out _) == false)
+            {
+                throw new KnownException(
+                    $"'{maxApiVersion}' is not an api-version. Expected something like 5.0 or 5.0-preview.1.");
+            }
+        }
+
         var config = new AzureDevOpsConfiguration()
         {
             CollectionUrl = Arguments.GetStringValue(Constants.ArgumentNameCollectionUrl),
             Token = token,
             Name = configName,
-            IsWindowsAuth = Arguments.GetBooleanValue(Constants.ArgumentNameWindowsAuth)
+            IsWindowsAuth = Arguments.GetBooleanValue(Constants.ArgumentNameWindowsAuth),
+            MaxApiVersion = maxApiVersion
         };
 
         AzureDevOpsConfigurationManager.Instance.Save(config);
