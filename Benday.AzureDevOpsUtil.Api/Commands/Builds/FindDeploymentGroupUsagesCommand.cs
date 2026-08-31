@@ -59,7 +59,7 @@ public class FindDeploymentGroupUsagesCommand : AzureDevOpsCommandBase
 
     protected override async Task OnExecute(CancellationToken cancellationToken)
     {
-        if (Arguments.HasValue(Constants.ArgumentNameAllProjects) == false &&
+        if (Arguments.GetBooleanValue(Constants.ArgumentNameAllProjects) == false &&
             Arguments.HasValue(Constants.ArgumentNameTeamProjectName) == false)
         {
             throw new KnownException(

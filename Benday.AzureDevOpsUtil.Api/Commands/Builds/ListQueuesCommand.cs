@@ -131,13 +131,13 @@ public class ListQueuesCommand : AzureDevOpsCommandBase
     {
         var toJson = Arguments.GetBooleanValue(Constants.CommandArgumentNameToJson);
 
-        if (Arguments.HasValue(Constants.ArgumentNameAllProjects) == false &&
+        if (Arguments.GetBooleanValue(Constants.ArgumentNameAllProjects) == false &&
             Arguments.HasValue(Constants.ArgumentNameTeamProjectName) == false)
         {
             throw new KnownException(
                 $"You must specify either --{Constants.ArgumentNameAllProjects} or supply a value for --{Constants.ArgumentNameTeamProjectName}.");
         }
-        else if (Arguments.HasValue(Constants.ArgumentNameAllProjects) == true &&
+        else if (Arguments.GetBooleanValue(Constants.ArgumentNameAllProjects) == true &&
             Arguments.HasValue(Constants.ArgumentNameTeamProjectName) == true)
         {
             throw new KnownException(
