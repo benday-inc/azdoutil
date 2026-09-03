@@ -50,6 +50,14 @@ public class AllProjectsArgumentFixture
     }
 
     [TestMethod]
+    public async Task UpdateNuGetToolInstaller_NoArgumentsThrowsKnownException()
+    {
+        await AssertNoArgumentsThrowsKnownException(
+            Constants.CommandName_UpdateNuGetToolInstaller,
+            (info, output) => new UpdateNuGetToolInstallerCommand(info, output));
+    }
+
+    [TestMethod]
     public async Task FindDemands_NoArgumentsThrowsKnownException()
     {
         await AssertNoArgumentsThrowsKnownException(

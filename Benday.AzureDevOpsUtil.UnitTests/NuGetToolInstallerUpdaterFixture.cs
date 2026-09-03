@@ -168,6 +168,110 @@ public class NuGetToolInstallerUpdaterFixture
             "display name");
     }
 
+    private static NuGetToolInstallerReference Reference(
+        string taskVersionSpec, string nugetVersionSpec, string displayName)
+    {
+        return new NuGetToolInstallerReference
+        {
+            TaskVersionSpec = taskVersionSpec,
+            NuGetVersionSpec = nugetVersionSpec,
+            StepDisplayName = displayName
+        };
+    }
+
+    [TestMethod]
+    public void IsOutOfSpec_EverythingAlreadyMatches_ReturnsFalse()
+    {
+        // arrange
+        var systemUnderTest = new NuGetToolInstallerUpdater("1.*", "7.9.x");
+
+        // act
+        var actual = systemUnderTest.IsOutOfSpec(Reference("1.*", "7.9.x", "Use NuGet 7.9.x"));
+
+        // assert
+        Assert.IsFalse(actual,
+            "A step that already has every value the updater would write is in spec.");
+    }
+
+    [TestMethod]
+    public void IsOutOfSpec_TaskVersionDiffers_ReturnsTrue()
+    {
+        // arrange
+        var systemUnderTest = new NuGetToolInstallerUpdater("1.*", "7.9.x");
+
+        // act
+        var actual = systemUnderTest.IsOutOfSpec(Reference("0.*", "7.9.x", "Use NuGet 7.9.x"));
+
+        // assert
+        Assert.IsTrue(actual, "task version spec differs");
+    }
+
+    [TestMethod]
+    public void IsOutOfSpec_NuGetVersionDiffers_ReturnsTrue()
+    {
+        // arrange
+        var systemUnderTest = new NuGetToolInstallerUpdater("1.*", "7.9.x");
+
+        // act
+        var actual = systemUnderTest.IsOutOfSpec(Reference("1.*", "4.4.1", "Use NuGet 7.9.x"));
+
+        // assert
+        Assert.IsTrue(actual, "nuget version spec differs");
+    }
+
+    [TestMethod]
+    public void IsOutOfSpec_DisplayNameDiffers_ReturnsTrue()
+    {
+        // arrange
+        // the command's job includes setting the display name, so a step with the right
+        // versions but a stale name is still out of spec
+        var systemUnderTest = new NuGetToolInstallerUpdater("1.*", "7.9.x");
+
+        // act
+        var actual = systemUnderTest.IsOutOfSpec(Reference("1.*", "7.9.x", "Use NuGet"));
+
+        // assert
+        Assert.IsTrue(actual, "display name differs");
+    }
+
+    [TestMethod]
+    public void IsOutOfSpec_MissingNuGetVersion_ReturnsTrue()
+    {
+        // arrange
+        // a step with no inputs.versionSpec scans as an empty string
+        var systemUnderTest = new NuGetToolInstallerUpdater("1.*", "7.9.x");
+
+        // act
+        var actual = systemUnderTest.IsOutOfSpec(Reference("1.*", "", "Use NuGet 7.9.x"));
+
+        // assert
+        Assert.IsTrue(actual, "nuget version spec is not set");
+    }
+
+    [TestMethod]
+    public void IsOutOfSpec_ScannedStepThatUpdaterJustWrote_ReturnsFalse()
+    {
+        // arrange
+        // the round trip that matters: update a definition, rescan it, and the steps
+        // should now report as in spec so a second run writes nothing
+        var definition = BuildDefinitionWithInstallerAndOtherStep();
+        var systemUnderTest = new NuGetToolInstallerUpdater("1.*", "7.9.x");
+
+        systemUnderTest.Update(definition);
+
+        // act
+        var references = NuGetToolInstallerScanner.FindReferences(definition.ToJsonString());
+
+        // assert
+        Assert.AreNotEqual<int>(0, references.Count, "scan should find the installer step");
+
+        foreach (var reference in references)
+        {
+            Assert.IsFalse(systemUnderTest.IsOutOfSpec(reference),
+                $"step '{reference.StepDisplayName}' should be in spec after an update");
+        }
+    }
+
     [TestMethod]
     public void Constructor_EmptyVersions_Throws()
     {

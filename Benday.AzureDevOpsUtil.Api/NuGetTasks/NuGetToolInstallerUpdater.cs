@@ -36,6 +36,27 @@ public class NuGetToolInstallerUpdater
     /// </summary>
     public string GetDisplayName() => $"Use NuGet {_nugetVersionSpec}";
 
+    /// <summary>
+    /// True when a NuGet tool installer step does not already have every value this
+    /// updater would write.  A step that is already in spec does not need its build
+    /// definition saved, which would otherwise cost a revision for no change.
+    /// </summary>
+    public bool IsOutOfSpec(NuGetToolInstallerReference reference)
+    {
+        if (reference == null)
+        {
+            throw new ArgumentNullException(nameof(reference));
+        }
+
+        return
+            string.Equals(reference.TaskVersionSpec, _taskVersionSpec,
+                StringComparison.OrdinalIgnoreCase) == false ||
+            string.Equals(reference.NuGetVersionSpec, _nugetVersionSpec,
+                StringComparison.OrdinalIgnoreCase) == false ||
+            string.Equals(reference.StepDisplayName, GetDisplayName(),
+                StringComparison.Ordinal) == false;
+    }
+
     public NuGetToolInstallerUpdateResult Update(JsonNode buildDefinition)
     {
         if (buildDefinition == null)

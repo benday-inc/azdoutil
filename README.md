@@ -200,7 +200,7 @@ And a discovery tool so the assistant can fall back to the command line for anyt
 | Builds | [repairbuilddefagentpool](#repairbuilddefagentpool) | Repairs the agent pool setting for the build definitions in a team project or team projects. This is helpful after an on-prem to cloud migration. |
 | Builds | [repairreleasedefagentpool](#repairreleasedefagentpool) | Repairs the agent pool setting for the release definitions in a team project or team projects. This is helpful after an on-prem to cloud migration. |
 | Builds | [setagentcapabilities](#setagentcapabilities) | Push a set of user-defined capabilities onto agents without going through the UI. Target a whole pool with /pool, a single agent with /agent, or every agent with /allpools. Supply the capabilities inline with /capabilities:"name=value;name2=value2" and/or from a flat JSON file with /input. Merges by default; use /replace to overwrite and /preview to see the changes first. |
-| Builds | [update-nuget-tool-installer](#update-nuget-tool-installer) | Update the NuGet tool installer steps (NuGetToolInstaller) in a classic build definition to a chosen task version and NuGet version, set each step's display name to show the NuGet version, and save the change back to the server. |
+| Builds | [update-nuget-tool-installer](#update-nuget-tool-installer) | Update the NuGet tool installer steps (NuGetToolInstaller) in classic build definitions to a chosen task version and NuGet version, set each step's display name to show the NuGet version, and save the change back to the server. Build definitions that already match are left alone. |
 | Flow Metrics | [agingwork](#agingwork) | Get aging in-progress work items |
 | Flow Metrics | [cycletimeconfidence](#cycletimeconfidence) | Get item cycle time for 50% and 85% levels. This helps you understand how items typically are delivered. |
 | Flow Metrics | [forecastdurationforitemcount](#forecastdurationforitemcount) | Use throughput data to forecast likely number of weeks to get given number of items done using Monte Carlo simulation |
@@ -498,17 +498,18 @@ And a discovery tool so the assistant can fall back to the command line for anyt
 | replace | Optional | Boolean | Overwrite each agent's user capabilities instead of merging |
 | preview | Optional | Boolean | Preview the changes without writing anything |
 ## <a name="update-nuget-tool-installer"></a> update-nuget-tool-installer
-**Update the NuGet tool installer steps (NuGetToolInstaller) in a classic build definition to a chosen task version and NuGet version, set each step's display name to show the NuGet version, and save the change back to the server.**
+**Update the NuGet tool installer steps (NuGetToolInstaller) in classic build definitions to a chosen task version and NuGet version, set each step's display name to show the NuGet version, and save the change back to the server. Build definitions that already match are left alone.**
 ### Arguments
 | Argument | Is Optional | Data Type | Description |
 | --- | --- | --- | --- |
 | quiet | Optional | Boolean | Quiet mode |
 | config | Optional | String | Configuration name to use |
-| teamproject | Required | String | Team project name |
-| name | Required | String | Build definition name |
+| teamproject | Optional | String | Team project name |
+| all | Optional | Boolean | Update build definitions in every project in this collection |
+| name | Optional | String | Build definition name. If omitted, every build definition in scope that uses the NuGet tool installer task is considered. |
 | nugetversion | Optional | String | Version of NuGet the task should install. Default is '7.9.x'. |
 | taskversion | Optional | String | Version spec for the NuGetToolInstaller task itself. Default is '1.*'. |
-| dryrun | Optional | Boolean | Write before/after JSON files locally instead of updating the build definition on the server. |
+| dryrun | Optional | Boolean | Write before/after JSON files locally instead of updating the build definitions on the server. |
 | exporttopath | Optional | String | Directory for dry-run output files. Default is the current working directory. |
 # Flow Metrics
 ## <a name="agingwork"></a> agingwork
