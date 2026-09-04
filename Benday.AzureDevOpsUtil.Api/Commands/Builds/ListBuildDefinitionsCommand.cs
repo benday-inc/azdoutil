@@ -109,11 +109,7 @@ public class ListBuildDefinitionsCommand : AzureDevOpsCommandBase
     private async Task ListForAllProjects(bool json)
     {
         // call ListTeamProjectsCommand
-        var command = new ListTeamProjectsCommand(
-            ExecutionInfo.GetCloneOfArguments(
-               Constants.CommandName_ListProcessTemplates, true), _OutputProvider);
-
-        await command.ExecuteAsync();
+        var command = await ExecuteAzdoCommandAsync<ListTeamProjectsCommand>();
 
         if (command.LastResult == null)
         {

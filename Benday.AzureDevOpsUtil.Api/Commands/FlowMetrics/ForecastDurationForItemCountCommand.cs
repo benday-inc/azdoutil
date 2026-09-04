@@ -42,11 +42,13 @@ public class ForecastDurationForItemCountCommand : AzureDevOpsCommandBase
         _NumberOfDaysOfHistory = Arguments.GetInt32Value(Constants.ArgumentNameCycleTimeNumberOfDays);
         _TeamProjectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);
 
-        var args = ExecutionInfo.GetCloneOfArguments(Constants.CommandArgumentNameGetCycleTimeAndThroughput, true);
+        var getDataCommand = await ExecuteAzdoCommandAsync<GetCycleTimeAndThroughputCommand>(args =>
+        {
+            args.Set(Constants.ArgumentNameCycleTimeNumberOfDays, _NumberOfDaysOfHistory);
+            args.Set(Constants.ArgumentNameTeamProjectName, _TeamProjectName);
 
-        var getDataCommand = new GetCycleTimeAndThroughputCommand(args, _OutputProvider);
-
-        await getDataCommand.ExecuteAsync();
+            CopyArgumentIfSupplied(args, Constants.ArgumentNameTeamName);
+        });
 
         if (getDataCommand.Data == null ||
             getDataCommand.Data.Items == null ||

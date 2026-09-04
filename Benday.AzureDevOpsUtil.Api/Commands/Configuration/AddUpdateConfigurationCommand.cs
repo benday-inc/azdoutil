@@ -62,10 +62,10 @@ public class AddUpdateConfigurationCommand : Command
 
         var configName = Constants.DefaultConfigurationName;
 
-        if (Arguments[Constants.ArgumentNameConfigurationName].HasValue == true)
+        if (Arguments.HasValue(Constants.ArgumentNameConfigurationName) == true)
         {
             configName =
-                Arguments[Constants.ArgumentNameConfigurationName].Value;
+                Arguments.GetStringValue(Constants.ArgumentNameConfigurationName);
         }
 
         var token = string.Empty;

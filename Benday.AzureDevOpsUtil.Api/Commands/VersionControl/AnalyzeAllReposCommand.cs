@@ -1,4 +1,4 @@
-using Benday.AzureDevOpsUtil.Api.BuildReadiness;
+﻿using Benday.AzureDevOpsUtil.Api.BuildReadiness;
 using Benday.AzureDevOpsUtil.Api.Commands.ProjectAdministration;
 using Benday.AzureDevOpsUtil.Api.Messages;
 using Benday.CommandsFramework;
@@ -41,8 +41,7 @@ public class AnalyzeAllReposCommand : AzureDevOpsCommandBase
 
         var teamProjectName = string.Empty;
 
-        if (Arguments.ContainsKey(Constants.ArgumentNameTeamProjectName) &&
-            Arguments[Constants.ArgumentNameTeamProjectName].HasValue)
+        if (Arguments.HasValue(Constants.ArgumentNameTeamProjectName) == true)
         {
             teamProjectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);
         }
@@ -55,15 +54,12 @@ public class AnalyzeAllReposCommand : AzureDevOpsCommandBase
             return;
         }
 
-        var analyzeRepoCommand = new AnalyzeRepoCommand(
-            ExecutionInfo.GetCloneOfArguments(
-                Constants.CommandName_AnalyzeRepo, true),
-            _OutputProvider);
+        // both are created rather than run: each project's repositories are read through
+        // GetGitRepositories() and analyzed through AnalyzeRepository(), so neither command
+        // ever sees a team project or repository argument of its own
+        var analyzeRepoCommand = CreateAzdoCommand<AnalyzeRepoCommand>();
 
-        var listGitReposCommand = new ListGitRepositoriesForProjectCommand(
-            ExecutionInfo.GetCloneOfArguments(
-                Constants.CommandArgumentName_ListGitRepos, true),
-            _OutputProvider);
+        var listGitReposCommand = CreateAzdoCommand<ListGitRepositoriesForProjectCommand>();
 
         var allResults = new List<RepositoryAnalysisResult>();
         var formatter = new BuildReadinessReportFormatter();
@@ -157,12 +153,7 @@ public class AnalyzeAllReposCommand : AzureDevOpsCommandBase
     {
         if (!string.IsNullOrWhiteSpace(teamProjectName))
         {
-            var listProjectsCommand = new ListTeamProjectsCommand(
-                ExecutionInfo.GetCloneOfArguments(
-                    Constants.CommandName_ListProjects, true),
-                _OutputProvider);
-
-            await listProjectsCommand.ExecuteAsync();
+            var listProjectsCommand = await ExecuteAzdoCommandAsync<ListTeamProjectsCommand>();
 
             var allProjects = listProjectsCommand.LastResult?.Projects;
 
@@ -178,12 +169,7 @@ public class AnalyzeAllReposCommand : AzureDevOpsCommandBase
         }
         else
         {
-            var listProjectsCommand = new ListTeamProjectsCommand(
-                ExecutionInfo.GetCloneOfArguments(
-                    Constants.CommandName_ListProjects, true),
-                _OutputProvider);
-
-            await listProjectsCommand.ExecuteAsync();
+            var listProjectsCommand = await ExecuteAzdoCommandAsync<ListTeamProjectsCommand>();
 
             return listProjectsCommand.LastResult?.Projects;
         }

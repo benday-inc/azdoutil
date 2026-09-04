@@ -35,12 +35,7 @@ public class ChangeProjectProcessCommand : AzureDevOpsCommandBase
 
     private async Task<ProcessTemplateDetailInfo> GetProcessTemplate(string processName)
     {
-        var listProcessTemplates = new ListProcessTemplatesCommand(
-            ExecutionInfo.GetCloneOfArguments(
-               Constants.CommandName_ListProcessTemplates, true),
-            _OutputProvider);
-
-        await listProcessTemplates.ExecuteAsync();
+        var listProcessTemplates = await ExecuteAzdoCommandAsync<ListProcessTemplatesCommand>();
 
         var processTemplates = listProcessTemplates.LastResult;
 
@@ -69,12 +64,8 @@ public class ChangeProjectProcessCommand : AzureDevOpsCommandBase
 
     private async Task<TeamProjectInfo> GetTeamProject(string projectName)
     {
-        var getTeamProject = new GetTeamProjectCommand(
-            ExecutionInfo.GetCloneOfArguments(
-               Constants.CommandName_GetProject, true),
-            _OutputProvider);
-
-        await getTeamProject.ExecuteAsync();
+        var getTeamProject = await ExecuteAzdoCommandAsync<GetTeamProjectCommand>(args => args
+            .Set(Constants.ArgumentNameTeamProjectName, projectName));
 
         var result = getTeamProject.LastResult;
 

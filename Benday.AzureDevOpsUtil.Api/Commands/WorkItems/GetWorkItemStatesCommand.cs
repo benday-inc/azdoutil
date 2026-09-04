@@ -65,11 +65,8 @@ public class GetWorkItemStatesCommand : AzureDevOpsCommandBase
 
     private async Task<GetWorkItemTypeStatesResponse> GetWorkItemTypeStates(string projectName, string workItemTypeName)
     {
-        var getProjectArgs = ExecutionInfo.GetCloneOfArguments(
-            Constants.CommandName_GetProject, true);
-        var getProject = new GetTeamProjectCommand(getProjectArgs, _OutputProvider);
-
-        await getProject.ExecuteAsync();
+        var getProject = await ExecuteAzdoCommandAsync<GetTeamProjectCommand>(args => args
+            .Set(Constants.ArgumentNameTeamProjectName, projectName));
 
         var project = getProject.LastResult;
 

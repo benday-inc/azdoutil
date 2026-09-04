@@ -1,4 +1,4 @@
-using Benday.AzureDevOpsUtil.Api;
+﻿using Benday.AzureDevOpsUtil.Api;
 using Benday.CommandsFramework;
 
 namespace Benday.AzureDevOpsUtil.UnitTests;
@@ -25,7 +25,7 @@ public class CommandRegistryFixture
         {
             ApplicationName = "Azure DevOps Utilities",
             Website = "https://www.benday.com",
-            StrictArgumentValidation = false
+            StrictArgumentValidation = true
         };
     }
 

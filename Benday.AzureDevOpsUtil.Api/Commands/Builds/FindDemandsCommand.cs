@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Web;
 
 using Benday.AzureDevOpsUtil.Api.Commands.ProjectAdministration;
@@ -133,11 +133,7 @@ public class FindDemandsCommand : AzureDevOpsCommandBase
     {
         if (Arguments.GetBooleanValue(Constants.ArgumentNameAllProjects) == true)
         {
-            var command = new ListTeamProjectsCommand(
-                ExecutionInfo.GetCloneOfArguments(Constants.CommandName_ListProjects, true),
-                _OutputProvider);
-
-            await command.ExecuteAsync();
+            var command = await ExecuteAzdoCommandAsync<ListTeamProjectsCommand>();
 
             if (command.LastResult == null || command.LastResult.Projects.Length == 0)
             {

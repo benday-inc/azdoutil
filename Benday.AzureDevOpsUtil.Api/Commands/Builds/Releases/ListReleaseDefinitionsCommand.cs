@@ -116,11 +116,7 @@ public class ListReleaseDefinitionsCommand : AzureDevOpsCommandBase
     private async Task DumpQueueInfo()
     {
         // call ListTeamProjectsCommand
-        var command = new ListTeamProjectsCommand(
-            ExecutionInfo.GetCloneOfArguments(
-               Constants.CommandName_ListProcessTemplates, true), _OutputProvider);
-
-        await command.ExecuteAsync();
+        var command = await ExecuteAzdoCommandAsync<ListTeamProjectsCommand>();
 
         if (command.LastResult == null)
         {
@@ -150,22 +146,10 @@ public class ListReleaseDefinitionsCommand : AzureDevOpsCommandBase
     private async Task<ReleaseQueueInfo?> GetQueueReferences(
         TeamProjectInfo project, ReleaseInfo releaseInfo)
     {
-        var command = new ExportReleaseDefinitionCommand(
-            ExecutionInfo.GetCloneOfArguments(
-               Constants.CommandArgumentNameExportReleaseDefinition, true),
-            _OutputProvider);
-
-        // remove the all argument
-        command.ExecutionInfo.RemoveArgumentValue(Constants.ArgumentNameAllProjects);
-
-        command.ExecutionInfo.RemoveArgumentValue(Constants.ArgumentNameTeamProjectName);
-
-        command.ExecutionInfo.AddArgumentValue(Constants.ArgumentNameTeamProjectName, project.Name);
-        command.ExecutionInfo.AddArgumentValue(
-            Constants.ArgumentNameReleaseDefinitionName, releaseInfo.Name);
-        command.ExecutionInfo.AddArgumentValue(Constants.CommandArgumentNameQueueInfo, true.ToString());
-
-        await command.ExecuteAsync();
+        var command = await ExecuteAzdoCommandAsync<ExportReleaseDefinitionCommand>(args => args
+            .Set(Constants.ArgumentNameTeamProjectName, project.Name)
+            .Set(Constants.ArgumentNameReleaseDefinitionName, releaseInfo.Name)
+            .Set(Constants.CommandArgumentNameQueueInfo, true));
 
         var returnValue = command.QueueInfo;
 
@@ -220,11 +204,7 @@ public class ListReleaseDefinitionsCommand : AzureDevOpsCommandBase
     private async Task ListForAllProjects(bool json)
     {
         // call ListTeamProjectsCommand
-        var command = new ListTeamProjectsCommand(
-            ExecutionInfo.GetCloneOfArguments(
-               Constants.CommandName_ListProcessTemplates, true), _OutputProvider);
-
-        await command.ExecuteAsync();
+        var command = await ExecuteAzdoCommandAsync<ListTeamProjectsCommand>();
 
         if (command.LastResult == null)
         {

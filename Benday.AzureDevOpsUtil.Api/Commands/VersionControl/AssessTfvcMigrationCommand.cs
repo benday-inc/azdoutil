@@ -1,4 +1,4 @@
-using Benday.AzureDevOpsUtil.Api.TfCommandLine;
+﻿using Benday.AzureDevOpsUtil.Api.TfCommandLine;
 using Benday.AzureDevOpsUtil.Api.TfvcAssessment;
 using Benday.CommandsFramework;
 
@@ -192,8 +192,7 @@ public class AssessTfvcMigrationCommand : AzureDevOpsCommandBase
     /// </summary>
     private void UseConfigurationForCollection(TfvcLocationInfo location)
     {
-        if (Arguments.ContainsKey(Constants.ArgumentNameConfigurationName) == true &&
-            Arguments[Constants.ArgumentNameConfigurationName].HasValue == true)
+        if (Arguments.HasValue(Constants.ArgumentNameConfigurationName) == true)
         {
             return;
         }
@@ -230,8 +229,7 @@ public class AssessTfvcMigrationCommand : AzureDevOpsCommandBase
 
     private int GetScanDepth()
     {
-        if (Arguments.ContainsKey(Constants.ArgumentNameScanDepth) == true &&
-            Arguments[Constants.ArgumentNameScanDepth].HasValue == true)
+        if (Arguments.HasValue(Constants.ArgumentNameScanDepth) == true)
         {
             var value = Arguments.GetInt32Value(Constants.ArgumentNameScanDepth);
 

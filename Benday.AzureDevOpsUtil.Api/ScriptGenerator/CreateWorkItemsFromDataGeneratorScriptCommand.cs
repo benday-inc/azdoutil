@@ -36,7 +36,7 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
 
         arguments.AddString(Constants.CommandArg_TeamProjectName)
             .WithDescription("Name of the team project")
-            .WithDefaultValue($"TestProject-{DateTime.Now.Ticks}")
+            .WithDefaultValue(GetTestTeamProjectName())
             .AsNotRequired();
 
         arguments.AddString(Constants.CommandArg_ProcessTemplateName)
@@ -78,6 +78,18 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
           .WithDescription($"Creates the excel export script. Requires an arg value for '{Constants.CommandArg_SaveScriptFileTo}'");
 
         return arguments;
+    }
+
+    private static string GetTestTeamProjectName()
+    {
+        // get string based on DateTime.UtcNow 
+        // that is "yyyy-mm-dd-hh-mm";
+        
+        var now = DateTime.UtcNow;
+        
+        var uniquifier = $"{now:yyyy-MM-dd-HH-mm}";
+        
+        return $"TestProject-{uniquifier}";
     }
 
     private bool _skipFutureDates = false;
@@ -135,7 +147,7 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
     {
         var scriptOnly = Arguments.GetBooleanValue(Constants.CommandArg_ScriptOnly);
 
-        if (scriptOnly == true && Arguments[Constants.CommandArg_SaveScriptFileTo].HasValue == false)
+        if (scriptOnly == true && Arguments.HasValue(Constants.CommandArg_SaveScriptFileTo) == false)
         {
             throw new KnownException($"When running in script only mode, a value for '{Constants.CommandArg_SaveScriptFileTo}' is required.");
         }
@@ -563,10 +575,9 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
                 rel.Attributes.Name = "Parent";
                 rel.RelationUrl = GetActionWorkItemMapUrl(row.FieldValue);
 
-                if (Arguments.ContainsKey(Constants.CommandArg_Comment) == true &&
-                    Arguments[Constants.CommandArg_Comment].HasValue == true)
+                if (Arguments.HasValue(Constants.CommandArg_Comment) == true)
                 {
-                    rel.Attributes.Comment = Arguments[Constants.CommandArg_Comment].Value;
+                    rel.Attributes.Comment = Arguments.GetStringValue(Constants.CommandArg_Comment);
                 }
 
                 body.AddValue(
@@ -634,45 +645,23 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
 
     private GetTeamProjectCommand CreateGetTeamProjectCommandInstance()
     {
-        var execInfo = ExecutionInfo.GetCloneOfArguments(
-            Constants.CommandName_GetProject,
-            true);
-
-        execInfo.RemoveAllArgumentsExcept(
-            preserveCommonArguments: true,
-            Constants.ArgumentNameTeamProjectName);
-
-        var teamProjectName = Arguments.GetStringValue(
-            Constants.CommandArg_TeamProjectName);
-
-        execInfo.AddArgumentValue(Constants.ArgumentNameTeamProjectName, teamProjectName);
-
-        var command =
-            new GetTeamProjectCommand(execInfo, _OutputProvider);
-
-        return command;
+        return CreateCommand<GetTeamProjectCommand>(args => args
+            .Set(Constants.ArgumentNameConfigurationName, GetConfigurationName())
+            .Set(Constants.ArgumentNameTeamProjectName,
+                Arguments.GetStringValue(Constants.CommandArg_TeamProjectName)));
     }
 
     private CreateTeamProjectCommand CreateCreateTeamProjectCommandInstance()
     {
-        var execInfo = ExecutionInfo.GetCloneOfArguments(
-            Constants.CommandName_CreateProject,
-            true);    
-
-        execInfo.RemoveAllArgumentsExcept(
-            preserveCommonArguments: true,
-            Constants.ArgumentNameTeamProjectName,
-            Constants.CommandArg_ProcessTemplateName);
-
-        var teamProjectName = Arguments.GetStringValue(
-            Constants.CommandArg_TeamProjectName);
-
-        execInfo.AddArgumentValue(Constants.ArgumentNameTeamProjectName, teamProjectName);
-        
-        var command =
-            new CreateTeamProjectCommand(execInfo, _OutputProvider);
-
-        return command;
+        // the process template name is read off this command's own arguments rather than
+        // being copied out of the raw command line, so the default value applies when it
+        // was not typed -- copying the command line sent an empty name to createproject
+        return CreateCommand<CreateTeamProjectCommand>(args => args
+            .Set(Constants.ArgumentNameConfigurationName, GetConfigurationName())
+            .Set(Constants.ArgumentNameTeamProjectName,
+                Arguments.GetStringValue(Constants.CommandArg_TeamProjectName))
+            .Set(Constants.CommandArg_ProcessTemplateName,
+                Arguments.GetStringValue(Constants.CommandArg_ProcessTemplateName)));
     }
 
     private async Task PopulateIterations(
@@ -680,17 +669,6 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
     {
         foreach (var item in sprints)
         {
-            var execInfo = ExecutionInfo.GetCloneOfArguments(
-                Constants.CommandName_SetIteration,
-                true);
-
-            execInfo.RemoveAllArgumentsExcept(true, Constants.ArgumentNameTeamProjectName);
-
-            var teamProjectName = Arguments.GetStringValue(
-            Constants.CommandArg_TeamProjectName);
-
-            execInfo.AddArgumentValue(Constants.ArgumentNameTeamProjectName, teamProjectName);
-
             var sprintStartDate = startDate.AddDays(
                 ((item.SprintNumber - 1) * 14)
                 );
@@ -702,13 +680,16 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
 
             WriteLine($"Setting sprint {item.SprintNumber} dates from {item.StartDate.ToShortDateString()} to {item.EndDate.ToShortDateString()}");
 
-            execInfo.AddArgumentValue(Constants.CommandArg_IterationName, $"Sprint {item.SprintNumber}");
-            execInfo.AddArgumentValue(Constants.CommandArg_StartDate, item.StartDate.ToShortDateString());
-            execInfo.AddArgumentValue(Constants.CommandArg_EndDate, item.EndDate.ToShortDateString());
-
-            var command = new SetIterationCommand(execInfo, _OutputProvider);
-
-            await command.ExecuteAsync();
+            // the dates go over as short date strings rather than through the DateTime
+            // overload: setiteration wants the local calendar date, and the round trip
+            // format the typed overload writes gets adjusted to UTC on the way back in
+            await ExecuteCommandAsync<SetIterationCommand>(args => args
+                .Set(Constants.ArgumentNameConfigurationName, GetConfigurationName())
+                .Set(Constants.CommandArg_TeamProjectName,
+                    Arguments.GetStringValue(Constants.CommandArg_TeamProjectName))
+                .Set(Constants.CommandArg_IterationName, $"Sprint {item.SprintNumber}")
+                .Set(Constants.CommandArg_StartDate, item.StartDate.ToShortDateString())
+                .Set(Constants.CommandArg_EndDate, item.EndDate.ToShortDateString()));
         }
     }
 
@@ -726,7 +707,7 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
             getExistingProjectCommand.LastResult == null)
         {
             throw new InvalidOperationException(
-                $"Project name '{Arguments[Constants.CommandArg_TeamProjectName].Value}' does not exist.");
+                $"Project name '{Arguments.GetStringValue(Constants.CommandArg_TeamProjectName)}' does not exist.");
         }
         else if (_createProjectIfNotExists == true &&
             getExistingProjectCommand.LastResult == null)
@@ -813,17 +794,10 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
 
     private async Task<TeamInfo> CreateTeam(string teamProjectName, string teamName)
     {
-        var args = ExecutionInfo.GetCloneOfArguments(
-                        Constants.CommandArgumentName_CreateTeam,
-                        true);
-
-        args.AddArgumentValue(Constants.ArgumentNameTeamProjectName, teamProjectName);
-        args.AddArgumentValue(Constants.ArgumentNameTeamName, teamName);
-
-        var command = new CreateTeamCommand(
-            args, _OutputProvider);
-
-        await command.ExecuteAsync();
+        var command = await ExecuteCommandAsync<CreateTeamCommand>(args => args
+            .Set(Constants.ArgumentNameConfigurationName, GetConfigurationName())
+            .Set(Constants.ArgumentNameTeamProjectName, teamProjectName)
+            .Set(Constants.ArgumentNameTeamName, teamName));
 
         if (command.LastResult == null)
         {

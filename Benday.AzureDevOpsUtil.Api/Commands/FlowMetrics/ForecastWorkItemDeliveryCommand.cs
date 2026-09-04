@@ -115,19 +115,15 @@ public class ForecastWorkItemDeliveryCommand : AzureDevOpsCommandBase
     private async Task GetForecast(TeamProjectInfo teamProject,
         GetWorkItemByIdResponse workItem, int position)
     {
-        var args = ExecutionInfo.GetCloneOfArguments(
-                        Constants.CommandArgumentNameGetForecastDurationForItemCount,
-                        true);
+        var command = await ExecuteAzdoCommandAsync<ForecastDurationForItemCountCommand>(args =>
+        {
+            args.Set(Constants.ArgumentNameCycleTimeNumberOfDays,
+                Arguments.GetInt32Value(Constants.ArgumentNameCycleTimeNumberOfDays));
+            args.Set(Constants.ArgumentNameTeamProjectName, teamProject.Name);
+            args.Set(Constants.ArgumentNameForecastNumberOfItems, position);
 
-        args.AddArgumentValue(Constants.ArgumentNameTeamProjectName, teamProject.Name);
-        args.AddArgumentValue(
-            Constants.ArgumentNameForecastNumberOfItems,
-            position.ToString());
-
-        var command = new ForecastDurationForItemCountCommand(
-            args, _OutputProvider);
-
-        await command.ExecuteAsync();
+            CopyArgumentIfSupplied(args, Constants.ArgumentNameTeamName);
+        });
 
         if (command.DataGroupedByWeek == null)
         {
@@ -206,12 +202,8 @@ public class ForecastWorkItemDeliveryCommand : AzureDevOpsCommandBase
 
     private async Task<GetWorkItemByIdResponse> GetWorkItem(int workItemId)
     {
-        var command = new GetWorkItemByIdCommand(
-            ExecutionInfo.GetCloneOfArguments(
-                Constants.CommandName_GetWorkItemById,
-                true), _OutputProvider);
-
-        await command.ExecuteAsync();
+        var command = await ExecuteAzdoCommandAsync<GetWorkItemByIdCommand>(args => args
+            .Set(Constants.CommandArg_WorkItemId, workItemId));
 
         if (command.WorkItem == null)
         {
@@ -242,16 +234,8 @@ public class ForecastWorkItemDeliveryCommand : AzureDevOpsCommandBase
 
     private async Task<TeamProjectInfo> GetTeamProject(string teamProjectName)
     {
-        var args = ExecutionInfo.GetCloneOfArguments(
-                        Constants.CommandName_GetProject,
-                        true);
-
-        args.AddArgumentValue(Constants.ArgumentNameTeamProjectName, teamProjectName);
-
-        var command = new GetTeamProjectCommand(
-            args, _OutputProvider);
-
-        await command.ExecuteAsync();
+        var command = await ExecuteAzdoCommandAsync<GetTeamProjectCommand>(args => args
+            .Set(Constants.ArgumentNameTeamProjectName, teamProjectName));
 
         if (command.LastResult == null)
         {

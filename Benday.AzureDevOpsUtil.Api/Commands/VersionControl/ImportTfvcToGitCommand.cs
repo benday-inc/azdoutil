@@ -109,11 +109,8 @@ public class ImportTfvcToGitCommand : AzureDevOpsCommandBase
 
     private async Task<TeamProjectInfo> GetProject(string projectName)
     {
-        var getProjectArgs = ExecutionInfo.GetCloneOfArguments(
-                    Constants.CommandName_GetProject, true);
-        var getProject = new GetTeamProjectCommand(getProjectArgs, _OutputProvider);
-
-        await getProject.ExecuteAsync();
+        var getProject = await ExecuteAzdoCommandAsync<GetTeamProjectCommand>(args => args
+            .Set(Constants.ArgumentNameTeamProjectName, projectName));
 
         TeamProjectInfo? project = getProject.LastResult;
 
@@ -130,14 +127,8 @@ public class ImportTfvcToGitCommand : AzureDevOpsCommandBase
     private async Task<GitRepositoryInfo> ValidateAndCreateGitRepository(
         TeamProjectInfo project, string repoName)
     {
-        var listGitReposArgs = ExecutionInfo.GetCloneOfArguments(
-            Constants.CommandArgumentName_ListGitRepos, true);
-
-        listGitReposArgs.AddArgumentValue(Constants.ArgumentNameRepositoryName, repoName);
-        var getExistingRepo = new ListGitRepositoriesForProjectCommand(
-            listGitReposArgs, _OutputProvider);
-
-        await getExistingRepo.ExecuteAsync();
+        var getExistingRepo = await ExecuteAzdoCommandAsync<ListGitRepositoriesForProjectCommand>(
+            args => args.Set(Constants.ArgumentNameTeamProjectName, project.Name));
 
         bool gitRepoExists = true;
 

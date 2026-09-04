@@ -60,11 +60,7 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
 
     private async Task<GetAgentPoolsResponse?> GetAgentPools()
     {
-        var command = new ListAgentPoolsCommand(
-            ExecutionInfo.GetCloneOfArguments(
-               Constants.CommandArgumentNameListAgentPools, true), _OutputProvider);
-
-        await command.ExecuteAsync();
+        var command = await ExecuteAzdoCommandAsync<ListAgentPoolsCommand>();
 
         return command.LastResult;
     }
@@ -172,11 +168,7 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
         bool previewOnly)
     {
         // call ListTeamProjectsCommand
-        var command = new ListTeamProjectsCommand(
-            ExecutionInfo.GetCloneOfArguments(
-               Constants.CommandName_ListProjects, true), _OutputProvider);
-
-        await command.ExecuteAsync();
+        var command = await ExecuteAzdoCommandAsync<ListTeamProjectsCommand>();
 
         if (command.LastResult == null ||
             command.LastResult.Projects == null ||
@@ -296,30 +288,9 @@ public class RepairBuildDefinitionAgentPoolCommand : AzureDevOpsCommandBase
         GetAgentPoolsResponse agentPoolInfoCurrent,
         BuildDefinitionInfo buildDefInfo, bool previewOnly)
     {
-        var execInfo = ExecutionInfo.GetCloneOfArguments(
-             Constants.CommandArgumentNameExportBuildDefinition,
-             true);
-
-        execInfo.Arguments.Add(
-            Constants.ArgumentNameBuildDefinitionName,
-            buildDefInfo.Name);
-
-        if (execInfo.Arguments.ContainsKey(Constants.ArgumentNameAllProjects) == true)
-        {
-            execInfo.Arguments.Remove(Constants.ArgumentNameAllProjects);
-        }
-
-        if (execInfo.Arguments.ContainsKey(Constants.ArgumentNameTeamProjectName) == false)
-        {
-            execInfo.Arguments.Add(
-                Constants.ArgumentNameTeamProjectName,
-                buildDefInfo.Project.Name);
-        }
-
-        var command = new ExportBuildDefinitionCommand(
-         execInfo, _OutputProvider);
-
-        await command.ExecuteAsync();
+        var command = await ExecuteAzdoCommandAsync<ExportBuildDefinitionCommand>(args => args
+            .Set(Constants.ArgumentNameTeamProjectName, buildDefInfo.Project.Name)
+            .Set(Constants.ArgumentNameBuildDefinitionName, buildDefInfo.Name));
 
         var buildDefJson = command.LastResultRawJson;
 

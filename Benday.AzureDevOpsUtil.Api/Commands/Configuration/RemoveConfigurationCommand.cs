@@ -26,7 +26,7 @@ public class RemoveConfigurationCommand : Command
 
     protected override Task OnExecute(CancellationToken cancellationToken)
     {
-        AzureDevOpsConfigurationManager.Instance.Remove(Arguments[Constants.ArgumentNameConfigurationName].Value);
+        AzureDevOpsConfigurationManager.Instance.Remove(Arguments.GetStringValue(Constants.ArgumentNameConfigurationName));
 
         return Task.CompletedTask;
     }

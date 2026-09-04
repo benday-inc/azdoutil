@@ -157,11 +157,7 @@ public class RepairReleaseDefinitionAgentPoolCommand : AzureDevOpsCommandBase
         bool previewOnly)
     {
         // call ListTeamProjectsCommand
-        var command = new ListTeamProjectsCommand(
-            ExecutionInfo.GetCloneOfArguments(
-               Constants.CommandName_ListProjects, true), _OutputProvider);
-
-        await command.ExecuteAsync();
+        var command = await ExecuteAzdoCommandAsync<ListTeamProjectsCommand>();
 
         if (command.LastResult == null)
         {
@@ -418,30 +414,9 @@ public class RepairReleaseDefinitionAgentPoolCommand : AzureDevOpsCommandBase
 
     private async Task<string?> GetReleaseDefinitionJson(ReleaseInfo releaseDefInfo, string teamProjectName)
     {
-        var execInfo = ExecutionInfo.GetCloneOfArguments(
-             Constants.CommandArgumentNameExportReleaseDefinition,
-             true);
-
-        execInfo.Arguments.Add(
-            Constants.ArgumentNameReleaseDefinitionName,
-            releaseDefInfo.Name);
-
-        if (execInfo.Arguments.ContainsKey(Constants.ArgumentNameAllProjects) == true)
-        {
-            execInfo.Arguments.Remove(Constants.ArgumentNameAllProjects);
-        }
-
-        if (execInfo.Arguments.ContainsKey(Constants.ArgumentNameTeamProjectName) == false)
-        {
-            execInfo.Arguments.Add(
-                Constants.ArgumentNameTeamProjectName,
-                teamProjectName);
-        }
-
-        var command = new ExportReleaseDefinitionCommand(
-            execInfo, _OutputProvider);
-
-
+        var command = CreateAzdoCommand<ExportReleaseDefinitionCommand>(args => args
+            .Set(Constants.ArgumentNameTeamProjectName, teamProjectName)
+            .Set(Constants.ArgumentNameReleaseDefinitionName, releaseDefInfo.Name));
 
         try
         {

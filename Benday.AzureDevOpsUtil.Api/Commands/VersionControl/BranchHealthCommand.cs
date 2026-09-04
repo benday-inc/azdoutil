@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 
 using Benday.AzureDevOpsUtil.Api.BranchHealth;
 using Benday.AzureDevOpsUtil.Api.GitRemotes;
@@ -114,8 +114,7 @@ public class BranchHealthCommand : AzureDevOpsCommandBase
 
     private int GetActivityWindowDays()
     {
-        if (Arguments.ContainsKey(Constants.ArgumentNameActivityWindowDays) == true &&
-            Arguments[Constants.ArgumentNameActivityWindowDays].HasValue == true)
+        if (Arguments.HasValue(Constants.ArgumentNameActivityWindowDays) == true)
         {
             var value = Arguments.GetInt32Value(Constants.ArgumentNameActivityWindowDays);
 

@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 using Benday.AzureDevOpsUtil.Api.McpTools;
@@ -80,15 +80,14 @@ public class McpConfigCommand : Command
 
     private bool IsFlagSet(string name)
     {
-        return Arguments.ContainsKey(name) && Arguments[name].HasValue;
+        return Arguments.HasValue(name);
     }
 
     private string? GetOptionalConfigName()
     {
-        if (Arguments.ContainsKey(Constants.ArgumentNameConfigurationName) &&
-            Arguments[Constants.ArgumentNameConfigurationName].HasValue)
+        if (Arguments.HasValue(Constants.ArgumentNameConfigurationName) == true)
         {
-            var value = Arguments[Constants.ArgumentNameConfigurationName].Value;
+            var value = Arguments.GetStringValue(Constants.ArgumentNameConfigurationName);
 
             return string.IsNullOrWhiteSpace(value) ? null : value;
         }
@@ -98,10 +97,9 @@ public class McpConfigCommand : Command
 
     private string GetClient(bool isInstallOrUninstall)
     {
-        if (Arguments.ContainsKey(Constants.ArgumentNameMcpClient) &&
-            Arguments[Constants.ArgumentNameMcpClient].HasValue)
+        if (Arguments.HasValue(Constants.ArgumentNameMcpClient) == true)
         {
-            var value = Arguments[Constants.ArgumentNameMcpClient].Value.Trim().ToLowerInvariant();
+            var value = Arguments.GetStringValue(Constants.ArgumentNameMcpClient).Trim().ToLowerInvariant();
 
             if (value == ClientClaudeCode || value == ClientVsCode || value == ClientPrint)
             {

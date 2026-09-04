@@ -255,10 +255,9 @@ public class CreateWorkItemsFromExcelScriptCommand : AzureDevOpsCommandBase
                 rel.Attributes.Name = "Parent";
                 rel.RelationUrl = GetActionWorkItemMapUrl(row.FieldValue);
 
-                if (Arguments.ContainsKey(Constants.CommandArg_Comment) == true &&
-                    Arguments[Constants.CommandArg_Comment].HasValue == true)
+                if (Arguments.HasValue(Constants.CommandArg_Comment) == true)
                 {
-                    rel.Attributes.Comment = Arguments[Constants.CommandArg_Comment].Value;
+                    rel.Attributes.Comment = Arguments.GetStringValue(Constants.CommandArg_Comment);
                 }
 
                 body.AddValue(
@@ -314,37 +313,18 @@ public class CreateWorkItemsFromExcelScriptCommand : AzureDevOpsCommandBase
 
     private GetTeamProjectCommand CreateGetTeamProjectCommandInstance()
     {
-        var execInfo = ExecutionInfo.GetCloneOfArguments(
-            Constants.CommandName_GetProject,
-            true);
-
-        execInfo.RemoveArgumentValue(Constants.CommandArg_TeamProjectName);
-        execInfo.AddArgumentValue(Constants.ArgumentNameTeamProjectName,
-            Arguments[Constants.CommandArg_TeamProjectName].Value);
-
-        var command =
-            new GetTeamProjectCommand(execInfo, _OutputProvider);
-
-        return command;
+        return CreateAzdoCommand<GetTeamProjectCommand>(args => args
+            .Set(Constants.ArgumentNameTeamProjectName,
+                Arguments.GetStringValue(Constants.CommandArg_TeamProjectName)));
     }
 
     private CreateTeamProjectCommand CreateCreateTeamProjectCommandInstance()
     {
-        var execInfo = ExecutionInfo.GetCloneOfArguments(
-            Constants.CommandName_CreateProject,
-            true);
-
-        execInfo.Arguments.Remove(Constants.CommandArg_TeamProjectName);
-        execInfo.Arguments.Add(Constants.ArgumentNameTeamProjectName,
-            Arguments[Constants.CommandArg_TeamProjectName].Value);
-
-        execInfo.Arguments.TryAdd(Constants.CommandArg_ProcessTemplateName,
-                Arguments[Constants.CommandArg_ProcessTemplateName].Value);
-
-        var command =
-            new CreateTeamProjectCommand(execInfo, _OutputProvider);
-
-        return command;
+        return CreateAzdoCommand<CreateTeamProjectCommand>(args => args
+            .Set(Constants.ArgumentNameTeamProjectName,
+                Arguments.GetStringValue(Constants.CommandArg_TeamProjectName))
+            .Set(Constants.CommandArg_ProcessTemplateName,
+                Arguments.GetStringValue(Constants.CommandArg_ProcessTemplateName)));
     }
 
     private async Task PopulateIterations()
@@ -357,17 +337,16 @@ public class CreateWorkItemsFromExcelScriptCommand : AzureDevOpsCommandBase
 
         foreach (var item in rows)
         {
-            var execInfo = ExecutionInfo.GetCloneOfArguments(
-                Constants.CommandName_SetIteration,
-                true);
-
-            execInfo.AddArgumentValue(Constants.CommandArg_IterationName, item.IterationName);
-            execInfo.AddArgumentValue(Constants.CommandArg_StartDate, item.GetIterationStart(_startDate).ToShortDateString());
-            execInfo.AddArgumentValue(Constants.CommandArg_EndDate, item.GetIterationEnd(_startDate).ToShortDateString());
-
-            var command = new SetIterationCommand(execInfo, _OutputProvider);
-
-            await command.ExecuteAsync();
+            // the dates go over as short date strings rather than through the DateTime
+            // overload: setiteration wants the local calendar date, and the round trip
+            // format the typed overload writes gets adjusted to UTC on the way back in
+            await ExecuteAzdoCommandAsync<SetIterationCommand>(args => args
+                .Set(Constants.CommandArg_TeamProjectName, _teamProjectName)
+                .Set(Constants.CommandArg_IterationName, item.IterationName)
+                .Set(Constants.CommandArg_StartDate,
+                    item.GetIterationStart(_startDate).ToShortDateString())
+                .Set(Constants.CommandArg_EndDate,
+                    item.GetIterationEnd(_startDate).ToShortDateString()));
         }
     }
 
@@ -381,7 +360,7 @@ public class CreateWorkItemsFromExcelScriptCommand : AzureDevOpsCommandBase
             getExistingProjectCommand.LastResult == null)
         {
             throw new InvalidOperationException(
-                $"Project name '{Arguments[Constants.CommandArg_TeamProjectName].Value}' does not exist.");
+                $"Project name '{Arguments.GetStringValue(Constants.CommandArg_TeamProjectName)}' does not exist.");
         }
         else if (_createProjectIfNotExists == true &&
             getExistingProjectCommand.LastResult == null)

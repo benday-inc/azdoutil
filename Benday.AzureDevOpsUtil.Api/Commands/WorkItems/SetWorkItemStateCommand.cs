@@ -36,18 +36,15 @@ public class SetWorkItemStateCommand : AzureDevOpsCommandBase
 
         DateTime stateTransitionDate = DateTime.Now;
 
-        if (Arguments[Constants.CommandArg_StateTransitionDate].HasValue == true)
+        if (Arguments.HasValue(Constants.CommandArg_StateTransitionDate) == true)
         {
             stateTransitionDate = Arguments.GetDateTimeValue(Constants.CommandArg_StateTransitionDate);
         }
 
         WriteLine($"Getting work item info for work item id '{workItemId}'...");
 
-        var getWorkItemArgs = ExecutionInfo.GetCloneOfArguments(
-            Constants.CommandName_GetWorkItemById, true);
-        var getWorkItem = new GetWorkItemByIdCommand(getWorkItemArgs, _OutputProvider);
-
-        await getWorkItem.ExecuteAsync();
+        var getWorkItem = await ExecuteAzdoCommandAsync<GetWorkItemByIdCommand>(args => args
+            .Set(Constants.CommandArg_WorkItemId, workItemId));
 
         if (getWorkItem.WorkItem == null)
         {
@@ -55,15 +52,11 @@ public class SetWorkItemStateCommand : AzureDevOpsCommandBase
         }
         else
         {
-            var args = ExecutionInfo.GetCloneOfArguments(
-                Constants.CommandArgumentNameGetWorkItemStates, true);
-
-            args.AddArgumentValue(Constants.ArgumentNameTeamProjectName, getWorkItem.WorkItem.FieldsAsStrings["System.TeamProject"]);
-            args.AddArgumentValue(Constants.ArgumentNameWorkItemTypeName, getWorkItem.WorkItem.FieldsAsStrings["System.WorkItemType"]);
-
-            var getStates = new GetWorkItemStatesCommand(args, _OutputProvider);
-
-            await getStates.ExecuteAsync();
+            var getStates = await ExecuteAzdoCommandAsync<GetWorkItemStatesCommand>(args => args
+                .Set(Constants.ArgumentNameTeamProjectName,
+                    getWorkItem.WorkItem.FieldsAsStrings["System.TeamProject"])
+                .Set(Constants.ArgumentNameWorkItemTypeName,
+                    getWorkItem.WorkItem.FieldsAsStrings["System.WorkItemType"]));
 
             var states = getStates.LastResult;
 

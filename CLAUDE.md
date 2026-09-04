@@ -79,9 +79,53 @@ deleted. Inside `Benday.AzureDevOpsUtil.Api` azdoutil's copy won by namespace pr
 noticed, but any other assembly importing both namespaces got CS0121. Before adding a helper here,
 check whether the framework already has one.
 
-Commands extend either:
-- `AsynchronousCommand` - For async operations (most commands)
-- `SynchronousCommand` - For simple synchronous operations
+**Running another command.** Roughly fifty places reuse another command's logic rather than
+repeating its API calls. Use `CreateAzdoCommand<T>()` (build it) or `ExecuteAzdoCommandAsync<T>()`
+(build it, validate it, run it) on `AzureDevOpsCommandBase`, naming the arguments the other command
+needs:
+
+```csharp
+var project = await ExecuteAzdoCommandAsync<GetTeamProjectCommand>(args => args
+    .Set(Constants.ArgumentNameTeamProjectName, teamProjectName));
+```
+
+These wrap the framework's `CommandBase.CreateCommand<T>()` / `ExecuteCommandAsync<T>()`, which
+carry over program options, configuration, output provider and service scope, default the command
+being run to quiet mode, and cap nesting depth so "A calls B calls A" throws instead of blowing the
+stack. The wrappers add the configuration name, because which Azure DevOps connection to use is an
+azdoutil *argument* rather than framework configuration, so it has to travel as an argument value.
+`CopyArgumentIfSupplied()` passes an optional argument along **only when it has a value** — an empty
+team name is not the same question as no team name, and the flow metrics commands ask which one they
+are being given.
+
+The old way was to clone the caller's whole command line (`GetCloneOfArguments`) and delete the
+arguments that did not belong (`RemoveAllArgumentsExcept`, since deleted). Two things were wrong
+with it: a value reached the command it was aimed at only when both commands happened to spell the
+argument the same way, and only when it had actually been typed — a **default value** declared by
+the calling command was never part of the command line, so it never travelled. That is why
+`createproject` used to be handed an empty process template name unless `--processname` was typed.
+It also meant every command was run with a pile of arguments it never declared, which is why
+`Program.cs` used to set `StrictArgumentValidation = false`.
+
+**`Program.cs` sets `StrictArgumentValidation = true`.** An argument a command does not declare is
+now a validation failure — `azdoutil getproject --teamproject Foo --bogus 1` answers *Unknown
+argument: bogus* instead of ignoring it. That flag could not be turned on while commands ran each
+other by cloning command lines. What this asks of new code: an argument passed to another command
+must be one that command declares, or the call fails the first time it runs. The framework's own
+reserved names (`--help`, `quiet`, `--json`, `gui`, `tui`, `completion`) are always accepted, and
+positional arguments are matched through the argument's alias, so neither trips it.
+`CommandRegistryFixture.GetProgramOptions()` mirrors this flag; keep the two together.
+
+Note that validation failures are handled differently in the two paths: run from the command line, a
+command prints its usage and returns; run from another command, it **throws** a `KnownException`, so
+the calling command cannot carry on believing the work happened.
+
+Read argument values with the `Arguments.GetStringValue()` / `GetBooleanValue()` / `GetInt32Value()`
+/ `HasValue()` extension methods rather than the `Arguments[name]` indexer. The indexer throws
+`KeyNotFoundException` for a name the command did not declare; the extensions answer empty/false.
+
+Commands extend `Command` (v5 merged `AsynchronousCommand` and `SynchronousCommand` into it); a
+sequential command overrides `OnExecute` and returns `Task.CompletedTask`.
 
 ### Configuration Management
 
@@ -280,11 +324,11 @@ Commands are organized into logical categories (defined in `Constants.cs`):
 To add a new command:
 
 1. Create a new class in `Benday.AzureDevOpsUtil.Api` (or appropriate subdirectory)
-2. Inherit from `AzureDevOpsCommandBase` (or `SynchronousCommand` for simple commands)
+2. Inherit from `AzureDevOpsCommandBase`
 3. Add `[Command]` attribute with category, name, and description
 4. Add a constructor taking `(CommandExecutionInfo info, ITextOutputProvider outputProvider)` — the framework activates commands through it
 5. Override `GetArguments()` to declare parameters on an `ArgumentCollection`
-6. Override `OnExecute()` method (or `Execute()` for synchronous commands), reading values via `Arguments.GetStringValue(...)` / `GetBooleanValue(...)`
+6. Override `OnExecute()`, reading values via `Arguments.GetStringValue(...)` / `GetBooleanValue(...)` — never the `Arguments[name]` indexer
 
 The framework automatically discovers the command and adds it to help. Argument names live in `Constants.cs` so the CLI, help output, and README generation stay consistent.
 
@@ -293,8 +337,7 @@ Example:
 [Command(
     Category = Constants.Category_WorkItems,
     Name = "mycommand",
-    Description = "Does something useful",
-    IsAsync = true)]
+    Description = "Does something useful")]
 public class MyCommand : AzureDevOpsCommandBase
 {
     public MyCommand(

@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Web;
 
@@ -179,16 +179,18 @@ public class UpdateNuGetToolInstallerCommand : AzureDevOpsCommandBase
     }
 
     /// <summary>
-    /// Runs the find command rather than repeating its scan. Its output is captured and
-    /// discarded so only this command's reporting reaches the console.
+    /// Runs the find command rather than repeating its scan. It runs quiet, so its own
+    /// report stays out of the way of this command's reporting.
     /// </summary>
     private async Task<List<NuGetToolInstallerUsage>> FindUsages()
     {
-        var command = new FindNuGetToolInstallerCommand(
-            ExecutionInfo.GetCloneOfArguments(Constants.CommandName_FindNuGetToolInstaller, true),
-            new StringBuilderTextOutputProvider());
+        var command = await ExecuteAzdoCommandAsync<FindNuGetToolInstallerCommand>(args =>
+        {
+            args.Set(Constants.ArgumentNameAllProjects,
+                Arguments.GetBooleanValue(Constants.ArgumentNameAllProjects));
 
-        await command.ExecuteAsync();
+            CopyArgumentIfSupplied(args, Constants.ArgumentNameTeamProjectName);
+        });
 
         return command.LastResult ?? new List<NuGetToolInstallerUsage>();
     }

@@ -66,8 +66,7 @@ public abstract class AzureDevOpsCommandBase : Command
     /// </summary>
     protected string GetOptionalStringValue(string argumentName)
     {
-        if (Arguments.ContainsKey(argumentName) == true &&
-            Arguments[argumentName].HasValue == true)
+        if (Arguments.HasValue(argumentName) == true)
         {
             return Arguments.GetStringValue(argumentName) ?? string.Empty;
         }
@@ -127,8 +126,7 @@ public abstract class AzureDevOpsCommandBase : Command
     /// </summary>
     protected void UseConfigurationForRemote(GitRemoteInfo remote)
     {
-        if (Arguments.ContainsKey(Constants.ArgumentNameConfigurationName) == true &&
-            Arguments[Constants.ArgumentNameConfigurationName].HasValue == true)
+        if (Arguments.HasValue(Constants.ArgumentNameConfigurationName) == true)
         {
             return;
         }
@@ -165,17 +163,88 @@ public abstract class AzureDevOpsCommandBase : Command
 
     protected string GetConfigurationName()
     {
-        if (Arguments.ContainsKey(Constants.ArgumentNameConfigurationName) == true &&
-            Arguments[Constants.ArgumentNameConfigurationName].HasValue)
+        if (Arguments.HasValue(Constants.ArgumentNameConfigurationName) == true)
         {
-            var configName = Arguments[Constants.ArgumentNameConfigurationName].Value;
-
-            return configName;
+            return Arguments.GetStringValue(Constants.ArgumentNameConfigurationName);
         }
         else
         {
             return Constants.DefaultConfigurationName;
         }
+    }
+
+    /// <summary>
+    /// Creates another azdoutil command so that its logic can be reused from inside this
+    /// one, with the connection this command is using already supplied. Everything else
+    /// the command needs is named explicitly by the caller.
+    /// </summary>
+    /// <remarks>
+    /// This is <see cref="CommandBase.CreateCommand{T}"/> plus the configuration name.
+    /// The framework carries over program options, configuration, output provider and
+    /// service scope, but the connection to use is an azdoutil argument rather than
+    /// framework configuration, so it has to travel as an argument value.
+    ///
+    /// Commands used to be built by cloning the caller's command line and deleting the
+    /// arguments that did not belong, which meant a value only reached the command it was
+    /// aimed at when the two spelled the argument the same way, and only when it had
+    /// actually been typed -- a default value declared by the calling command was never
+    /// part of the command line, so it never travelled.
+    /// </remarks>
+    /// <typeparam name="T">Type of the command to create</typeparam>
+    /// <param name="configureArguments">Callback for populating the arguments</param>
+    /// <param name="quiet">Run the command in quiet mode. Defaults to true.</param>
+    /// <returns>The new command instance</returns>
+    protected T CreateAzdoCommand<T>(
+        Action<CommandArgumentValues>? configureArguments = null,
+        bool quiet = true) where T : AzureDevOpsCommandBase
+    {
+        return CreateCommand<T>(args =>
+        {
+            args.Set(Constants.ArgumentNameConfigurationName, GetConfigurationName());
+
+            configureArguments?.Invoke(args);
+        }, quiet);
+    }
+
+    /// <summary>
+    /// Passes one of this command's arguments along to another command, but only when a
+    /// value was actually supplied.
+    /// </summary>
+    /// <remarks>
+    /// An empty value is not the same thing as no value: a command that asks
+    /// <see cref="ExtensionMethods.HasValue"/> before narrowing a query would treat an
+    /// empty team name as "a team named nothing" rather than "no team given".
+    /// </remarks>
+    /// <param name="args">Arguments being built for the other command</param>
+    /// <param name="argumentName">Argument to pass along if it has a value</param>
+    protected void CopyArgumentIfSupplied(CommandArgumentValues args, string argumentName)
+    {
+        if (Arguments.HasValue(argumentName) == true)
+        {
+            args.Set(argumentName, Arguments.GetStringValue(argumentName));
+        }
+    }
+
+    /// <summary>
+    /// Creates another azdoutil command, validates it and runs it. The command instance is
+    /// returned so that results can be read back off it.
+    /// </summary>
+    /// <typeparam name="T">Type of the command to run</typeparam>
+    /// <param name="configureArguments">Callback for populating the arguments</param>
+    /// <param name="quiet">Run the command in quiet mode. Defaults to true.</param>
+    /// <param name="cancellationToken">Cancels the command being run</param>
+    /// <returns>The command instance after it has run</returns>
+    protected async Task<T> ExecuteAzdoCommandAsync<T>(
+        Action<CommandArgumentValues>? configureArguments = null,
+        bool quiet = true,
+        CancellationToken cancellationToken = default) where T : AzureDevOpsCommandBase
+    {
+        return await ExecuteCommandAsync<T>(args =>
+        {
+            args.Set(Constants.ArgumentNameConfigurationName, GetConfigurationName());
+
+            configureArguments?.Invoke(args);
+        }, quiet, cancellationToken);
     }
 
     /// <summary>

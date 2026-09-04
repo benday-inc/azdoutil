@@ -106,16 +106,8 @@ public class CreateTeamCommand : AzureDevOpsCommandBase
 
     private async Task<TeamProjectInfo> GetTeamProject(string teamProjectName)
     {
-        var args = ExecutionInfo.GetCloneOfArguments(
-                        Constants.CommandName_GetProject,
-                        true);
-
-        args.AddArgumentValue(Constants.ArgumentNameTeamProjectName, teamProjectName);
-
-        var command = new GetTeamProjectCommand(
-            args, _OutputProvider);
-
-        await command.ExecuteAsync();
+        var command = await ExecuteAzdoCommandAsync<GetTeamProjectCommand>(args => args
+            .Set(Constants.ArgumentNameTeamProjectName, teamProjectName));
 
         if (command.LastResult == null)
         {
@@ -152,14 +144,7 @@ public class CreateTeamCommand : AzureDevOpsCommandBase
 
     private async Task<ConnectionDataResponse> GetConnectionData()
     {
-        var args = ExecutionInfo.GetCloneOfArguments(
-                        Constants.CommandName_ConnectionData,
-                        true);
-
-        var command = new GetConnectionDataCommand(
-            args, _OutputProvider);
-
-        await command.ExecuteAsync();
+        var command = await ExecuteAzdoCommandAsync<GetConnectionDataCommand>();
 
         if (command.LastResult == null)
         {

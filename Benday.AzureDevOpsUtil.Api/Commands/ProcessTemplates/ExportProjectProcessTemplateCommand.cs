@@ -89,17 +89,9 @@ public class ExportProjectProcessTemplateCommand : AzureDevOpsCommandBase
 
     private async Task<List<string>> GetWorkItemTypes(string project)
     {
-        var args = ExecutionInfo.GetCloneOfArguments(
-                        Constants.CommandArgumentNameGetWorkItemTypes,
-                        true);
-
-        args.AddArgumentValue(Constants.ArgumentNameNameOnly, true.ToString());
-        args.AddArgumentValue(Constants.ArgumentNameTeamProjectName, project);
-
-        var command = new GetWorkItemTypesCommand(
-            args, _OutputProvider);
-
-        await command.ExecuteAsync();
+        var command = await ExecuteAzdoCommandAsync<GetWorkItemTypesCommand>(args => args
+            .Set(Constants.ArgumentNameTeamProjectName, project)
+            .Set(Constants.ArgumentNameNameOnly, true));
 
         if (command.AllWorkItemTypes == null)
         {
@@ -121,14 +113,7 @@ public class ExportProjectProcessTemplateCommand : AzureDevOpsCommandBase
     {
         // get all projects
       
-        var args = ExecutionInfo.GetCloneOfArguments(
-                        Constants.CommandName_ListProjects,
-                        true);        
-
-        var command = new ListTeamProjectsCommand(
-            args, _OutputProvider);
-
-        await command.ExecuteAsync();
+        var command = await ExecuteAzdoCommandAsync<ListTeamProjectsCommand>();
 
         if (command.LastResult == null)
         {

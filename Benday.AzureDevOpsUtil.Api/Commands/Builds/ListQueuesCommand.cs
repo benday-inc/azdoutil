@@ -60,11 +60,7 @@ public class ListQueuesCommand : AzureDevOpsCommandBase
         List<BuildQueueInfo> returnValue = new();
 
         // call ListTeamProjectsCommand
-        var command = new ListTeamProjectsCommand(
-            ExecutionInfo.GetCloneOfArguments(
-               Constants.CommandName_ListProjects, true), _OutputProvider);
-
-        await command.ExecuteAsync();
+        var command = await ExecuteAzdoCommandAsync<ListTeamProjectsCommand>();
 
         if (command.LastResult == null)
         {

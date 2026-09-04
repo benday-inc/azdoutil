@@ -44,13 +44,14 @@ public class CycleTimeConfidenceRangesCommand : AzureDevOpsCommandBase
         _NumberOfDaysOfHistory = Arguments.GetInt32Value(Constants.ArgumentNameCycleTimeNumberOfDays);
         _TeamProjectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);
 
-        var args = ExecutionInfo.GetCloneOfArguments(Constants.CommandArgumentNameSuggestServiceLevelExpectation, true);
+        var command = await ExecuteAzdoCommandAsync<CalculateSuggestedServiceLevelExpectationCommand>(args =>
+        {
+            args.Set(Constants.ArgumentNameCycleTimeNumberOfDays, _NumberOfDaysOfHistory);
+            args.Set(Constants.ArgumentNameTeamProjectName, _TeamProjectName);
+            args.Set(Constants.ArgumentNamePercent, 85);
 
-        args.AddArgumentValue(Constants.ArgumentNamePercent, "85");
-
-        var command = new CalculateSuggestedServiceLevelExpectationCommand(args, _OutputProvider);
-
-        await command.ExecuteAsync();
+            CopyArgumentIfSupplied(args, Constants.ArgumentNameTeamName);
+        });
 
         var cycleTimeAt85Percent = command.CycleTimeAtPercent;
         var cycleTimeAt50Percent = command.GetCycleTimeAtPercent(50);

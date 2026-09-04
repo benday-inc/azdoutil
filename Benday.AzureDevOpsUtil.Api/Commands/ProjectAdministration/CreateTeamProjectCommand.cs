@@ -33,13 +33,13 @@ public class CreateTeamProjectCommand : AzureDevOpsCommandBase
 
     protected override async Task OnExecute(CancellationToken cancellationToken)
     {
-        var projectName = Arguments[Constants.ArgumentNameTeamProjectName].Value;
+        var projectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);
 
         var project = await GetExistingTeamProject(projectName);
 
         if (project == null)
         {
-            var processTemplateName = Arguments[Constants.CommandArg_ProcessTemplateName].Value;
+            var processTemplateName = Arguments.GetStringValue(Constants.CommandArg_ProcessTemplateName);
 
             var processTemplate = await GetProcessTemplate(
                 processTemplateName);
@@ -48,6 +48,10 @@ public class CreateTeamProjectCommand : AzureDevOpsCommandBase
             {
                 throw new InvalidOperationException(
                     $"Invalid process template name '{processTemplateName}'.");
+            }
+            else
+            {
+                WriteStatus($"Validated process template name '{processTemplate.Name}'.");
             }
 
             await CreateNewTeamProject(projectName, processTemplate);
@@ -61,15 +65,7 @@ public class CreateTeamProjectCommand : AzureDevOpsCommandBase
 
     private async Task<TeamProjectInfo?> GetExistingTeamProject(string teamProjectName)
     {
-        var execInfo = ExecutionInfo.GetCloneOfArguments(
-            Constants.CommandName_ListProjects,
-            true);
-
-        execInfo.RemoveAllArgumentsExcept(true);
-
-        var command = new ListTeamProjectsCommand(execInfo, _OutputProvider);
-
-        await command.ExecuteAsync();
+        var command = await ExecuteAzdoCommandAsync<ListTeamProjectsCommand>();
 
         if (command.LastResult == null || command.LastResult.Count == 0)
         {
@@ -87,11 +83,7 @@ public class CreateTeamProjectCommand : AzureDevOpsCommandBase
 
     private async Task<ProcessTemplateDetailInfo?> GetProcessTemplate(string processTemplateName)
     {
-        var args = ExecutionInfo.GetCloneOfArguments(Constants.CommandName_ListProjects, true);
-        args.RemoveAllArgumentsExcept(true);
-        var command = new ListProcessTemplatesCommand(args, _OutputProvider);
-
-        await command.ExecuteAsync();
+        var command = await ExecuteAzdoCommandAsync<ListProcessTemplatesCommand>();
 
         if (command.LastResult == null || command.LastResult.Count == 0)
         {

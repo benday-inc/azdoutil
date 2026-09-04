@@ -26,9 +26,9 @@ public class ListConfigurationCommand : Command
 
     protected override Task OnExecute(CancellationToken cancellationToken)
     {
-        if (Arguments[Constants.ArgumentNameConfigurationName].HasValue)
+        if (Arguments.HasValue(Constants.ArgumentNameConfigurationName))
         {
-            var configName = Arguments[Constants.ArgumentNameConfigurationName].Value;
+            var configName = Arguments.GetStringValue(Constants.ArgumentNameConfigurationName);
 
             var config = AzureDevOpsConfigurationManager.Instance.Get(configName);
 

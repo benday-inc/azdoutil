@@ -52,11 +52,9 @@ public class ExportWorkItemQueryCommand : AzureDevOpsCommandBase
         _workItemQueryName = Arguments.GetStringValue(Constants.ArgumentNameWorkItemQueryName);
         _exportToPath = Arguments.GetStringValue(Constants.ArgumentNameExportToPath);
 
-        var args = ExecutionInfo.GetCloneOfArguments(Constants.CommandName_RunWorkItemQuery, true);
-
-        var itemsToExportInfo = new RunWorkItemQueryCommand(args, _OutputProvider);
-
-        await itemsToExportInfo.ExecuteAsync();
+        var itemsToExportInfo = await ExecuteAzdoCommandAsync<RunWorkItemQueryCommand>(args => args
+            .Set(Constants.ArgumentNameTeamProjectName, _teamProjectName)
+            .Set(Constants.ArgumentNameWorkItemQueryName, _workItemQueryName));
 
         if (itemsToExportInfo.WorkItemQueryInfo == null)
         {

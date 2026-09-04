@@ -100,11 +100,11 @@ public class RunWorkItemQueryCommand : AzureDevOpsCommandBase
 
     private async Task<WorkItemQueryInfo> GetWorkItemQuery()
     {
-        var args = ExecutionInfo.GetCloneOfArguments(
-            Constants.CommandName_ShowWorkItemQuery, true);
-        var command = new ShowWorkItemQueryCommand(args, _OutputProvider);
-
-        await command.ExecuteAsync();
+        var command = await ExecuteAzdoCommandAsync<ShowWorkItemQueryCommand>(args => args
+            .Set(Constants.ArgumentNameTeamProjectName,
+                Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName))
+            .Set(Constants.ArgumentNameWorkItemQueryName,
+                Arguments.GetStringValue(Constants.ArgumentNameWorkItemQueryName)));
 
         Utilities.AssertNotNull(command.LastResult, "ShowWorkItemQueryCommand.LastResult");
         Utilities.AssertNotNull(command.LastResult?.Value, "ShowWorkItemQueryCommand.LastResult.value");

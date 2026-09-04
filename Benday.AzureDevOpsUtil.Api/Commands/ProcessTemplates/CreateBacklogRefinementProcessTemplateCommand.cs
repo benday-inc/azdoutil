@@ -36,16 +36,7 @@ public class CreateBacklogRefinementProcessTemplateCommand : AzureDevOpsCommandB
     {
         var isAgile = Arguments.GetBooleanValue("agile");
 
-        var execInfo = ExecutionInfo.GetCloneOfArguments(
-                Constants.CommandName_ListProcessTemplates, true);
-
-        execInfo.RemoveAllArgumentsExcept(true);
-
-        var listProcessTemplates = new ListProcessTemplatesCommand(
-             execInfo,
-             _OutputProvider);
-
-        await listProcessTemplates.ExecuteAsync();
+        var listProcessTemplates = await ExecuteAzdoCommandAsync<ListProcessTemplatesCommand>();
 
         ProcessTemplates = listProcessTemplates.LastResult;
 

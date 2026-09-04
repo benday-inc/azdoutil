@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 
 using Benday.AzureDevOpsUtil.Api.BuildReadiness;
 using Benday.AzureDevOpsUtil.Api.Messages;
@@ -131,10 +131,8 @@ public class AnalyzeRepoCommand : AzureDevOpsCommandBase
 
     private async Task<GitRepositoryInfo?> FindRepository(string projectName, string repoName)
     {
-        var listGitReposCommand = new ListGitRepositoriesForProjectCommand(
-            ExecutionInfo.GetCloneOfArguments(
-                Constants.CommandArgumentName_ListGitRepos, true),
-            _OutputProvider);
+        var listGitReposCommand = CreateAzdoCommand<ListGitRepositoriesForProjectCommand>(
+            args => args.Set(Constants.ArgumentNameTeamProjectName, projectName));
 
         var repos = await listGitReposCommand.GetGitRepositories(projectName);
 

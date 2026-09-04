@@ -34,7 +34,7 @@ public class GetTeamProjectCommand : AzureDevOpsCommandBase
 
     protected override async Task OnExecute(CancellationToken cancellationToken)
     {
-        var projectName = Arguments[Constants.ArgumentNameTeamProjectName].Value;
+        var projectName = Arguments.GetStringValue(Constants.ArgumentNameTeamProjectName);
 
         using var client = GetHttpClientInstanceForAzureDevOps();
 

@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
 using System.Web;
 
@@ -119,11 +119,7 @@ public class FindNuGetToolInstallerCommand : AzureDevOpsCommandBase
     {
         if (Arguments.GetBooleanValue(Constants.ArgumentNameAllProjects) == true)
         {
-            var command = new ListTeamProjectsCommand(
-                ExecutionInfo.GetCloneOfArguments(Constants.CommandName_ListProjects, true),
-                _OutputProvider);
-
-            await command.ExecuteAsync();
+            var command = await ExecuteAzdoCommandAsync<ListTeamProjectsCommand>();
 
             if (command.LastResult == null || command.LastResult.Projects.Length == 0)
             {

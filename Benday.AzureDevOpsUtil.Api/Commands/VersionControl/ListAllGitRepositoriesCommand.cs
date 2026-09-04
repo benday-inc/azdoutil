@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 
 using Benday.AzureDevOpsUtil.Api.Commands.ProjectAdministration;
 using Benday.AzureDevOpsUtil.Api.Messages;
@@ -42,12 +42,7 @@ public class ListAllGitRepositoriesCommand : AzureDevOpsCommandBase
         var outputCsv = Arguments.GetBooleanValue(Constants.ArgumentNameOutputCsv);
         var showLastCommit = Arguments.GetBooleanValue(Constants.ArgumentNameShowLastCommitInfo);
 
-        var listProjectsCommand = new ListTeamProjectsCommand(
-            ExecutionInfo.GetCloneOfArguments(
-                Constants.CommandName_ListProjects, true),
-            _OutputProvider);
-
-        await listProjectsCommand.ExecuteAsync();
+        var listProjectsCommand = await ExecuteAzdoCommandAsync<ListTeamProjectsCommand>();
 
         var projectsResult = listProjectsCommand.LastResult;
 
@@ -57,10 +52,9 @@ public class ListAllGitRepositoriesCommand : AzureDevOpsCommandBase
             return;
         }
 
-        var listGitReposCommand = new ListGitRepositoriesForProjectCommand(
-            ExecutionInfo.GetCloneOfArguments(
-                Constants.CommandArgumentName_ListGitRepos, true),
-            _OutputProvider);
+        // created rather than run: the repositories are read a project at a time through
+        // GetGitRepositories(), so the command never sees a team project argument
+        var listGitReposCommand = CreateAzdoCommand<ListGitRepositoriesForProjectCommand>();
 
         var totalRepoCount = 0;
 

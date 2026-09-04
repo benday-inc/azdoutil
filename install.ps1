@@ -7,6 +7,7 @@ param([Parameter(HelpMessage='Uninstall before installing')]
 
 if ($reinstall -eq $true)
 {
+    Write-Host "Calling uninstall..."
     &.\uninstall.ps1
 }
 
