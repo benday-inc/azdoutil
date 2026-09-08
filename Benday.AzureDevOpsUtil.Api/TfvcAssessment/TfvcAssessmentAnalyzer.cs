@@ -199,7 +199,7 @@ public class TfvcAssessmentAnalyzer
         {
             result.Notes.Add(
                 $"{scan.UnreadableDefinitions.Count} build definition(s) could not be read: " +
-                string.Join(", ", scan.UnreadableDefinitions) + ".");
+                FindingDetailFormatter.FormatList(scan.UnreadableDefinitions) + ".");
         }
 
         result.Notes.Add(
@@ -290,7 +290,7 @@ public class TfvcAssessmentAnalyzer
                     "shipped independently of the solutions that reference it, and those " +
                     "solutions cannot be migrated to separate Git repositories without " +
                     "breaking these references.",
-                string.Join(", ", shared.SolutionPaths)));
+                FindingDetailFormatter.FormatList(shared.SolutionPaths)));
         }
     }
 
@@ -312,8 +312,14 @@ public class TfvcAssessmentAnalyzer
                 "Every solution and build listed here is coupled to this folder. None of them " +
                     "can be migrated to an independent Git repository while these references " +
                     "exist.",
-                "Solutions: " + string.Join(", ", folder.SolutionPaths) +
-                    ". Builds: " + string.Join(", ", folder.BuildDefinitionNames) + "."));
+                // Two lists in one value, so each gets half the budget rather
+                // than the first one being free to crowd out the second.
+                "Solutions: " + FindingDetailFormatter.FormatList(
+                        folder.SolutionPaths,
+                        FindingDetailFormatter.MaxDetailLength / 2) +
+                    ". Builds: " + FindingDetailFormatter.FormatList(
+                        folder.BuildDefinitionNames,
+                        FindingDetailFormatter.MaxDetailLength / 2) + "."));
         }
     }
 
@@ -398,7 +404,7 @@ public class TfvcAssessmentAnalyzer
                     "dependencies.",
                 "These files are carried into the Git repository along with every version of " +
                     "them that was ever checked in.",
-                string.Join(", ", content.GeneratedFolders.Select(
+                FindingDetailFormatter.FormatList(content.GeneratedFolders.Select(
                     x => $"{x.Name} ({x.FileCount} file(s))"))));
         }
     }
@@ -410,7 +416,7 @@ public class TfvcAssessmentAnalyzer
             .Select(x => $"{x.Path} ({TfvcAssessmentReportFormatter.FormatSize(x.SizeBytes)})")
             .ToList();
 
-        return string.Join(", ", matches);
+        return FindingDetailFormatter.FormatList(matches);
     }
 
     private void AddBuildDefinitionFindings(TfvcAssessmentResult result)
@@ -439,7 +445,7 @@ public class TfvcAssessmentAnalyzer
                     "separate TFVC paths into its workspace.",
                 "A Git-based build pulls from a single repository. This build's source layout " +
                     "cannot be reproduced from a single Git repository.",
-                string.Join(", ", definition.MappedPaths)));
+                FindingDetailFormatter.FormatList(definition.MappedPaths)));
         }
     }
 
@@ -463,7 +469,7 @@ public class TfvcAssessmentAnalyzer
                 $"{usage.Path} is mapped into the workspace of {usage.DefinitionCount} " +
                     "build definitions.",
                 "Multiple builds depend on this folder's contents.",
-                string.Join(", ", usage.DefinitionNames)));
+                FindingDetailFormatter.FormatList(usage.DefinitionNames)));
         }
     }
 
@@ -505,7 +511,7 @@ public class TfvcAssessmentAnalyzer
     {
         foreach (var group in result.UnregisteredBranchGroups)
         {
-            var list = string.Join(", ", group.FolderPaths);
+            var list = FindingDetailFormatter.FormatList(group.FolderPaths);
 
             result.Findings.Add(new AssessmentFinding(
                 FindingCategories.UnregisteredBranches,
@@ -533,7 +539,7 @@ public class TfvcAssessmentAnalyzer
                 $"{activeCount} branch(es) have had changes in the last 90 days.",
                 "Each active branch is in-flight work that must be accounted for " +
                     "in a migration.",
-                string.Join(", ", result.BranchActivity
+                FindingDetailFormatter.FormatList(result.BranchActivity
                     .Where(x => x.Classification == BranchActivityClassification.Active)
                     .Select(x => x.Path))));
         }
@@ -561,7 +567,7 @@ public class TfvcAssessmentAnalyzer
                 $"{deadCount} branch(es) have had no changes in the last 365 days.",
                 "Nothing in the branch metadata records whether the contents of these " +
                     "branches exist anywhere else.",
-                string.Join(", ", result.BranchActivity
+                FindingDetailFormatter.FormatList(result.BranchActivity
                     .Where(x => x.Classification == BranchActivityClassification.Dead)
                     .Select(x => x.Path))));
         }

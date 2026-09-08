@@ -579,4 +579,75 @@ public class TfvcAssessmentReportFormatterFixture
 
         StringAssert.Contains(actual, TfvcAssessmentReportFormatter.FooterLine, "Missing footer.");
     }
+
+    [TestMethod]
+    public void FormatFindingsCsv_OversizedDetail_IsClampedToWhatExcelCanHold()
+    {
+        // arrange
+        // A real repository produced a dead-branch finding of 94,016
+        // characters. Excel holds 32,767 in a cell; past that it spills the
+        // overflow into following rows split on every comma and misaligns the
+        // rest of the sheet.
+        var result = new TfvcAssessmentResult
+        {
+            ProjectName = "GnarlyCorp",
+            ScopePath = "$/GnarlyCorp",
+            GeneratedUtc = UtcNow
+        };
+
+        result.Findings.Add(new AssessmentFinding(
+            FindingCategories.BranchActivity,
+            "1521 branch(es) have had no changes in the last 365 days.",
+            "Nothing in the branch metadata records whether the contents exist elsewhere.",
+            new string('x', 94016)));
+
+        // act
+        var actual = SystemUnderTest.FormatFindingsCsv(result);
+
+        // assert
+        foreach (var row in new Benday.CommandsFramework.DataFormatting.CsvReader(actual))
+        {
+            foreach (var value in row.GetValues())
+            {
+                Assert.IsTrue(
+                    value.Length <= FindingDetailFormatter.ExcelMaxCellLength,
+                    $"A cell holds {value.Length} characters, over Excel's limit of " +
+                        $"{FindingDetailFormatter.ExcelMaxCellLength}.");
+            }
+        }
+    }
+
+    [TestMethod]
+    public void FormatFindingsCsv_OversizedDetail_StillHasOneRowPerFinding()
+    {
+        // arrange
+        var result = new TfvcAssessmentResult
+        {
+            ProjectName = "GnarlyCorp",
+            ScopePath = "$/GnarlyCorp",
+            GeneratedUtc = UtcNow
+        };
+
+        result.Findings.Add(new AssessmentFinding(
+            FindingCategories.BranchActivity, "fact one", "consequence one",
+            new string('x', 94016)));
+
+        result.Findings.Add(new AssessmentFinding(
+            FindingCategories.Content, "fact two", "consequence two", "short detail"));
+
+        // act
+        var actual = SystemUnderTest.FormatFindingsCsv(result);
+
+        // assert
+        var rows = new Benday.CommandsFramework.DataFormatting.CsvReader(actual).ToList();
+
+        Assert.AreEqual(2, rows.Count, "Wrong number of rows.");
+
+        foreach (var row in rows)
+        {
+            Assert.AreEqual(4, row.ColumnCount, "A row has the wrong column count.");
+        }
+
+        Assert.AreEqual("fact two", rows[1]["Fact"], "The second finding was misaligned.");
+    }
 }

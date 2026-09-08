@@ -637,6 +637,11 @@ public class TfvcAssessmentReportFormatter
 
     /// <summary>
     /// One row per finding, for a spreadsheet.
+    ///
+    /// Every value is clamped to what Excel can hold in a cell.  The analyzer
+    /// already caps its lists on a whole-item boundary, which is the shortening
+    /// that means something; this is the backstop that keeps a finding added
+    /// later from quietly producing a file Excel misaligns.
     /// </summary>
     public string FormatFindingsCsv(TfvcAssessmentResult result)
     {
@@ -649,12 +654,18 @@ public class TfvcAssessmentReportFormatter
         foreach (var finding in result.Findings)
         {
             csvWriter.AddRow(
-                finding.Category,
-                finding.Fact,
-                finding.Consequence,
-                finding.Detail);
+                ClampForExcel(finding.Category),
+                ClampForExcel(finding.Fact),
+                ClampForExcel(finding.Consequence),
+                ClampForExcel(finding.Detail));
         }
 
         return csvWriter.ToCsvString();
+    }
+
+    private static string ClampForExcel(string value)
+    {
+        return FindingDetailFormatter.Clamp(
+            value, FindingDetailFormatter.ExcelMaxCellLength);
     }
 }

@@ -74,10 +74,13 @@ public class AssessTfvcMigrationCommand : AzureDevOpsCommandBase
 
             if (IsQuietMode == false)
             {
-                WriteLine(
+                // The diagnostic channel, not the result channel.  This used to
+                // go to stdout, so piping --outputcsv to a file put a sentence
+                // of English on line 1 of the CSV.
+                WriteStatus(
                     $"Using the TFVC workspace holding this directory: project " +
                     $"'{projectName}', path '{tfvcPath}' at {location.CollectionUrl}");
-                WriteLine(string.Empty);
+                WriteStatus(string.Empty);
             }
         }
 
@@ -102,9 +105,12 @@ public class AssessTfvcMigrationCommand : AzureDevOpsCommandBase
             MaxScanDepth = GetScanDepth()
         };
 
-        if (IsQuietMode == false && outputCsv == false)
+        if (IsQuietMode == false)
         {
-            analyzer.ProgressCallback = message => WriteLine(message);
+            // Progress is commentary, so it goes to the diagnostic channel.
+            // That is also what lets it stay switched on while --outputcsv is
+            // being redirected to a file: it no longer lands in the CSV.
+            analyzer.ProgressCallback = message => WriteStatus(message);
         }
 
         var result = await analyzer.AnalyzeAsync(projectName, tfvcPath, DateTime.UtcNow);
