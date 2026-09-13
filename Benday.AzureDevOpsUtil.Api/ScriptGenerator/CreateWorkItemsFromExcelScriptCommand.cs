@@ -37,11 +37,11 @@ public class CreateWorkItemsFromExcelScriptCommand : AzureDevOpsCommandBase
         arguments.AddString(Constants.CommandArg_TeamProjectName)
             .WithDescription("Name of the team project");
         arguments.AddString(Constants.CommandArg_ProcessTemplateName)
-            .WithDescription("Process template name");
+            .WithDescription("Process template name. Also decides whether a BacklogPriority row in the script is written to Microsoft.VSTS.Common.BacklogPriority (Scrum) or Microsoft.VSTS.Common.StackRank (Agile, CMMI, Basic)");
         arguments.AddBoolean(Constants.CommandArg_CreateProjectIfNotExists)
             .AsRequired()
             .AllowEmptyValue(false)
-            .WithDescription("Creates the team project if it doesn't exist");
+            .WithDescription("Creates the team project if it doesn't exist. Takes a value (--createproject true or --createproject false), unlike the same argument on createfromgenerator, which is a flag");
 
         return arguments;
     }
@@ -52,6 +52,7 @@ public class CreateWorkItemsFromExcelScriptCommand : AzureDevOpsCommandBase
     private string? _pathToExcel;
     private List<WorkItemScriptAction>? _actions;
     private string _teamProjectName = string.Empty;
+    private string _processTemplateName = string.Empty;
 
     protected override async Task OnExecute(CancellationToken cancellationToken)
     {
@@ -63,6 +64,7 @@ public class CreateWorkItemsFromExcelScriptCommand : AzureDevOpsCommandBase
         }
 
         _teamProjectName = Arguments.GetStringValue(Constants.CommandArg_TeamProjectName);
+        _processTemplateName = Arguments.GetStringValue(Constants.CommandArg_ProcessTemplateName);
         _pathToExcel = Arguments.GetStringValue(Constants.CommandArg_PathToExcel);
 
         AssertFileExists(_pathToExcel, Constants.CommandArg_PathToExcel);
@@ -178,32 +180,9 @@ public class CreateWorkItemsFromExcelScriptCommand : AzureDevOpsCommandBase
         AddActionWorkItemIdMap(action, savedWorkItemInfo);
     }
 
-    private static string GetFullRefname(WorkItemScriptRow row)
+    private string GetFullRefname(WorkItemScriptRow row)
     {
-        if (row.Refname == "Title")
-        {
-            return "System.Title";
-        }
-        else if (row.Refname == "Status" || row.Refname == "State")
-        {
-            return "System.State";
-        }
-        else if (row.Refname == "Effort")
-        {
-            return "Microsoft.VSTS.Scheduling.Effort";
-        }
-        else if (row.Refname == "IterationPath")
-        {
-            return "System.IterationPath";
-        }
-        else if (row.Refname == "RemainingWork")
-        {
-            return "Microsoft.VSTS.Scheduling.RemainingWork";
-        }
-        else
-        {
-            return row.Refname;
-        }
+        return WorkItemScriptRefnames.GetFullRefname(row.Refname, _processTemplateName);
     }
 
     private void PopulateBody(WorkItemScriptAction action, DateTime actionDate, WorkItemFieldOperationValueCollection body)

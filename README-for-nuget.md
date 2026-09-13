@@ -640,8 +640,8 @@ The tools are all read-only:
 | pathtoexcel | Required | String | Path to the Excel script |
 | startdate | Required | DateTime | Date for the start of the Excel script |
 | teamproject | Required | String | Name of the team project |
-| processname | Required | String | Process template name |
-| createproject | Required | Boolean | Creates the team project if it doesn't exist |
+| processname | Required | String | Process template name. Also decides whether a BacklogPriority row in the script is written to Microsoft.VSTS.Common.BacklogPriority (Scrum) or Microsoft.VSTS.Common.StackRank (Agile, CMMI, Basic) |
+| createproject | Required | Boolean | Creates the team project if it doesn't exist. Takes a value (--createproject true or --createproject false), unlike the same argument on createfromgenerator, which is a flag |
 ## createfromgenerator
 **Create work items using random data generator**
 ### Arguments

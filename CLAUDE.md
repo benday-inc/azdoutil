@@ -216,6 +216,8 @@ Execution modes:
 
 The **Test Data** category commands (`CreateWorkItemsFromDataGeneratorScriptCommand`, `CreateWorkItemInfoFromDataGeneratorCommand`, `CreateWorkItemsFromExcelScriptCommand`) live here in `ScriptGenerator/` rather than under `Commands/` — the framework discovers them by attribute regardless of directory.
 
+Scripts name fields in short form (`Title`, `State`, `Effort`, `BacklogPriority`...). **`WorkItemScriptRefnames`** is the one map from those to Azure DevOps reference names, and both the generator command and the Excel command go through it. `BacklogPriority`/`StackRank` resolve by the target project's process template (Scrum family → `Microsoft.VSTS.Common.BacklogPriority`, everything else → `Microsoft.VSTS.Common.StackRank`), which is why `createfromexcel` takes `--processname` even for an existing project. The two commands used to keep separate copies and the Excel one fell behind, so a script the generator exported failed on the first work item with *TF51535: Cannot find field BacklogPriority*. `WorkItemScriptRefnamesFixture` round-trips a generated script through the Excel writer and reader and fails if the generator ever writes a short name the map does not know. Note the argument shapes differ: `--createproject` is a flag on `createfromgenerator` but takes a value (`--createproject true`) on `createfromexcel`.
+
 ### BuildReadiness Module
 
 The `BuildReadiness/` directory contains the analysis engine behind the `analyzerepo` and `analyzeallrepos` commands (in `Commands/VersionControl/`) and the `analyze_repository` MCP tool. It inspects a repository's build readiness — languages, solutions, project files, NuGet/external references — **without cloning**, using the Azure DevOps Git Items API:
@@ -301,7 +303,7 @@ API notes verified against docs: TFS-internal group SIDs start with `S-1-9-15513
 ### Other Api Directories
 
 - `WorkItems/` - Work item type/field/state definition models plus a few work item commands that live outside `Commands/`
-- `Excel/` - Excel read/write helpers used by the ScriptGenerator import/export paths
+- `Excel/` - Excel read/write helpers used by the ScriptGenerator import/export paths. Built on **MiniExcel** (Apache-2.0, no dependencies): `ExcelReader` reads a sheet as a header row plus data rows keyed by header text, `ExcelWorkItemScriptWriter` writes the Script and Iterations sheets from row dictionaries. It used to be EPPlus, whose Polyform Noncommercial license has to be acknowledged in code before the first workbook opens — only the write path did, so `createfromexcel` died with `LicenseNotSetException` in any process that had not first run the generator. Don't reintroduce a library that needs a license call
 - `UsageFormatters/` - `MarkdownUsageFormatter`, used by the README generation tests
 - `Messages/` - Azure DevOps REST API DTOs
 

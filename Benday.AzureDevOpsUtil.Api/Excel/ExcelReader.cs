@@ -1,22 +1,24 @@
-﻿using OfficeOpenXml;
+using MiniExcelLibs;
 
 namespace Benday.AzureDevOpsUtil.Api.Excel;
 
+/// <summary>
+/// Reads a worksheet as a header row followed by data rows, keyed by the
+/// header text. Built on MiniExcel (Apache-2.0). This used to sit on EPPlus,
+/// whose Polyform Noncommercial license has to be acknowledged in code before
+/// the first workbook is opened -- and only the write path did, so a fresh
+/// process could write a script but not read one back.
+/// </summary>
 public class ExcelReader
 {
     private readonly string _PathToExcelFile;
-    private List<string> _SheetNames;
+    private readonly List<string> _SheetNames;
 
     public ExcelReader(string pathToExcelFile)
     {
         _PathToExcelFile = pathToExcelFile;
 
-        PopulateSheetNames();
-
-        if (_SheetNames == null)
-        {
-            throw new InvalidOperationException($"Problem while populating sheet names.");
-        }
+        _SheetNames = PopulateSheetNames();
     }
 
     public List<string> SheetNames
@@ -25,27 +27,19 @@ public class ExcelReader
         {
             return _SheetNames;
         }
-    }    
+    }
 
-    private void PopulateSheetNames()
+    private List<string> PopulateSheetNames()
     {
-        var returnValue = new List<string>();
+        using var stream = OpenForRead();
 
-        using (var excel = new OfficeOpenXml.ExcelPackage())
-        {
-            // NOTE: open the file and ignore whether any other process has it open
-            using (var stream = File.Open(_PathToExcelFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-            {
-                excel.Load(stream);
-            }
+        return MiniExcel.GetSheetNames(stream);
+    }
 
-            foreach (var sheet in excel.Workbook.Worksheets)
-            {
-                returnValue.Add(sheet.Name);
-            }
-        }
-
-        _SheetNames = returnValue;
+    private FileStream OpenForRead()
+    {
+        // NOTE: open the file and ignore whether any other process has it open
+        return File.Open(_PathToExcelFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
     }
 
     public List<ExcelRowWrapper> GetRows(int sheetIndex)
@@ -57,142 +51,114 @@ public class ExcelReader
 
     public List<ExcelRowWrapper> GetRows(string sheetName)
     {
+        AssertSheetExists(sheetName);
+
         var returnValue = new List<ExcelRowWrapper>();
-        
-        using (var excel = new OfficeOpenXml.ExcelPackage())
+
+        Dictionary<string, string>? mappings = null;
+
+        // row numbers are 1-based like Excel's, so they line up with what the
+        // user sees when a script step is reported as failing
+        var rowIndex = 0;
+
+        foreach (var row in ReadRawRows(sheetName))
         {
-            // NOTE: open the file and ignore whether any other process has it open
-            using (var stream = File.Open(_PathToExcelFile,
-                FileMode.Open,
-                FileAccess.Read,
-                FileShare.ReadWrite))
+            rowIndex++;
+
+            if (mappings == null)
             {
-                excel.Load(stream);
+                // first row is the header row
+                mappings = GetColumnMappings(row);
             }
+            else
+            {
+                var wrapper = new ExcelRowWrapper(mappings, row, rowIndex);
 
-            var mappings = GetColumnMappings(excel, sheetName);
-
-            PopulateRows(returnValue, mappings, excel, sheetName);
+                if (wrapper.IsRowEmpty == false)
+                {
+                    returnValue.Add(wrapper);
+                }
+            }
         }
 
         return returnValue;
     }
 
-    private void PopulateRows(List<ExcelRowWrapper> rows,
-        Dictionary<string, int> mappings, ExcelPackage excel, string sheetName)
-    {
-        if (SheetNames.Contains(sheetName) == false)
-        {
-            throw new InvalidOperationException("Invalid sheet name.");
-        }
-
-        var sheetIndex = SheetNames.IndexOf(sheetName);
-
-        var sheet = excel.Workbook.Worksheets[sheetIndex];
-
-        var start = sheet.Dimension.Start;
-        var end = sheet.Dimension.End;
-
-        var rowCount = end.Row;
-
-        // skip the first row because it's the header row
-        var startingRow = start.Row + 1;
-        _ = end.Column;
-        _ = start.Column;
-        for (var rowIndex = startingRow;
-            rowIndex < rowCount + 1; rowIndex++)
-        {
-            var wrapper = new ExcelRowWrapper(mappings, sheet, rowIndex);
-            if (wrapper.IsRowEmpty == false)
-            {
-                rows.Add(wrapper);
-            }
-        }
-    }
-
+    /// <summary>
+    /// Header text to 1-based column index for the named sheet.
+    /// </summary>
     public Dictionary<string, int> GetColumnMappings(string sheetName)
     {
-        using var excel = new OfficeOpenXml.ExcelPackage();
-        // NOTE: open the file and ignore whether any other process has it open
-        using (var stream = File.Open(_PathToExcelFile,
-                                      FileMode.Open,
-                                      FileAccess.Read,
-                                      FileShare.ReadWrite))
+        AssertSheetExists(sheetName);
+
+        var headerRow = ReadRawRows(sheetName).FirstOrDefault();
+
+        if (headerRow == null)
         {
-            excel.Load(stream);
+            return new Dictionary<string, int>();
         }
 
-        return GetColumnMappings(excel, sheetName);
+        return GetColumnMappings(headerRow)
+            .ToDictionary(kv => kv.Key, kv => ColumnLetterToIndex(kv.Value));
     }
 
-    public Dictionary<string, int> GetColumnMappings()
-    {
-        throw new NotImplementedException();
-    }
-
-    private Dictionary<string, int> GetColumnMappings(
-        OfficeOpenXml.ExcelPackage excel, string sheetName)
+    private void AssertSheetExists(string sheetName)
     {
         if (SheetNames.Contains(sheetName) == false)
         {
             throw new InvalidOperationException($"Invalid sheet name '{sheetName}' in file '{_PathToExcelFile}'.");
         }
+    }
 
-        var sheetIndex = SheetNames.IndexOf(sheetName);
+    /// <summary>
+    /// Every row of the sheet, header included, as column letter to cell value.
+    /// The enumeration owns the file handle, so it has to be consumed inside
+    /// the caller's loop rather than returned to someone else.
+    /// </summary>
+    private IEnumerable<IDictionary<string, object?>> ReadRawRows(string sheetName)
+    {
+        using var stream = OpenForRead();
 
-        var mappings = new Dictionary<string, int>();
-
-        // NOTE: open the file and ignore whether any other process has it open
-        using (var stream = File.Open(_PathToExcelFile,
-                                      FileMode.Open,
-                                      FileAccess.Read,
-                                      FileShare.ReadWrite))
+        foreach (var row in MiniExcel.Query(stream, useHeaderRow: false, sheetName: sheetName))
         {
-            excel.Load(stream);
+            yield return (IDictionary<string, object?>)row;
         }
+    }
 
-        var sheet = excel.Workbook.Worksheets[sheetIndex];
+    /// <summary>
+    /// Header text to column letter, read from the header row.
+    /// </summary>
+    private static Dictionary<string, string> GetColumnMappings(IDictionary<string, object?> headerRow)
+    {
+        var mappings = new Dictionary<string, string>();
 
-        var start = sheet.Dimension.Start;
-        var end = sheet.Dimension.End;
-        _ = end.Row;
-        var startingRow = start.Row;
-        var columnCount = end.Column;
-        var startingColumn = start.Column;
-
-        for (var columnIndex = startingColumn; columnIndex < columnCount + 1; columnIndex++)
+        foreach (var cell in headerRow)
         {
-            AddColumnMapping(mappings, sheet, startingRow, columnIndex);
+            var value = ExcelRowWrapper.CellToString(cell.Value);
+
+            if (string.IsNullOrWhiteSpace(value) == false)
+            {
+                if (mappings.ContainsKey(value) == true)
+                {
+                    throw new InvalidOperationException(string.Format("Duplicate column name '{0}'", value));
+                }
+
+                mappings.Add(value, cell.Key);
+            }
         }
 
         return mappings;
     }
 
-    private void AddColumnMapping(Dictionary<string, int> mappings,
-        ExcelWorksheet sheet, int rowIndex, int columnIndex)
+    private static int ColumnLetterToIndex(string columnLetters)
     {
-        var value = SafeToString(sheet.Cells[rowIndex, columnIndex]);
+        var index = 0;
 
-        if (string.IsNullOrWhiteSpace(value) == false)
+        foreach (var letter in columnLetters.ToUpperInvariant())
         {
-            if (mappings.ContainsKey(value) == true)
-            {
-                throw new InvalidOperationException(string.Format("Duplicate column name '{0}'", value));
-            }
+            index = (index * 26) + (letter - 'A' + 1);
+        }
 
-            mappings.Add(value, columnIndex);
-        }
-    }
-
-    private static string SafeToString(ExcelRange excelRange)
-    {
-        if (excelRange == null || excelRange.Text == null)
-        {
-            return string.Empty;
-        }
-        else
-        {
-            return excelRange.Text;
-        }
+        return index;
     }
 }

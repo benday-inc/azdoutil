@@ -5,7 +5,6 @@ using System.Xml.Linq;
 using Benday.AzureDevOpsUtil.Api.Messages;
 using Benday.CommandsFramework;
 
-using OfficeOpenXml.Utils;
 
 namespace Benday.AzureDevOpsUtil.Api.Commands.WorkItems;
 

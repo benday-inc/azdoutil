@@ -1,40 +1,43 @@
-﻿using OfficeOpenXml;
+using System.Globalization;
 
 namespace Benday.AzureDevOpsUtil.Api.Excel;
 
-
-
+/// <summary>
+/// One data row of a worksheet, addressable by header text.
+/// </summary>
 public class ExcelRowWrapper
 {
     protected readonly Dictionary<string, string> _values = new();
 
-    public ExcelRowWrapper(Dictionary<string, int> mappings, ExcelWorksheet sheet, int rowIndex)
+    /// <param name="mappings">Header text to column letter</param>
+    /// <param name="cells">Column letter to cell value for this row</param>
+    /// <param name="rowIndex">1-based Excel row number</param>
+    public ExcelRowWrapper(Dictionary<string, string> mappings, IDictionary<string, object?> cells, int rowIndex)
     {
         if (mappings == null)
         {
             throw new ArgumentNullException(nameof(mappings), "Argument cannot be null.");
         }
 
-        if (sheet == null)
+        if (cells == null)
         {
-            throw new ArgumentNullException(nameof(sheet), "Argument cannot be null.");
+            throw new ArgumentNullException(nameof(cells), "Argument cannot be null.");
         }
 
         RowIndex = rowIndex;
 
-        PopulateValues(sheet, mappings, RowIndex);
+        PopulateValues(cells, mappings);
     }
 
     private void PopulateValues(
-        ExcelWorksheet sheet,
-        Dictionary<string, int> mappings,
-        int rowIndex)
+        IDictionary<string, object?> cells,
+        Dictionary<string, string> mappings)
     {
         var foundAValueInRow = false;
 
         foreach (var columnName in mappings.Keys)
         {
-            var temp = GetValue(sheet, mappings, rowIndex, columnName);
+            var temp = GetValue(cells, mappings, columnName);
             if (foundAValueInRow == false &&
                 string.IsNullOrWhiteSpace(temp) == false)
             {
@@ -66,36 +69,45 @@ public class ExcelRowWrapper
         }
     }
 
-    private string SafeToString(ExcelRange excelRange)
+    /// <summary>
+    /// The text of a cell the way the script readers expect it: numbers
+    /// without a culture-specific decimal separator, booleans lower-cased,
+    /// blanks as empty string.
+    /// </summary>
+    public static string CellToString(object? cellValue)
     {
-        if (excelRange == null || excelRange.Text == null)
+        if (cellValue == null)
         {
             return string.Empty;
         }
+        else if (cellValue is bool boolValue)
+        {
+            return boolValue.ToString().ToLower();
+        }
+        else if (cellValue is string stringValue)
+        {
+            return stringValue;
+        }
         else
         {
-            return excelRange.Text;
+            return Convert.ToString(cellValue, CultureInfo.InvariantCulture) ?? string.Empty;
         }
     }
 
-    private string GetValue(ExcelWorksheet sheet,
-        Dictionary<string, int> mappings, int rowIndex, string columnName)
+    private static string GetValue(IDictionary<string, object?> cells,
+        Dictionary<string, string> mappings, string columnName)
     {
         if (mappings.ContainsKey(columnName) == true)
         {
-            var columnIndex = mappings[columnName];
+            var columnLetter = mappings[columnName];
 
-            var range = sheet.Cells[rowIndex, columnIndex];
-
-            if (range.Value is bool)
+            if (cells.TryGetValue(columnLetter, out var cellValue) == true)
             {
-                return range.GetValue<bool>().ToString().ToLower();
+                return CellToString(cellValue);
             }
             else
             {
-                var value = SafeToString(range);
-
-                return value;
+                return string.Empty;
             }
         }
         else

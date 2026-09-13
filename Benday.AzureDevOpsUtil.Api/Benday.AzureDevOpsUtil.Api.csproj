@@ -10,7 +10,7 @@
     <PackageReference Include="Benday.CommandsFramework" Version="5.*" />
     <PackageReference Include="Benday.Common" Version="9.12.0" />
     <PackageReference Include="Benday.XmlUtilities" Version="5.*" />
-    <PackageReference Include="EPPlus" Version="8.*" />
+    <PackageReference Include="MiniExcel" Version="1.*" />
     <PackageReference Include="ModelContextProtocol" Version="1.4.1" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.*" />
   </ItemGroup>

@@ -1,93 +1,63 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using Benday.AzureDevOpsUtil.Api.ScriptGenerator;
 
-using OfficeOpenXml;
+using MiniExcelLibs;
 
 namespace Benday.AzureDevOpsUtil.Api.Excel;
+
+/// <summary>
+/// Writes a generated work item script to Excel in the layout
+/// <see cref="ExcelReader"/> reads back: a Script sheet and an Iterations
+/// sheet, each a header row followed by data rows.
+/// </summary>
 public class ExcelWorkItemScriptWriter
 {
     public void WriteToExcel(string filename, List<WorkItemScriptAction> actions)
     {
-        ExcelPackage.License.SetNonCommercialPersonal("azdoutil");
+        var dir = Path.GetDirectoryName(filename) ?? throw new InvalidOperationException();
 
-        using (var excel = new OfficeOpenXml.ExcelPackage())
+        if (!Directory.Exists(dir))
         {
-            var worksheetScript = excel.Workbook.Worksheets.Add(ExcelConstants.SheetNameScript);
-            var worksheetIterations = excel.Workbook.Worksheets.Add(ExcelConstants.SheetNameIterations);
-
-            AddIterations(excel, worksheetIterations);
-            AddActions(excel, worksheetScript, actions);
-
-            var dir = Path.GetDirectoryName(filename) ?? throw new InvalidOperationException();
-
-            if (!Directory.Exists(dir))
-            {
-                Directory.CreateDirectory(dir);
-            }
-
-            excel.SaveAs(filename);
+            Directory.CreateDirectory(dir);
         }
-    }
 
-    private void AddIterations(ExcelPackage excel, ExcelWorksheet worksheet)
-    {
-        worksheet.SetValue(1, 1, ExcelConstants.ColumnNameIterationName);
-        worksheet.SetValue(1, 2, ExcelConstants.ColumnNameStartDay);
-        worksheet.SetValue(1, 3, ExcelConstants.ColumnNameEndDay);
-        
-        AddIteration(worksheet, 1);
-        AddIteration(worksheet, 2);
-        AddIteration(worksheet, 3);
-        AddIteration(worksheet, 4);
-        AddIteration(worksheet, 5);
-        AddIteration(worksheet, 6);
-    }
-
-    private static void AddIteration(
-        ExcelWorksheet worksheet,
-        int sprintNumber)
-    {
-        var rowIndex = sprintNumber + 1;
-
-        var sprintStartDate = ((sprintNumber - 1) * 14);
-        var sprintEndDate = (sprintNumber * 14) - 1;
-
-        worksheet.SetValue(rowIndex, 1, $"Sprint {sprintNumber}");
-        worksheet.SetValue(rowIndex, 2, sprintStartDate);
-        worksheet.SetValue(rowIndex, 3, sprintEndDate);
-    }
-
-    private void AddActions(ExcelPackage excel, 
-        ExcelWorksheet worksheet, 
-        List<WorkItemScriptAction> actions)
-    {
-        Dictionary<string, int> mappings = new();
-
-        var columnIndex = 0;
-
-        mappings.Add(ExcelConstants.ColumnNameActionId, ++columnIndex);
-        mappings.Add(ExcelConstants.ColumnNameDescription, ++columnIndex);
-        mappings.Add(ExcelConstants.ColumnNameWorkItemId, ++columnIndex);
-        mappings.Add(ExcelConstants.ColumnNameOperation, ++columnIndex);
-        mappings.Add(ExcelConstants.ColumnNameWorkItemType, ++columnIndex);
-        mappings.Add(ExcelConstants.ColumnNameActionDay, ++columnIndex);
-        mappings.Add(ExcelConstants.ColumnNameActionHour, ++columnIndex);
-        mappings.Add(ExcelConstants.ColumnNameActionMinute, ++columnIndex);
-        mappings.Add(ExcelConstants.ColumnNameRefname, ++columnIndex);
-        mappings.Add(ExcelConstants.ColumnNameFieldValue, ++columnIndex);
-
-        AddColumnHeaders(worksheet, mappings);
-
-        var rowIndex = 1;
-
-        foreach ( var action in actions )
+        // a dictionary of sheet name to rows writes one sheet per entry, in
+        // this order; the first row's keys become that sheet's header row
+        var sheets = new Dictionary<string, object>
         {
-            var row = new ExcelRowWriteWrapper(mappings, worksheet, ++rowIndex);
+            { ExcelConstants.SheetNameScript, GetActionRows(actions) },
+            { ExcelConstants.SheetNameIterations, GetIterationRows() }
+        };
+
+        MiniExcel.SaveAs(filename, sheets, overwriteFile: true);
+    }
+
+    private static List<Dictionary<string, object?>> GetIterationRows()
+    {
+        var rows = new List<Dictionary<string, object?>>();
+
+        for (var sprintNumber = 1; sprintNumber <= 6; sprintNumber++)
+        {
+            var sprintStartDate = ((sprintNumber - 1) * 14);
+            var sprintEndDate = (sprintNumber * 14) - 1;
+
+            rows.Add(new Dictionary<string, object?>
+            {
+                { ExcelConstants.ColumnNameIterationName, $"Sprint {sprintNumber}" },
+                { ExcelConstants.ColumnNameStartDay, sprintStartDate },
+                { ExcelConstants.ColumnNameEndDay, sprintEndDate }
+            });
+        }
+
+        return rows;
+    }
+
+    private static List<Dictionary<string, object?>> GetActionRows(List<WorkItemScriptAction> actions)
+    {
+        var rows = new List<Dictionary<string, object?>>();
+
+        foreach (var action in actions)
+        {
+            var row = NewActionRow();
 
             row[ExcelConstants.ColumnNameActionId] = action.ActionId;
             row[ExcelConstants.ColumnNameDescription] = action.Definition.Description;
@@ -100,33 +70,42 @@ public class ExcelWorkItemScriptWriter
             row[ExcelConstants.ColumnNameRefname] = action.Definition.Refname;
             row[ExcelConstants.ColumnNameFieldValue] = action.Definition.FieldValue;
 
-            if (action.Rows.Count > 1)
+            rows.Add(row);
+
+            // the remaining rows of an action carry only a field and a value;
+            // the reader attaches them to the action above by the blank ActionId
+            foreach (var childRow in action.Rows.Skip(1))
             {
-                bool isFirst = true;
+                var childRowValues = NewActionRow();
 
-                foreach (var childRow in action.Rows)
-                {
-                    if (isFirst == true)
-                    {
-                        isFirst = false;
-                    }
-                    else
-                    {
-                        var childRowWriter = new ExcelRowWriteWrapper(mappings, worksheet, ++rowIndex);
+                childRowValues[ExcelConstants.ColumnNameRefname] = childRow.Refname;
+                childRowValues[ExcelConstants.ColumnNameFieldValue] = childRow.FieldValue;
 
-                        childRowWriter[ExcelConstants.ColumnNameRefname] = childRow.Refname;
-                        childRowWriter[ExcelConstants.ColumnNameFieldValue] = childRow.FieldValue;
-                    }
-                }
+                rows.Add(childRowValues);
             }
         }
+
+        return rows;
     }
 
-    private void AddColumnHeaders(ExcelWorksheet worksheet, Dictionary<string, int> mappings)
+    /// <summary>
+    /// Every column present, in header order, so the first row defines the
+    /// full header and a child row keeps its values in the right columns.
+    /// </summary>
+    private static Dictionary<string, object?> NewActionRow()
     {
-        foreach (var key in mappings.Keys)
+        return new Dictionary<string, object?>
         {
-            worksheet.SetValue(1, mappings[key], key);
-        }
+            { ExcelConstants.ColumnNameActionId, null },
+            { ExcelConstants.ColumnNameDescription, null },
+            { ExcelConstants.ColumnNameWorkItemId, null },
+            { ExcelConstants.ColumnNameOperation, null },
+            { ExcelConstants.ColumnNameWorkItemType, null },
+            { ExcelConstants.ColumnNameActionDay, null },
+            { ExcelConstants.ColumnNameActionHour, null },
+            { ExcelConstants.ColumnNameActionMinute, null },
+            { ExcelConstants.ColumnNameRefname, null },
+            { ExcelConstants.ColumnNameFieldValue, null }
+        };
     }
 }

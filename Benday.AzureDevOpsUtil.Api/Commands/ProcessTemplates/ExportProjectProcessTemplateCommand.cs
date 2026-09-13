@@ -5,7 +5,6 @@ using System.Reflection.PortableExecutable;
 using Benday.AzureDevOpsUtil.Api.Messages;
 using Benday.CommandsFramework;
 
-using OfficeOpenXml.Utils;
 
 using Benday.AzureDevOpsUtil.Api.Commands.ProjectAdministration;
 using Benday.AzureDevOpsUtil.Api.Commands.WorkItems;

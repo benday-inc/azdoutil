@@ -478,46 +478,7 @@ public class CreateWorkItemsFromDataGeneratorScriptCommand : AzureDevOpsCommandB
 
     private string GetFullRefname(WorkItemScriptRow row)
     {
-        if (row.Refname == "Title")
-        {
-            return "System.Title";
-        }
-        else if (
-            StringUtility.IsEqualsCaseInsensitive("Status", row.Refname) ||
-            StringUtility.IsEqualsCaseInsensitive("State", row.Refname))
-        {
-            return "System.State";
-        }
-        else if (row.Refname == "Effort")
-        {
-            return "Microsoft.VSTS.Scheduling.Effort";
-        }
-        else if (row.Refname == "IterationPath")
-        {
-            return "System.IterationPath";
-        }
-        else if (row.Refname == "RemainingWork")
-        {
-            return "Microsoft.VSTS.Scheduling.RemainingWork";
-        }
-        else if (StringUtility.IsEqualsCaseInsensitive("BacklogPriority", row.Refname))
-        {
-            // Scrum and Scrum with Backlog Refinement use BacklogPriority
-            // Agile and others use StackRank
-            if (_processTemplateName.Equals("Scrum", StringComparison.CurrentCultureIgnoreCase) ||
-                _processTemplateName.Equals("Scrum with Backlog Refinement", StringComparison.CurrentCultureIgnoreCase))
-            {
-                return "Microsoft.VSTS.Common.BacklogPriority";
-            }
-            else
-            {
-                return "Microsoft.VSTS.Common.StackRank";
-            }
-        }
-        else
-        {
-            return row.Refname;
-        }
+        return WorkItemScriptRefnames.GetFullRefname(row.Refname, _processTemplateName);
     }
 
     private void PopulateBody(WorkItemScriptAction action, DateTime actionDate, WorkItemFieldOperationValueCollection body)
